@@ -65,21 +65,21 @@ Standardized commit messages create a **machine-parseable, auditable change hist
 - **Customizable prompt templates** — enforce your commit message policies, scoping rules, and formatting standards
 - **Pinned model versions** — no opaque model swaps by a cloud provider; you control what runs
 - **Centralized deployment** — oh-my-zsh-style installer enables org-wide rollout via internal repos
-- **Configuration hierarchy** — central defaults with per-developer overrides via `~/.AI Commitrc`
+- **Configuration hierarchy** — central defaults with per-developer overrides via `~/.aicommitrc`
 
 ---
 
 ## Quick Install
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/<user>/AI Commit/main/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/<user>/aicommit/main/install.sh)"
 ```
 
 Or clone manually:
 
 ```bash
-git clone https://github.com/<user>/AI Commit.git ~/.AI Commit
-~/.AI Commit/install.sh
+git clone https://github.com/<user>/aicommit.git ~/.aicommit
+~/.aicommit/install.sh
 ```
 
 ### Prerequisites
@@ -94,11 +94,11 @@ git clone https://github.com/<user>/AI Commit.git ~/.AI Commit
 
 ## Usage
 
-### `AI Commit` — Interactive Commit
+### `aicommit` — Interactive Commit
 
 ```bash
 git add -p                # Stage your changes
-AI Commit                  # Generate and review commit message
+aicommit                  # Generate and review commit message
 ```
 
 **Options:**
@@ -120,14 +120,14 @@ git add -p && aic         # Stage and auto-commit
 
 ## Configuration
 
-Edit `~/.AI Commitrc` to customize behavior:
+Edit `~/.aicommitrc` to customize behavior:
 
 ```bash
 # LLM model (must be available in Ollama)
 AI_MODEL="qwen2.5-coder:latest"
 
 # Custom prompt template
-AI_PROMPT_FILE="$HOME/.AI Commit/templates/prompt.txt"
+AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
 ```
 
 ---
@@ -162,7 +162,7 @@ AI_PROMPT_FILE="$HOME/.AI Commit/templates/prompt.txt"
 ## Uninstall
 
 ```bash
-~/.AI Commit/uninstall.sh
+~/.aicommit/uninstall.sh
 ```
 
 ---

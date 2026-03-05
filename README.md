@@ -1,6 +1,6 @@
 # aicommit
 
-**Zero-Trust, Privacy-First, Compliance-Ready AI Commit Message Generator**
+**Zero-Trust, Privacy-First, Compliance-Ready AI-Driven Git Tooling**
 
 Locally-executed, regulatory-aligned developer tooling that generates [Conventional Commits](https://www.conventionalcommits.org/) messages using an on-device LLM via [Ollama](https://ollama.ai/). Source code never crosses a trust boundary. No cloud APIs. No API keys. No data exfiltration surface. Full alignment with your organization's security, privacy, and governance posture.
 

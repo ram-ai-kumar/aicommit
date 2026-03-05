@@ -92,6 +92,72 @@ detect_upgrade_pattern() {
     fi
 }
 
+# Categorize staged files into structural layers.
+# Outputs a FILE CATEGORIES block used as context and for diff filtering.
+# Also writes asset filenames (newline-separated) to ${tmp_dir}/ASSET_FILES
+# so build_ai_context can exclude their diffs.
+categorize_staged_files() {
+    local staged_files="$1"
+    local tmp_dir="$2"
+
+    local source_files=() config_files=() doc_files=() infra_files=() test_files=() asset_files=()
+
+    while IFS= read -r file; do
+        [ -z "$file" ] && continue
+        case "$file" in
+            # Tests — matched before source to avoid false positives
+            tests/*|test/*|spec/*|__tests__/*|\
+            *.test.js|*.test.ts|*.spec.js|*.spec.ts|\
+            test_*.py|*_test.py|*_test.go)
+                test_files+=("$file") ;;
+            # IaC / CI/CD / migrations
+            *.tf|*.tfvars|\
+            .github/workflows/*|.gitlab-ci.yml|.circleci/*|Jenkinsfile|\
+            docker-compose*|Dockerfile*|\
+            k8s/*|kubernetes/*|helm/*|\
+            db/migrate/*|migrations/*|alembic/versions/*)
+                infra_files+=("$file") ;;
+            # Documentation
+            *.md|*.rst|\
+            docs/*|doc/*|\
+            README*|CHANGELOG*|CONTRIBUTING*|LICENSE*)
+                doc_files+=("$file") ;;
+            # Static assets — binary/visual, diffs excluded
+            *.svg|*.png|*.jpg|*.jpeg|*.gif|*.ico|*.fig|*.webp|\
+            *.mp4|*.mp3|*.woff|*.woff2|*.ttf|\
+            assets/*|static/*|public/images/*)
+                asset_files+=("$file") ;;
+            # Config / environment / lock files
+            *.env|*.env.*|\
+            *.yaml|*.yml|*.json|*.toml|*.cfg|*.ini|*.conf|\
+            config/*|.config/*|\
+            *.lock|*lock.json|*lock.yaml)
+                config_files+=("$file") ;;
+            # Functional source — catch-all
+            *)
+                source_files+=("$file") ;;
+        esac
+    done <<< "$staged_files"
+
+    # Write asset filenames for diff exclusion in build_ai_context
+    if [ -n "$tmp_dir" ]; then
+        printf '' > "${tmp_dir}/ASSET_FILES"
+        for f in "${asset_files[@]}"; do
+            printf '%s\n' "$f" >> "${tmp_dir}/ASSET_FILES"
+        done
+    fi
+
+    local output="=== FILE CATEGORIES ==="
+    [ ${#source_files[@]} -gt 0 ] && output="${output}\nFunctional Source:  $(IFS=', '; echo "${source_files[*]}")"
+    [ ${#config_files[@]} -gt 0 ] && output="${output}\nConfiguration:      $(IFS=', '; echo "${config_files[*]}")"
+    [ ${#doc_files[@]} -gt 0 ]    && output="${output}\nDocumentation:      $(IFS=', '; echo "${doc_files[*]}")"
+    [ ${#infra_files[@]} -gt 0 ]  && output="${output}\nInfrastructure/CI:  $(IFS=', '; echo "${infra_files[*]}")"
+    [ ${#test_files[@]} -gt 0 ]   && output="${output}\nTests:              $(IFS=', '; echo "${test_files[*]}")"
+    [ ${#asset_files[@]} -gt 0 ]  && output="${output}\nStatic Assets (diff excluded): $(IFS=', '; echo "${asset_files[*]}")"
+
+    printf '%b\n' "$output"
+}
+
 # Build enhanced context string from analysis results
 build_enhanced_context() {
     local staged_files="$1"

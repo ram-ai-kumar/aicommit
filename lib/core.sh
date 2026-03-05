@@ -92,6 +92,64 @@ ${file}: +${lines_added} -${lines_deleted} lines"
     printf '%s' "$total_files" > "${tmp_dir}/FILE_COUNT"
 }
 
+# Filter diff by tier and truncate per-file. Reads from stdin, writes to stdout.
+# Tier 1 (stat only)  — generated/binary/sensitive files: diff entirely excluded
+# Tier 2 (20-line cap) — low-signal files: tests, docs, markdown
+# Tier 3 (80-line cap) — full-signal files: source, config, migrations
+filter_and_truncate_diff() {
+    awk '
+    BEGIN { tier = 3; max_lines = 80; file_lines = 0 }
+    /^diff --git/ {
+        if (file_lines > max_lines && max_lines > 0)
+            printf "    ... (%d lines truncated)\n", (file_lines - max_lines)
+        file = $NF; sub(/^b\//, "", file)
+        file_lines = 0
+
+        # Tier 1 — stat only
+        if (file ~ /\.(lock|snap|pyc|class|map)$/ ||
+            file ~ /lock\.(json|yaml|toml)$/ ||
+            file ~ /\.(svg|png|jpg|jpeg|gif|ico|fig|webp|mp4|mp3|woff2?|ttf)$/ ||
+            file ~ /\.min\.(js|css)$/ ||
+            file ~ /_pb2\.py$/ || file ~ /\.pb\.go$/ ||
+            file ~ /^dist\// || file ~ /\/dist\// ||
+            file ~ /^build\// || file ~ /\/build\// ||
+            file ~ /^out\// || file ~ /\/out\// ||
+            file ~ /^\.next\// ||
+            file ~ /^coverage\// || file ~ /\/coverage\// ||
+            file ~ /^\.nyc_output\// ||
+            file ~ /\.env$/ || file ~ /\.env\./) {
+            tier = 1; max_lines = 0
+        }
+        # Tier 2 — low-signal, 20-line cap
+        else if (file ~ /^tests?\// || file ~ /\/tests?\// ||
+                 file ~ /^spec\// || file ~ /\/spec\// ||
+                 file ~ /^__tests__\// ||
+                 file ~ /\.(test|spec)\.(js|ts)$/ ||
+                 file ~ /^test_[^/]+\.py$/ || file ~ /\/test_[^/]+\.py$/ ||
+                 file ~ /_test\.(py|go)$/ ||
+                 file ~ /^docs?\// || file ~ /\/docs?\// ||
+                 file ~ /\.(md|rst)$/ ||
+                 file ~ /^README/ || file ~ /^CHANGELOG/ || file ~ /^CONTRIBUTING/) {
+            tier = 2; max_lines = 20
+        }
+        # Tier 3 — full signal, 80-line cap
+        else {
+            tier = 3; max_lines = 80
+        }
+        if (tier >= 2) print
+        next
+    }
+    {
+        file_lines++
+        if (tier >= 2 && file_lines <= max_lines) print
+    }
+    END {
+        if (file_lines > max_lines && max_lines > 0)
+            printf "    ... (%d lines truncated)\n", (file_lines - max_lines)
+    }
+    '
+}
+
 # Build AI context — writes CHANGES_CONTEXT to temp dir
 # Args: $1=diff, $2=staged_files, $3=numstat_data
 build_ai_context() {
@@ -118,44 +176,36 @@ build_ai_context() {
         return 1
     fi
 
-    local file_context change_stats enhanced_context
+    local file_context change_stats enhanced_context categories_context
     file_context=$(cat "${tmp_dir}/FILE_CONTEXT")
     change_stats=$(cat "${tmp_dir}/CHANGE_STATS")
     enhanced_context=$(build_enhanced_context "$staged_files" "$changes")
+    categories_context=$(categorize_staged_files "$staged_files" "$tmp_dir")
 
-    # Filter lock file diffs, keep meaningful changes (up to 800 lines)
-    local lock_file_patterns='\.lock$|lock\.json$|lock\.yaml$|lock\.toml$'
-    local lock_files=""
+    # Tier 1 patterns (stat only): generated, binary, sensitive — matches filter_and_truncate_diff tier 1
+    local stat_only_ext='\.lock$|lock\.(json|yaml|toml)$|\.snap$|\.pyc$|\.class$|\.map$|_pb2\.py$|\.pb\.go$'
+    local stat_only_assets='\.svg$|\.png$|\.jpg$|\.jpeg$|\.gif$|\.ico$|\.fig$|\.webp$|\.mp4$|\.mp3$|\.woff2?$|\.ttf$|\.min\.(js|css)$'
+    local stat_only_dirs='^(dist|build|out|\.next|coverage|\.nyc_output)/|/(dist|build|coverage)/'
+    local stat_only_env='\.env$|\.env\.'
+    local stat_only_patterns="${stat_only_ext}|${stat_only_assets}|${stat_only_env}"
+    local stat_only_files=""
 
     while IFS= read -r file; do
-        if [ -n "$file" ] && echo "$file" | grep -qE "$lock_file_patterns"; then
-            lock_files="${lock_files}${file}\n"
+        if [ -n "$file" ] && { echo "$file" | grep -qE "$stat_only_patterns" || echo "$file" | grep -qE "$stat_only_dirs"; }; then
+            stat_only_files="${stat_only_files}${file}\n"
         fi
     done <<< "$staged_files"
 
+    # Single-pass tiered filter: excludes tier-1 diffs, caps tier-2 at 20 lines, tier-3 at 80 lines
     local changes_summary
-    if [ -n "$lock_files" ]; then
-        changes_summary=$(echo "$changes" | awk '
-        /^diff --git/ {
-            skip = 0
-            file = $NF
-            sub(/^b\//, "", file)
-        }
-        file ~ /\.lock$/ || file ~ /lock\.json$/ || file ~ /lock\.yaml$/ || file ~ /lock\.toml$/ {
-            skip = 1
-        }
-        !skip { print }
-        ' | head -800)
-    else
-        changes_summary=$(echo "$changes" | head -800)
-    fi
+    changes_summary=$(echo "$changes" | filter_and_truncate_diff)
 
-    # Build lock file stats from numstat
-    local lock_stat=""
-    if [ -n "$lock_files" ]; then
-        lock_stat=$(printf '%b' "$lock_files" | sed '/^$/d' | while IFS= read -r lf; do
+    # Stat summary for tier-1 files (lets LLM infer dependency/asset changes without reading diff)
+    local stat_only_stat=""
+    if [ -n "$stat_only_files" ]; then
+        stat_only_stat=$(printf '%b' "$stat_only_files" | sed '/^$/d' | while IFS= read -r sf; do
             local stat_line
-            stat_line=$(echo "$numstat_data" | awk -v f="$lf" '$3 == f {printf "%s | +%s -%s\n", $3, $1, $2}')
+            stat_line=$(echo "$numstat_data" | awk -v f="$sf" '$3 == f {printf "%s | +%s -%s\n", $3, $1, $2}')
             [ -n "$stat_line" ] && echo "$stat_line"
         done)
     fi
@@ -166,8 +216,7 @@ build_ai_context() {
     local changes_context="=== REPOSITORY ===
 ${repo_name}
 
-=== STAGED FILES ===
-${file_context}
+${categories_context}
 
 === CHANGE STATISTICS ===
 ${change_stats}
@@ -177,11 +226,11 @@ ${enhanced_context}
 === CHANGES ===
 ${changes_summary}"
 
-    if [ -n "$lock_stat" ]; then
+    if [ -n "$stat_only_stat" ]; then
         changes_context="${changes_context}
 
-=== DEPENDENCY FILE CHANGES (stat only) ===
-${lock_stat}"
+=== OMITTED DIFFS — stat only (generated/binary/sensitive) ===
+${stat_only_stat}"
     fi
 
     # Add recent commit history for scope consistency
@@ -318,6 +367,7 @@ cleanup_aicommit_ephemeral() {
           "${tmp_dir}/CHANGE_STATS" \
           "${tmp_dir}/RESPONSE" \
           "${tmp_dir}/FILE_COUNT" \
+          "${tmp_dir}/ASSET_FILES" \
           "${tmp_dir}/OLLAMA_ERROR" > /dev/null 2>&1
 }
 

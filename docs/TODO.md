@@ -10,7 +10,7 @@ Upcoming improvements, organized by priority — high-impact items first, nice-t
 
 ---
 
-### 1. Temp File Security Hardening
+### 1. Temp File Security Hardening [DONE]
 
 **Area:** Security, Zero Trust posture
 

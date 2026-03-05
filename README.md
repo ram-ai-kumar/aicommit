@@ -72,13 +72,13 @@ Standardized commit messages create a **machine-parseable, auditable change hist
 ## Quick Install
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/<user>/aicommit/main/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ram-ai-kumar/aicommit/main/install.sh)"
 ```
 
 Or clone manually:
 
 ```bash
-git clone https://github.com/<user>/aicommit.git ~/.aicommit
+git clone https://github.com/ram-ai-kumar/aicommit.git ~/.aicommit
 ~/.aicommit/install.sh
 ```
 

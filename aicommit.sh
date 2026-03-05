@@ -57,9 +57,11 @@ aicommit() {
     done
 
     export AICOMMIT_MODE=true
-
     local tmp_dir
     tmp_dir=$(get_aicommit_tmp_dir)
+
+    # Clean up ephemeral files on exit (keeps FULL_PROMPT if it exists)
+    trap cleanup_aicommit_ephemeral EXIT
 
     # --regenerate: skip context building, re-run LLM on cached prompt
     if [ "$regenerate" = "true" ]; then
@@ -83,8 +85,8 @@ aicommit() {
         display_commit_confirmation
         read -r response
         case $response in
-            y|Y) process_commit "$commit_msg"; display_success ;;
-            e|E) git commit -e -m "$commit_msg" ;;
+            y|Y) process_commit "$commit_msg"; cleanup_aicommit_all; display_success ;;
+            e|E) git commit -e -m "$commit_msg"; cleanup_aicommit_all ;;
             *)   echo "❌ Cancelled" ;;
         esac
         return 0
@@ -147,8 +149,8 @@ aicommit() {
     read -r response
 
     case $response in
-        y|Y) process_commit "$commit_msg"; display_success ;;
-        e|E) git commit -e -m "$commit_msg" ;;
+        y|Y) process_commit "$commit_msg"; cleanup_aicommit_all; display_success ;;
+        e|E) git commit -e -m "$commit_msg"; cleanup_aicommit_all ;;
         *)   echo "❌ Cancelled" ;;
     esac
 }
@@ -156,6 +158,7 @@ aicommit() {
 # Quick AI commit — auto-commits without confirmation
 aic() {
     export AICOMMIT_MODE=true
+    trap cleanup_aicommit_ephemeral EXIT
 
     local changes staged_files numstat_data
     changes=$(git diff --staged)
@@ -191,5 +194,6 @@ aic() {
 
     display_commit_message "$commit_msg"
     process_commit "$commit_msg"
+    cleanup_aicommit_all
     display_success
 }

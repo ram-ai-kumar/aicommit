@@ -25,7 +25,7 @@ get_aicommit_tmp_dir() {
         export _AICOMMIT_REPO_NAME=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")
     fi
     local tmp_dir="/tmp/.aicommit/${_AICOMMIT_REPO_NAME}"
-    mkdir -p "$tmp_dir" > /dev/null 2>&1
+    mkdir -m 700 -p "$tmp_dir" > /dev/null 2>&1
     echo "$tmp_dir"
 }
 
@@ -37,6 +37,9 @@ build_file_context() {
     local numstat_data="$2"
     local tmp_dir
     tmp_dir=$(get_aicommit_tmp_dir)
+
+    # Restrict permissions for sensitive content
+    umask 077
 
     # Zero-out owned files before writing — never use stale content
     : > "${tmp_dir}/FILE_CONTEXT"
@@ -97,6 +100,9 @@ build_ai_context() {
     local numstat_data="$3"
     local tmp_dir
     tmp_dir=$(get_aicommit_tmp_dir)
+
+    # Restrict permissions for sensitive content
+    umask 077
 
     # Zero-out owned file before writing — never use stale content
     : > "${tmp_dir}/CHANGES_CONTEXT"
@@ -202,6 +208,9 @@ generate_commit_message() {
     local tmp_dir
     tmp_dir=$(get_aicommit_tmp_dir)
 
+    # Restrict permissions for sensitive content
+    umask 077
+
     local changes_file="${tmp_dir}/CHANGES_CONTEXT"
     local prompt_out="${tmp_dir}/FULL_PROMPT"
 
@@ -289,4 +298,23 @@ generate_commit_message() {
 process_commit() {
     local commit_msg="$1"
     echo "$commit_msg" | git commit -F -
+}
+
+# Cleanup ephemeral context files (keeps FULL_PROMPT for --regenerate)
+cleanup_aicommit_ephemeral() {
+    local tmp_dir
+    tmp_dir=$(get_aicommit_tmp_dir)
+    rm -f "${tmp_dir}/CHANGES_CONTEXT" \
+          "${tmp_dir}/FILE_CONTEXT" \
+          "${tmp_dir}/CHANGE_STATS" \
+          "${tmp_dir}/RESPONSE" \
+          "${tmp_dir}/FILE_COUNT" > /dev/null 2>&1
+}
+
+# Cleanup everything including the prompt
+cleanup_aicommit_all() {
+    cleanup_aicommit_ephemeral
+    local tmp_dir
+    tmp_dir=$(get_aicommit_tmp_dir)
+    rm -f "${tmp_dir}/FULL_PROMPT" > /dev/null 2>&1
 }

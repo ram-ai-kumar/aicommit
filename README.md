@@ -1,4 +1,4 @@
-# aicommit
+# AI Commit (`aicommit`)
 
 **Zero-Trust, Privacy-First, Compliance-Ready AI-Driven Git Tooling**
 
@@ -6,11 +6,11 @@ Locally-executed, regulatory-aligned developer tooling that generates [Conventio
 
 ---
 
-## Why aicommit?
+## Why AI Commit?
 
-Developer AI tools that send source code to cloud providers introduce risk at every level — data exposure, vendor lock-in, compliance burden, unpredictable costs. **aicommit eliminates all of it** by running the entire AI pipeline locally.
+Developer AI tools that send source code to cloud providers introduce risk at every level — data exposure, vendor lock-in, compliance burden, unpredictable costs. **AI Commit eliminates all of it** by running the entire AI pipeline locally.
 
-| Concern | aicommit |
+| Concern | AI Commit |
 |---------|----------|
 | Source code sent to third parties | **Never** — all inference is local |
 | API keys & credential management | **None required** |
@@ -22,7 +22,7 @@ Developer AI tools that send source code to cloud providers introduce risk at ev
 
 ## Zero Trust Architecture
 
-aicommit is designed around Zero Trust principles — no implicit trust in external services, every operation validated, data never crosses trust boundaries.
+AI Commit is designed around Zero Trust principles — no implicit trust in external services, every operation validated, data never crosses trust boundaries.
 
 | ZTA Principle | Implementation |
 |---------------|----------------|
@@ -52,7 +52,7 @@ Standardized commit messages create a **machine-parseable, auditable change hist
 
 ### Regulatory Alignment
 
-| Framework | Control | How aicommit Supports |
+| Framework | Control | How AI Commit Supports |
 |-----------|---------|-----------------------|
 | **SOC 2** | CC8.1 — Change Management | Structured, typed commit messages enforced org-wide |
 | **ISO 27001** | A.12.1.2 — Change Management | Standardized, traceable change documentation |
@@ -65,21 +65,21 @@ Standardized commit messages create a **machine-parseable, auditable change hist
 - **Customizable prompt templates** — enforce your commit message policies, scoping rules, and formatting standards
 - **Pinned model versions** — no opaque model swaps by a cloud provider; you control what runs
 - **Centralized deployment** — oh-my-zsh-style installer enables org-wide rollout via internal repos
-- **Configuration hierarchy** — central defaults with per-developer overrides via `~/.aicommitrc`
+- **Configuration hierarchy** — central defaults with per-developer overrides via `~/.AI Commitrc`
 
 ---
 
 ## Quick Install
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/<user>/aicommit/main/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/<user>/AI Commit/main/install.sh)"
 ```
 
 Or clone manually:
 
 ```bash
-git clone https://github.com/<user>/aicommit.git ~/.aicommit
-~/.aicommit/install.sh
+git clone https://github.com/<user>/AI Commit.git ~/.AI Commit
+~/.AI Commit/install.sh
 ```
 
 ### Prerequisites
@@ -94,11 +94,11 @@ git clone https://github.com/<user>/aicommit.git ~/.aicommit
 
 ## Usage
 
-### `aicommit` — Interactive Commit
+### `AI Commit` — Interactive Commit
 
 ```bash
 git add -p                # Stage your changes
-aicommit                  # Generate and review commit message
+AI Commit                  # Generate and review commit message
 ```
 
 **Options:**
@@ -120,14 +120,14 @@ git add -p && aic         # Stage and auto-commit
 
 ## Configuration
 
-Edit `~/.aicommitrc` to customize behavior:
+Edit `~/.AI Commitrc` to customize behavior:
 
 ```bash
 # LLM model (must be available in Ollama)
 AI_MODEL="qwen2.5-coder:latest"
 
 # Custom prompt template
-AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
+AI_PROMPT_FILE="$HOME/.AI Commit/templates/prompt.txt"
 ```
 
 ---
@@ -145,9 +145,9 @@ AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
 
 ---
 
-## Cloud AI Tools vs. aicommit
+## Cloud AI Tools vs. AI Commit
 
-| Risk Vector | Cloud AI Tools | aicommit |
+| Risk Vector | Cloud AI Tools | AI Commit |
 |-------------|----------------|----------|
 | Source code exposure to third party | ⚠️ Diffs sent to cloud API | ✅ None |
 | Vendor lock-in | ⚠️ Tied to provider API/pricing | ✅ Open source, swappable local models |
@@ -162,7 +162,7 @@ AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
 ## Uninstall
 
 ```bash
-~/.aicommit/uninstall.sh
+~/.AI Commit/uninstall.sh
 ```
 
 ---

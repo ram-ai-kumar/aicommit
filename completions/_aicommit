@@ -1,0 +1,12 @@
+#compdef aicommit
+
+# Zsh completion for aicommit
+_aicommit() {
+    _arguments \
+        '(-h --help)'{-h,--help}'[Show help message]' \
+        '(-d --dry-run)'{-d,--dry-run}'[Build context without calling LLM]' \
+        '(-v --verbose)'{-v,--verbose}'[Show temp file paths and enhanced context]' \
+        '(-r --regenerate)'{-r,--regenerate}'[Re-run LLM on cached prompt]'
+}
+
+_aicommit "$@"

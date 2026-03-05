@@ -261,7 +261,7 @@ generate_commit_message() {
         fi
     done
     wait "$ollama_pid"
-    printf "\r\033[K" > /dev/tty
+    printf "\n" > /dev/tty
 
     local commit_msg
     commit_msg=$(cat "$response_file" 2>/dev/null)

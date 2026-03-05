@@ -557,3 +557,22 @@ source "$AICOMMIT_DIR/lib/core.sh"
 | Startup time | ⚠️ Loads everything including completions | ✅ Loads only what's needed |
 | Maintainability | ✅ Single source path | ⚠️ Two source paths to keep in sync |
 | Impact magnitude | Minimal — completions overhead is negligible in bash | Low overall benefit |
+
+---
+
+### 19. Persistent Generation Progress Message
+
+**Area:** Developer experience, UI
+
+#### Current State
+The "Generating commit message... (X s)" line is cleared (using `\r\033[K`) before the generated commit message is printed. This removes the history of how long that specific generation took, which can be useful for debugging or monitoring LLM performance trends in real-time.
+
+#### Proposed Change
+Remove the clearing escape code (`\n` instead of `\r\033[K`) to allow the generation timer to persist in history, with the commit message appearing on the subsequent lines.
+
+#### Trade-off Assessment
+| Dimension | Before (now) | After |
+|-----------|--------------|-------|
+| UI Cleanliness | ✅ Clean, ephemeral status | ⚠️ Slightly more terminal noise |
+| Persistent history | ❌ Status disappears | ✅ Generation time recorded in log |
+| Ease of use | — | ✅ Trivial change |

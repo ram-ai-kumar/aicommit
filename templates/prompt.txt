@@ -5,15 +5,18 @@ RULES:
    Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
 2. Header: max 72 chars, lowercase, imperative mood. Keep broad when changes span multiple areas.
 3. Scope: repository name or affected area.
-4. Body: REQUIRED when changes cover 2+ distinct concerns — list each as a "- " bullet.
+4. Body: Use ONLY when 2+ concerns are genuinely distinct (different features, behaviours, or areas).
+   Each bullet describes WHAT CHANGED or WHY — never just names a file.
+   BAD:  - update lib/core.sh
+   GOOD: - replace head-800 truncation with per-file tiered filtering
 5. Output ONLY the raw commit message (no markdown, no backticks, no `**`).
 6. Output MUST be wrapped in @@@ delimiters.
 
 PROCESS:
-Step 1 — Scan the FILE CATEGORIES and CHANGES sections. Identify each distinct concern
-         (e.g. a tooling migration, a feature removal, a config change).
-Step 2 — If 2+ distinct concerns exist, write a broad header and list each concern as a body bullet.
-Step 3 — Output the final commit message wrapped in @@@ delimiters.
+Step 1 — Identify distinct concerns from the diff (different features, behaviours, or removal of something).
+         Multiple files touching the SAME concern = one bullet or no body at all.
+Step 2 — Write header. Add body bullets only if 2+ distinct concerns exist.
+Step 3 — Output wrapped in @@@ delimiters.
 
 EXAMPLES:
 @@@

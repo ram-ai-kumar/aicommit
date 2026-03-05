@@ -125,7 +125,7 @@ filter_and_truncate_diff() {
                  file ~ /^spec\// || file ~ /\/spec\// ||
                  file ~ /^__tests__\// ||
                  file ~ /\.(test|spec)\.(js|ts)$/ ||
-                 file ~ /^test_[^/]+\.py$/ || file ~ /\/test_[^/]+\.py$/ ||
+                 file ~ /test_.*\.py$/ ||
                  file ~ /_test\.(py|go)$/ ||
                  file ~ /^docs?\// || file ~ /\/docs?\// ||
                  file ~ /\.(md|rst)$/ ||

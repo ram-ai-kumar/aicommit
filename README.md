@@ -20,6 +20,24 @@ Developer AI tools that send source code to cloud providers introduce risk at ev
 
 ---
 
+## What You Get
+
+### Complete Change Attribution
+
+Most AI commit tools capture the dominant change and lose the rest. AI Commit identifies every distinct concern in a commit — a tooling migration, a feature removal, a security patch — and documents each one. Your change history reflects reality, not a summary of the loudest diff.
+
+This matters when a compliance audit, incident post-mortem, or code review requires a precise answer to *"what exactly changed and why?"*
+
+### Sensitive Files Stay Out of AI
+
+Environment variables, secrets, and credentials are excluded from AI analysis by design — even when staged. Generated artifacts, compiled outputs, and binary assets are similarly filtered. The AI sees only what is meaningful for understanding intent. Nothing more.
+
+### Noise-Free, Authoritative Audit Trail
+
+Conventional Commits enforced across every developer, every repository, every day. Machine-parseable commit history that feeds directly into changelog generation, release automation, and compliance reporting — without manual curation.
+
+---
+
 ## Zero Trust Architecture
 
 AI Commit is designed around Zero Trust principles — no implicit trust in external services, every operation validated, data never crosses trust boundaries.
@@ -39,6 +57,7 @@ AI Commit is designed around Zero Trust principles — no implicit trust in exte
 > **Core guarantee:** No source code, diff content, or intellectual property is ever transmitted outside the developer's machine.
 
 - **No network calls to AI services** — removes API interception, MITM, and token exfiltration attack surfaces
+- **Secrets excluded from AI analysis** — `.env` files and credentials are filtered before LLM input, by design
 - **No persistent storage of diffs** — temp files are ephemeral and repo-scoped
 - **Open source & fully auditable** — readable bash scripts; no compiled binaries, no obfuscated logic
 - **Clean lifecycle** — installer/uninstaller leave no orphaned files, configs, or hidden services
@@ -134,12 +153,12 @@ AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
 
 ## How It Works
 
-1. Reads staged `git diff` and file metadata
-2. Detects project type, change patterns, and upgrade signals
-3. Builds enhanced context with change statistics and recent commit history
-4. Assembles a prompt grounded in the Conventional Commits specification
-5. Sends to the **local** Ollama LLM for commit message generation
-6. Presents the message for review — or auto-commits with `aic`
+1. Reads staged changes and classifies every file by role — source, config, tests, infrastructure, documentation, assets
+2. Filters AI input intelligently: secrets and credentials excluded, generated artifacts reduced to statistics, test and documentation files summarized
+3. Identifies distinct change concerns across the diff — a feature addition, a tooling migration, a security removal — and preserves all of them
+4. Assembles a focused prompt grounded in the Conventional Commits specification
+5. Sends to the **local** Ollama LLM — never a remote server
+6. Presents the complete, multi-concern commit message for review — or auto-commits with `aic`
 
 > All processing happens on your machine. The LLM never sees your code from a remote server — it runs locally alongside your development environment.
 
@@ -150,9 +169,11 @@ AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
 | Risk Vector | Cloud AI Tools | AI Commit |
 |-------------|----------------|----------|
 | Source code exposure to third party | ⚠️ Diffs sent to cloud API | ✅ None |
+| Secrets in staged files exposed to AI | ⚠️ Sent as-is | ✅ Excluded by design |
 | Vendor lock-in | ⚠️ Tied to provider API/pricing | ✅ Open source, swappable local models |
 | API key management | ⚠️ Keys must be secured and rotated | ✅ No keys needed |
 | Compliance audit complexity | ⚠️ Must document data flows to vendor | ✅ Data never leaves the device |
+| Multi-change commit accuracy | ⚠️ Typically captures only dominant change | ✅ All distinct concerns documented |
 | Model behavior changes | ⚠️ Provider can change model silently | ✅ Pinned local model version |
 | Availability | ⚠️ Requires internet + vendor uptime | ✅ Works fully offline |
 | Cost | ⚠️ Per-seat or per-token pricing | ✅ Zero marginal cost |

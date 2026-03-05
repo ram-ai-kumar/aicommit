@@ -10,38 +10,7 @@ Upcoming improvements, organized by priority — high-impact items first, nice-t
 
 ---
 
-### 1. Temp File Security Hardening [DONE]
-
-**Area:** Security, Zero Trust posture
-
-#### Current State
-Context files (`CHANGES_CONTEXT`, `FULL_PROMPT`, `FILE_CONTEXT`, `CHANGE_STATS`) are written to `/tmp/.aicommit/<repo>/` with default `umask` permissions. On shared systems, other users can read these files — which contain **source code diffs, file lists, and the full LLM prompt**. This contradicts the Zero Trust claim that "source code never leaves the developer's machine."
-
-Additionally, temp files from previous runs persist indefinitely until manually cleaned or the machine reboots. Stale prompts from past work sessions remain on disk.
-
-#### Proposed Change
-1. **Restrict permissions** — create temp dirs with `700` and files with `600`:
-   ```bash
-   mkdir -p -m 700 "$tmp_dir"
-   umask 077  # before writing context files
-   ```
-2. **Auto-clean on exit** — add a trap to remove temp files after each run:
-   ```bash
-   trap 'rm -f "${tmp_dir}/FILE_CONTEXT" "${tmp_dir}/CHANGE_STATS"' EXIT
-   ```
-3. **Preserve FULL_PROMPT** only when `--regenerate` might be used; clean otherwise.
-
-#### Trade-off Assessment
-| Dimension | Before (now) | After |
-|-----------|--------------|-------|
-| Shared system risk | ❌ Diffs readable by other users | ✅ Owner-only access |
-| Disk hygiene | ❌ Stale context files persist | ✅ Auto-cleaned per session |
-| `--regenerate` compat | ✅ Always available | ⚠️ Must explicitly preserve prompt if needed |
-| ZTA narrative | ⚠️ Weakened by world-readable temp files | ✅ Fully defensible |
-
----
-
-### 2. LLM Timeout and Error Handling
+### 2. LLM Timeout and Error Handling [DONE]
 
 **Area:** Reliability, developer experience
 
@@ -115,6 +84,28 @@ Add a test suite using [BATS](https://github.com/bats-core/bats-core) (Bash Auto
 | Regression safety | ❌ None | ✅ Automated detection |
 | Compliance posture | ⚠️ "We test manually" | ✅ Auditable test evidence |
 | Contributor confidence | ❌ Fear of breaking things | ✅ Safe to refactor |
+
+---
+
+### 4. Installer / Uninstaller Improvements [PARTIAL]
+
+**Area:** Distribution, first-run experience, developer workflow
+
+#### Current State
+The project lacks a unified way to sync development changes to the local installation. Developers (including AI agents) have to manually `cp` files into `~/.aicommit/`.
+
+#### Proposed Change
+1. **Sync Script** — implemented `install.sh` to mirror repo content to `~/.aicommit` with proper permissions.
+2. **Global Installer** — (Planned) A script that detects Zsh/Bash and automatically adds the `source` line to `.zshrc` or `.bashrc`.
+3. **Uninstaller** — (Planned) A script to cleanly remove `~/.aicommit` and related config.
+
+#### Trade-off Assessment
+| Dimension | Before (now) | After |
+|-----------|--------------|-------|
+| Development speed | ❌ Manual sync | ✅ Automated sync |
+| First-run experience | ❌ No global install | ✅ Global install planned |
+| Cleanup | ❌ Manual removal | ✅ Uninstaller planned |
+| Complexity | ✅ Simple manual steps | ⚠️ More installer logic |
 
 ---
 

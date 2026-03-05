@@ -108,14 +108,19 @@ aicommit() {
         return 1
     fi
 
+    # Build context first (this creates FILE_COUNT safely)
+    build_ai_context "$changes" "$staged_files" "$numstat_data"
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
+
     local file_list file_count
-    file_list=$(echo "$staged_files" | tr '\n' ', ' | sed 's/,$//')
-    file_count=$(echo "$staged_files" | wc -l | tr -d ' ')
+    # Read count from temp file to avoid xtrace pollution in subshell capture
+    file_count=$(cat "${tmp_dir}/FILE_COUNT" 2>/dev/null || echo "0")
+    # Build list from staged_files safely
+    file_list=$(printf '%s' "$staged_files" | tr '\n' ', ' | sed 's/,$//')
 
     display_setup_info "$file_count" "$file_list"
-
-    # Build context
-    build_ai_context "$changes" "$staged_files" "$numstat_data"
     if [ $? -ne 0 ]; then
         return 1
     fi
@@ -174,12 +179,18 @@ aic() {
         return 1
     fi
 
-    local file_list file_count
-    file_list=$(echo "$staged_files" | tr '\n' ', ' | sed 's/,$//')
-    file_count=$(echo "$staged_files" | wc -l | tr -d ' ')
-    display_setup_info "$file_count" "$file_list"
-
+    # Build context first (this creates FILE_COUNT safely)
     build_ai_context "$changes" "$staged_files" "$numstat_data"
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
+
+    local file_list file_count
+    local tmp_dir
+    tmp_dir=$(get_aicommit_tmp_dir)
+    file_count=$(cat "${tmp_dir}/FILE_COUNT" 2>/dev/null || echo "0")
+    file_list=$(printf '%s' "$staged_files" | tr '\n' ', ' | sed 's/,$//')
+    display_setup_info "$file_count" "$file_list"
     if [ $? -ne 0 ]; then
         return 1
     fi

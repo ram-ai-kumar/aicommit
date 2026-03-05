@@ -161,7 +161,7 @@ build_ai_context() {
     fi
 
     local repo_name
-    repo_name=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")
+    repo_name="${_AICOMMIT_REPO_NAME:-unknown}"
 
     local changes_context="=== REPOSITORY ===
 ${repo_name}
@@ -217,6 +217,7 @@ generate_commit_message() {
     # Zero-out owned files before writing — never use stale content
     : > "${tmp_dir}/FULL_PROMPT"
     : > "${tmp_dir}/RESPONSE"
+    : > "${tmp_dir}/OLLAMA_ERROR"
 
     if [ ! -f "$changes_file" ] || [ ! -s "$changes_file" ]; then
         display_error "Context files not found or empty in $tmp_dir"
@@ -239,11 +240,13 @@ generate_commit_message() {
 
     # Run ollama in background to allow timeout and elapsed-time display
     local response_file="${tmp_dir}/RESPONSE"
-    ollama run "$model" < "$prompt_out" > "$response_file" 2>/dev/null &
+    local error_file="${tmp_dir}/OLLAMA_ERROR"
+    ollama run "$model" < "$prompt_out" > "$response_file" 2> "$error_file" &
     local ollama_pid=$!
 
     local elapsed=0
-    local timeout_secs=${AICOMMIT_TIMEOUT:-120}
+    # Prioritize AI_TIMEOUT as per TODO, fallback to AICOMMIT_TIMEOUT
+    local timeout_secs=${AI_TIMEOUT:-${AICOMMIT_TIMEOUT:-120}}
     printf "🧠 Generating commit message..." > /dev/tty
     while kill -0 "$ollama_pid" 2>/dev/null; do
         sleep 0.5
@@ -261,7 +264,13 @@ generate_commit_message() {
         fi
     done
     wait "$ollama_pid"
+    local exit_code=$?
     printf "\n" > /dev/tty
+
+    if [ $exit_code -ne 0 ]; then
+        display_error "Ollama generation failed (exit $exit_code)" "Check diagnostic log: $error_file"
+        return 1
+    fi
 
     local commit_msg
     commit_msg=$(cat "$response_file" 2>/dev/null)
@@ -308,7 +317,8 @@ cleanup_aicommit_ephemeral() {
           "${tmp_dir}/FILE_CONTEXT" \
           "${tmp_dir}/CHANGE_STATS" \
           "${tmp_dir}/RESPONSE" \
-          "${tmp_dir}/FILE_COUNT" > /dev/null 2>&1
+          "${tmp_dir}/FILE_COUNT" \
+          "${tmp_dir}/OLLAMA_ERROR" > /dev/null 2>&1
 }
 
 # Cleanup everything including the prompt

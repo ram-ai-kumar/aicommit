@@ -48,6 +48,12 @@ build_file_context() {
         file="${file//$'\r'/}"
         [ -z "$file" ] && continue
 
+        # Skip sensitive files from change statistics
+        if echo "$file" | grep -qE "\.env$|\.env\.|config\.ini|.*secrets.*|.*credentials.*|.*\.key|.*\.pem|.*\.p12"; then
+            total_files=$((total_files + 1))
+            continue
+        fi
+
         total_files=$((total_files + 1))
 
         local numstat_line lines_added lines_deleted file_ext file_type
@@ -87,7 +93,9 @@ ${file}: +${lines_added} -${lines_deleted} lines"
 # Tier 2 (20-line cap) — low-signal files: tests, docs, markdown
 # Tier 3 (80-line cap) — full-signal files: source, config, migrations
 filter_and_truncate_diff() {
-    awk '
+    local sensitive_pattern='\.env$|\.env\.|config\.ini|.*secrets.*|.*credentials.*|.*\.key|.*\.pem|.*\.p12'
+
+    awk -v sensitive="$sensitive_pattern" '
     BEGIN { tier = 3; max_lines = 80; file_lines = 0 }
     /^diff --git/ {
         if (file_lines > max_lines && max_lines > 0)
@@ -95,6 +103,10 @@ filter_and_truncate_diff() {
         file = $NF; sub(/^b\//, "", file)
         file_lines = 0
 
+        # Skip sensitive files entirely
+        if (file ~ sensitive) {
+            tier = 1; max_lines = 0
+        }
         # Tier 1 — stat only
         if (file ~ /\.(lock|snap|pyc|class|map)$/ ||
             file ~ /lock\.(json|yaml|toml)$/ ||
@@ -166,17 +178,25 @@ build_ai_context() {
         return 1
     fi
 
+    # Filter out sensitive files from staged_files before processing
+    local filtered_staged_files=""
+    while IFS= read -r file; do
+        if ! echo "$file" | grep -qE "\.env$|\.env\.|config\.ini|.*secrets.*|.*credentials.*|.*\.key|.*\.pem|.*\.p12"; then
+            filtered_staged_files="${filtered_staged_files}${file}\n"
+        fi
+    done <<< "$staged_files"
+
     local file_context change_stats enhanced_context categories_context
     file_context=$(cat "${tmp_dir}/FILE_CONTEXT")
     change_stats=$(cat "${tmp_dir}/CHANGE_STATS")
-    enhanced_context=$(build_enhanced_context "$staged_files" "$changes")
-    categories_context=$(categorize_staged_files "$staged_files" "$tmp_dir")
+    enhanced_context=$(build_enhanced_context "$filtered_staged_files" "$changes")
+    categories_context=$(categorize_staged_files "$filtered_staged_files" "$tmp_dir")
 
     # Tier 1 patterns (stat only): generated, binary, sensitive — matches filter_and_truncate_diff tier 1
     local stat_only_ext='\.lock$|lock\.(json|yaml|toml)$|\.snap$|\.pyc$|\.class$|\.map$|_pb2\.py$|\.pb\.go$'
     local stat_only_assets='\.svg$|\.png$|\.jpg$|\.jpeg$|\.gif$|\.ico$|\.fig$|\.webp$|\.mp4$|\.mp3$|\.woff2?$|\.ttf$|\.min\.(js|css)$'
     local stat_only_dirs='^(dist|build|out|\.next|coverage|\.nyc_output)/|/(dist|build|coverage)/'
-    local stat_only_env='\.env$|\.env\.'
+    local stat_only_env='\.env$|\.env\.|config\.ini|.*secrets.*|.*credentials.*|.*\.key|.*\.pem|.*\.p12'
     local stat_only_patterns="${stat_only_ext}|${stat_only_assets}|${stat_only_env}"
     local stat_only_files=""
 

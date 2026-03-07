@@ -10,34 +10,7 @@ Upcoming improvements, organized by priority — high-impact items first, nice-t
 
 ---
 
-### 2. Test Suite
-
-**Area:** Quality assurance, compliance
-
-#### Current State
-
-No automated tests exist. Changes are verified manually. This makes regression detection impossible and weakens the compliance narrative (auditors expect tested software).
-
-#### Proposed Change
-
-Add a test suite using [BATS](https://github.com/bats-core/bats-core) (Bash Automated Testing System):
-
-- Unit tests for each `lib/` module (project type detection, prompt assembly)
-- Integration tests for the full `aicommit` → `generate_commit_message` pipeline (mocked Ollama)
-- CI workflow to run tests on every push
-
-#### Trade-off Assessment
-
-| Dimension              | Before (now)              | After                                     |
-| ---------------------- | ------------------------- | ----------------------------------------- |
-| Development speed      | ✅ No test overhead        | ⚠️ Tests must be maintained alongside code |
-| Regression safety      | ❌ None                    | ✅ Automated detection                     |
-| Compliance posture     | ⚠️ "We test manually"      | ✅ Auditable test evidence                 |
-| Contributor confidence | ❌ Fear of breaking things | ✅ Safe to refactor                        |
-
----
-
-### 3. Installer / Uninstaller Improvements [PARTIAL]
+### 2. Installer / Uninstaller Improvements [PARTIAL]
 
 **Area:** Distribution, first-run experience, developer workflow
 
@@ -62,7 +35,7 @@ The project lacks a unified way to sync development changes to the local install
 
 ---
 
-### 4. Publish-Ready Installer
+### 3. Publish-Ready Installer
 
 **Area:** Distribution readiness
 
@@ -87,7 +60,7 @@ REPO_URL="${AICOMMIT_REPO:-https://github.com/actual-user/aicommit.git}"
 
 ---
 
-### 5. Guided Ollama Onboarding in Installer
+### 4. Guided Ollama Onboarding in Installer
 
 **Area:** Developer experience, zero-friction adoption
 
@@ -127,7 +100,7 @@ Enhance `install.sh` with a guided, non-invasive onboarding flow:
 
 ---
 
-### 6. Install/Uninstall Path Validation — Guard Against Destructive `rm -rf`
+### 5. Install/Uninstall Path Validation — Guard Against Destructive `rm -rf`
 
 **Area:** Security, safety
 
@@ -171,7 +144,7 @@ validate_install_path() {
 
 ---
 
-### 7. Supply Chain Integrity Verification
+### 6. Supply Chain Integrity Verification
 
 **Area:** Security, trust
 
@@ -209,7 +182,7 @@ The documented install method (`sh -c "$(curl -fsSL ...)"`) is a known supply ch
 
 ---
 
-### 8. Prompt Injection Defense
+### 7. Prompt Injection Defense
 
 **Area:** Security, LLM safety
 
@@ -254,7 +227,7 @@ The LLM would see this as part of the prompt and could be tricked into generatin
 
 ---
 
-### 9. Sanitize Repo Name in Temp File Paths
+### 8. Sanitize Repo Name in Temp File Paths
 
 **Area:** Security, robustness
 
@@ -291,7 +264,7 @@ get_aicommit_tmp_dir() {
 
 ---
 
-### 10. Fix `umask 077` Session Pollution
+### 9. Fix `umask 077` Session Pollution
 
 **Area:** Security, shell correctness
 
@@ -327,7 +300,7 @@ Apply this pattern in both `build_file_context()` and `generate_commit_message()
 
 ---
 
-### 11. Robust Ollama Process Detection
+### 10. Robust Ollama Process Detection
 
 **Area:** Reliability
 
@@ -363,7 +336,7 @@ This is authoritative — if the API responds, Ollama is ready; if not, it isn't
 
 ---
 
-### 12. Deduplicate `aicommit()` and `aic()` Pipeline
+### 11. Deduplicate `aicommit()` and `aic()` Pipeline
 
 **Area:** Code quality, maintainability
 
@@ -390,7 +363,7 @@ aic()      { _aicommit_pipeline --auto "$@"; }
 
 ---
 
-### 13. Bash Shell Support in Installer
+### 12. Bash Shell Support in Installer
 
 **Area:** Adoption reach, portability
 
@@ -421,7 +394,7 @@ fi
 
 ---
 
-### 14. Multi-Scope Commit Detection and Warning
+### 13. Multi-Scope Commit Detection and Warning
 
 **Area:** Commit quality, governance
 
@@ -455,7 +428,7 @@ Don't block — just warn. The user decides.
 
 ---
 
-### 15. Fix Model Name Validation to Use Literal Grep
+### 14. Fix Model Name Validation to Use Literal Grep
 
 **Area:** Security, correctness
 
@@ -487,7 +460,7 @@ ollama list 2>/dev/null | grep -qF "$model"
 
 ---
 
-### 16. Add `set -o pipefail` to bin Wrappers
+### 15. Add `set -o pipefail` to bin Wrappers
 
 **Area:** Reliability, shell correctness
 
@@ -513,7 +486,7 @@ set -eo pipefail
 
 ---
 
-### 17. Add `set -u` to Catch Undefined Variables
+### 16. Add `set -u` to Catch Undefined Variables
 
 **Area:** Reliability, correctness
 
@@ -540,7 +513,7 @@ local model="${AI_MODEL:-qwen2.5-coder:latest}"  # already done — this pattern
 
 ---
 
-### 18. Exclude `.env` Filenames from LLM Prompt
+### 17. Exclude `.env` Filenames from LLM Prompt
 
 **Area:** Security, information disclosure
 
@@ -570,7 +543,7 @@ Configuration (sensitive, names redacted): 2 .env files
 
 ---
 
-### 19. Configurable Diff Context Cap
+### 18. Configurable Diff Context Cap
 
 **Area:** Flexibility, large-repo support
 
@@ -606,7 +579,7 @@ With guidance in `.aicommitrc`:
 
 ---
 
-### 20. Expand File Type Detection
+### 19. Expand File Type Detection
 
 **Area:** Context quality
 
@@ -661,7 +634,7 @@ esac
 
 ---
 
-### 21. Prune Unused Reference File
+### 20. Prune Unused Reference File
 
 **Area:** Codebase hygiene
 
@@ -686,7 +659,7 @@ Either:
 
 ---
 
-### 22. Optimize `bin/` Wrapper Startup
+### 21. Optimize `bin/` Wrapper Startup
 
 **Area:** Performance, developer experience
 
@@ -715,7 +688,7 @@ source "$AICOMMIT_DIR/lib/core.sh"
 
 ---
 
-### 19. Remove Dead `display_setup_info` Return Check
+### 22. Remove Dead `display_setup_info` Return Check
 
 **Area:** Code quality
 
@@ -747,7 +720,7 @@ display_setup_info "$file_count" "$file_list"
 
 ---
 
-### 20. Fix Misleading `elapsed` Counter Variable
+### 23. Fix Misleading `elapsed` Counter Variable
 
 **Area:** Code clarity
 
@@ -778,7 +751,7 @@ if [ "$elapsed_tenths" -ge $((timeout_secs * 10)) ]; then
 
 ---
 
-### 21. Document `~/.aicommitrc` as Arbitrary Code Execution
+### 24. Document `~/.aicommitrc` as Arbitrary Code Execution
 
 **Area:** Security documentation, user awareness
 

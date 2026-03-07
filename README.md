@@ -2,7 +2,7 @@
 
 ## Zero-Trust, Privacy-First, Compliance-Ready AI-Driven Git Tooling
 
-Locally-executed, regulatory-aligned developer tooling that generates [Conventional Commits](https://www.conventionalcommits.org/) messages using an on-device LLM via [Ollama](https://ollama.ai/). Source code never crosses a trust boundary. No cloud APIs. No API keys. No data exfiltration surface. Full alignment with your organization's security, privacy, and governance posture.
+Locally-executed, regulatory-aligned developer tooling that generates [Conventional Commits](https://www.conventionalcommits.org/) messages using a pluggable on-device LLM runtime. Source code never crosses a trust boundary. No cloud APIs. No API keys. No data exfiltration surface. Full alignment with your organization's security, privacy, and governance posture.
 
 ---
 
@@ -83,8 +83,10 @@ Standardized commit messages create a **machine-parseable, auditable change hist
 
 - **Customizable prompt templates** — enforce your commit message policies, scoping rules, and formatting standards
 - **Pinned model versions** — no opaque model swaps by a cloud provider; you control what runs
+- **Swappable LLM backend** — configure Ollama, llama.cpp, or LocalAI via a single `AI_BACKEND` variable; no pipeline changes required
 - **Centralized deployment** — oh-my-zsh-style installer enables org-wide rollout via internal repos
 - **Configuration hierarchy** — central defaults with per-developer overrides via `~/.aicommitrc`
+- **Verified by automated test suite** — 8 test categories covering unit, security, compliance, exception, and integration scenarios; CI runs on every commit
 
 ---
 
@@ -103,7 +105,7 @@ git clone https://github.com/ram-ai-kumar/aicommit.git ~/.aicommit
 
 ### Prerequisites
 
-- **[Ollama](https://ollama.ai/)** — local LLM runtime
+- **[Ollama](https://ollama.ai/)** — local LLM runtime (default backend; `llamacpp` and `localai` are supported via `AI_BACKEND` — see Configuration)
 - **qwen2.5-coder** model (or configure a different model):
 
 ```bash
@@ -165,10 +167,10 @@ AI_TIMEOUT=120
 2. Filters AI input intelligently: secrets and credentials excluded, generated artifacts reduced to statistics, test and documentation files summarized
 3. Identifies distinct change concerns across the diff — a feature addition, a tooling migration, a security removal — and preserves all of them
 4. Assembles a focused prompt grounded in the Conventional Commits specification
-5. Sends to the **local** Ollama LLM with configurable timeout (default 120s) — never a remote server
+5. Sends to the **local** LLM backend (Ollama by default; `llamacpp` and `localai` also supported) with configurable timeout — never a remote server
 6. Presents the complete, multi-concern commit message for review — or auto-commits with `aic`
 
-> All processing happens on your machine. The LLM never sees your code from a remote server — it runs locally alongside your development environment.
+> All processing happens on your machine. The LLM never sees your code from a remote server — it runs locally alongside your development environment. The backend is swappable without changing any other part of the pipeline.
 
 ---
 
@@ -193,6 +195,72 @@ AI_TIMEOUT=120
 ```bash
 ~/.aicommit/uninstall.sh
 ```
+
+---
+
+## Testing
+
+aicommit ships a verified test suite using [BATS](https://github.com/bats-core/bats-core) (Bash Automated Testing System) covering all 28 functions across 4 library modules. Test coverage spans 8 categories — from unit and security to compliance and integration — providing auditable evidence of correct behavior. CI runs on every push and pull request.
+
+### Running Tests
+
+```bash
+# Run the full suite with progress output (recommended)
+bats --formatter pretty test/unit/ test/contexts/
+
+# Run a specific category
+bats --formatter pretty test/unit/
+bats --formatter pretty test/contexts/security.bats
+
+# Run via the test runner (includes security scan and reporting)
+./test/run_tests.sh
+
+# Run specific category via test runner
+./test/run_tests.sh unit
+./test/run_tests.sh security
+
+# Clean up test artifacts
+./test/run_tests.sh --clean
+```
+
+### Test Categories
+
+- **Smoke Tests**: Basic workflow functionality and installation verification
+- **Unit Tests**: Individual function and component testing
+- **Negative Tests**: Error conditions and failure scenarios
+- **Edge Tests**: Boundary conditions and extreme inputs
+- **Security Tests**: Zero Trust Architecture principles and data leakage prevention
+- **Exception Tests**: Circuit breaker patterns and timeout handling
+- **Compliance Tests**: Audit trail and governance requirements
+- **Integration Tests**: End-to-end workflow validation
+
+### Circuit Breakers
+
+The system includes circuit breaker patterns to handle non-responsive processes:
+
+- **Git Operations**: Timeout after 30s (configurable via `AI_GIT_TIMEOUT`)
+- **LLM Backend**: Timeout after `AI_TIMEOUT` + 60s grace period
+- **File System**: Timeout after 10s (configurable via `AI_FILESYSTEM_TIMEOUT`)
+- **Network**: Timeout after 15s (configurable via `AI_NETWORK_TIMEOUT`)
+
+### Security Testing
+
+The test suite verifies Zero Trust Architecture principles:
+
+- ✅ **Never Trust, Always Verify**: All external inputs validated
+- ✅ **Assume Breach**: No data leaves system without verification
+- ✅ **Least Privilege**: Minimal permissions, no escalation
+- ✅ **Micro-segmentation**: Isolated temp directories per repo
+- ✅ **No Implicit Trust**: Backend validation before use
+
+### CI/CD Integration
+
+Automated testing runs on every push and pull request via `.github/workflows/test.yml`:
+
+- Multi-shell testing (bash, zsh)
+- Comprehensive test coverage reporting
+- Security scanning for hardcoded secrets
+- Test artifacts preserved on failure for forensic review; auto-cleaned on green
 
 ---
 

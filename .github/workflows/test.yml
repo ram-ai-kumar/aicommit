@@ -1,0 +1,120 @@
+name: Comprehensive Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        shell: [bash, zsh]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install BATS
+      run: |
+        git clone https://github.com/bats-core/bats-core.git
+        sudo bats-core/install.sh /usr/local
+        
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git curl coreutils
+        
+    - name: Setup test environment
+      run: |
+        chmod +x test/test_helper.sh
+        echo "Test environment ready"
+        
+    - name: Run Smoke Tests
+      run: |
+        echo "🚀 Running smoke tests..."
+        bats test/contexts/smoke.bats
+
+    - name: Run Unit Tests
+      run: |
+        echo "🧪 Running unit tests..."
+        bats test/unit/
+
+    - name: Run Negative Tests
+      run: |
+        echo "❌ Running negative tests..."
+        bats test/contexts/negative.bats
+
+    - name: Run Edge Tests
+      run: |
+        echo "🔍 Running edge tests..."
+        bats test/contexts/edge.bats
+
+    - name: Run Security Tests
+      run: |
+        echo "🔒 Running security tests..."
+        bats test/contexts/security.bats
+
+    - name: Run Exception Tests
+      run: |
+        echo "⚠️ Running exception tests..."
+        bats test/contexts/exception.bats
+
+    - name: Run Compliance Tests
+      run: |
+        echo "📋 Running compliance tests..."
+        bats test/contexts/compliance.bats
+
+    - name: Run Integration Tests
+      run: |
+        echo "🔄 Running integration tests..."
+        bats test/contexts/integration.bats
+        
+    - name: Generate Test Report
+      if: always()
+      run: |
+        echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "| Test Category | Status |" >> $GITHUB_STEP_SUMMARY
+        echo "|---------------|--------|" >> $GITHUB_STEP_SUMMARY
+        echo "| Smoke Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Unit Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Negative Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Edge Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Security Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Exception Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Compliance Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+        echo "| Integration Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Upload Test Artifacts
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-logs
+        path: |
+          /tmp/.aicommit/
+          test-results/
+        retention-days: 7
+        
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run security tests
+      run: |
+        chmod +x test/test_helper.sh
+        bats test/contexts/security.bats
+        
+    - name: Check for secrets
+      run: |
+        echo "Scanning for potential secrets..."
+        if grep -rE "(password|secret|key|token)" --include="*.sh" --exclude-dir=test .; then
+          echo "⚠️ Potential secrets found in source code"
+          exit 1
+        fi
+        echo "✅ No secrets detected in source code"

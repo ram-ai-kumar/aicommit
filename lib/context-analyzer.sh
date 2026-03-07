@@ -127,12 +127,16 @@ categorize_staged_files() {
             *.mp4|*.mp3|*.woff|*.woff2|*.ttf|\
             assets/*|static/*|public/images/*)
                 asset_files+=("$file") ;;
-            # Config / environment / lock files
-            *.env|*.env.*|\
-            *.yaml|*.yml|*.json|*.toml|*.cfg|*.ini|*.conf|\
+            # Config / environment / lock files (exclude .env and sensitive configs from prompt)
+            *.yaml|*.yml|*.json|*.toml|*.conf|\
             config/*|.config/*|\
             *.lock|*lock.json|*lock.yaml)
                 config_files+=("$file") ;;
+            # Sensitive files - exclude from prompt entirely
+            *.env|*.env.*|\
+            config.ini|*secrets.*|*credentials.*|*.key|*.pem|*.p12)
+                # Don't add to any category - exclude from prompt
+                ;;
             # Functional source — catch-all
             *)
                 source_files+=("$file") ;;

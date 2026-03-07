@@ -1,6 +1,6 @@
 # AI Commit (`aicommit`)
 
-**Zero-Trust, Privacy-First, Compliance-Ready AI-Driven Git Tooling**
+## Zero-Trust, Privacy-First, Compliance-Ready AI-Driven Git Tooling
 
 Locally-executed, regulatory-aligned developer tooling that generates [Conventional Commits](https://www.conventionalcommits.org/) messages using an on-device LLM via [Ollama](https://ollama.ai/). Source code never crosses a trust boundary. No cloud APIs. No API keys. No data exfiltration surface. Full alignment with your organization's security, privacy, and governance posture.
 
@@ -10,13 +10,13 @@ Locally-executed, regulatory-aligned developer tooling that generates [Conventio
 
 Developer AI tools that send source code to cloud providers introduce risk at every level — data exposure, vendor lock-in, compliance burden, unpredictable costs. **AI Commit eliminates all of it** by running the entire AI pipeline locally.
 
-| Concern | AI Commit |
-|---------|----------|
-| Source code sent to third parties | **Never** — all inference is local |
-| API keys & credential management | **None required** |
-| Telemetry / analytics / phone-home | **Zero** |
-| Internet dependency | **Works fully offline** |
-| Per-seat or per-token cost | **None** — runs on hardware you own |
+| Concern                            | AI Commit                           |
+| ---------------------------------- | ----------------------------------- |
+| Source code sent to third parties  | **Never** — all inference is local  |
+| API keys & credential management   | **None required**                   |
+| Telemetry / analytics / phone-home | **Zero**                            |
+| Internet dependency                | **Works fully offline**             |
+| Per-seat or per-token cost         | **None** — runs on hardware you own |
 
 ---
 
@@ -42,13 +42,13 @@ Conventional Commits enforced across every developer, every repository, every da
 
 AI Commit is designed around Zero Trust principles — no implicit trust in external services, every operation validated, data never crosses trust boundaries.
 
-| ZTA Principle | Implementation |
-|---------------|----------------|
-| **Never trust, always verify** | Validates LLM runtime and model availability before every invocation |
-| **Assume breach** | Source code never leaves the device — no outbound channel to intercept |
-| **Least privilege** | Read-only access to `git diff` output; no elevated permissions required |
-| **Micro-segmentation** | Temp files scoped per-repository in isolated directories |
-| **No implicit trust in external services** | Locally-hosted LLM only — zero cloud AI provider dependency |
+| ZTA Principle                              | Implementation                                                          |
+| ------------------------------------------ | ----------------------------------------------------------------------- |
+| **Never trust, always verify**             | Validates LLM runtime and model availability before every invocation    |
+| **Assume breach**                          | Source code never leaves the device — no outbound channel to intercept  |
+| **Least privilege**                        | Read-only access to `git diff` output; no elevated permissions required |
+| **Micro-segmentation**                     | Temp files scoped per-repository in isolated directories                |
+| **No implicit trust in external services** | Locally-hosted LLM only — zero cloud AI provider dependency             |
 
 ---
 
@@ -71,12 +71,12 @@ Standardized commit messages create a **machine-parseable, auditable change hist
 
 ### Regulatory Alignment
 
-| Framework | Control | How AI Commit Supports |
-|-----------|---------|-----------------------|
-| **SOC 2** | CC8.1 — Change Management | Structured, typed commit messages enforced org-wide |
-| **ISO 27001** | A.12.1.2 — Change Management | Standardized, traceable change documentation |
-| **GDPR** | Art. 25 — Data Protection by Design | No code/personal data leaves the device |
-| **HIPAA** | § 164.312 — Technical Safeguards | Zero data transmission to external AI services |
+| Framework       | Control                             | How AI Commit Supports                                 |
+| --------------- | ----------------------------------- | ------------------------------------------------------ |
+| **SOC 2**       | CC8.1 — Change Management           | Structured, typed commit messages enforced org-wide    |
+| **ISO 27001**   | A.12.1.2 — Change Management        | Standardized, traceable change documentation           |
+| **GDPR**        | Art. 25 — Data Protection by Design | No code/personal data leaves the device                |
+| **HIPAA**       | § 164.312 — Technical Safeguards    | Zero data transmission to external AI services         |
 | **NIST 800-53** | CM-3 — Configuration Change Control | Conventional Commits provide structured change records |
 
 ### Organizational Controls
@@ -105,9 +105,10 @@ git clone https://github.com/ram-ai-kumar/aicommit.git ~/.aicommit
 
 - **[Ollama](https://ollama.ai/)** — local LLM runtime
 - **qwen2.5-coder** model (or configure a different model):
-  ```bash
-  ollama pull qwen2.5-coder:latest
-  ```
+
+```bash
+ollama pull qwen2.5-coder:latest
+```
 
 ---
 
@@ -122,12 +123,12 @@ aicommit                  # Generate and review commit message
 
 **Options:**
 
-| Flag | Description |
-|------|-------------|
-| `--help`, `-h` | Show usage |
-| `--dry-run`, `-d` | Build prompt without calling LLM |
-| `--verbose`, `-v` | Show temp file paths |
-| `--regenerate`, `-r` | Re-run LLM on cached prompt |
+| Flag                 | Description                      |
+| -------------------- | -------------------------------- |
+| `--help`, `-h`       | Show usage                       |
+| `--dry-run`, `-d`    | Build prompt without calling LLM |
+| `--verbose`, `-v`    | Show temp file paths             |
+| `--regenerate`, `-r` | Re-run LLM on cached prompt      |
 
 ### `aic` — Quick Auto-Commit
 
@@ -147,6 +148,10 @@ AI_MODEL="qwen2.5-coder:latest"
 
 # Custom prompt template
 AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
+
+# Timeout for LLM inference (seconds)
+# Increase for large models or slow hardware
+AI_TIMEOUT=120
 ```
 
 ---
@@ -157,7 +162,7 @@ AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
 2. Filters AI input intelligently: secrets and credentials excluded, generated artifacts reduced to statistics, test and documentation files summarized
 3. Identifies distinct change concerns across the diff — a feature addition, a tooling migration, a security removal — and preserves all of them
 4. Assembles a focused prompt grounded in the Conventional Commits specification
-5. Sends to the **local** Ollama LLM — never a remote server
+5. Sends to the **local** Ollama LLM with configurable timeout (default 120s) — never a remote server
 6. Presents the complete, multi-concern commit message for review — or auto-commits with `aic`
 
 > All processing happens on your machine. The LLM never sees your code from a remote server — it runs locally alongside your development environment.
@@ -166,17 +171,17 @@ AI_PROMPT_FILE="$HOME/.aicommit/templates/prompt.txt"
 
 ## Cloud AI Tools vs. AI Commit
 
-| Risk Vector | Cloud AI Tools | AI Commit |
-|-------------|----------------|----------|
-| Source code exposure to third party | ⚠️ Diffs sent to cloud API | ✅ None |
-| Secrets in staged files exposed to AI | ⚠️ Sent as-is | ✅ Excluded by design |
-| Vendor lock-in | ⚠️ Tied to provider API/pricing | ✅ Open source, swappable local models |
-| API key management | ⚠️ Keys must be secured and rotated | ✅ No keys needed |
-| Compliance audit complexity | ⚠️ Must document data flows to vendor | ✅ Data never leaves the device |
-| Multi-change commit accuracy | ⚠️ Typically captures only dominant change | ✅ All distinct concerns documented |
-| Model behavior changes | ⚠️ Provider can change model silently | ✅ Pinned local model version |
-| Availability | ⚠️ Requires internet + vendor uptime | ✅ Works fully offline |
-| Cost | ⚠️ Per-seat or per-token pricing | ✅ Zero marginal cost |
+| Risk Vector                           | Cloud AI Tools                            | AI Commit                             |
+| ------------------------------------- | ----------------------------------------- | ------------------------------------- |
+| Source code exposure to third party   | ⚠️ Diffs sent to cloud API                 | ✅ None                                |
+| Secrets in staged files exposed to AI | ⚠️ Sent as-is                              | ✅ Excluded by design                  |
+| Vendor lock-in                        | ⚠️ Tied to provider API/pricing            | ✅ Open source, swappable local models |
+| API key management                    | ⚠️ Keys must be secured and rotated        | ✅ No keys needed                      |
+| Compliance audit complexity           | ⚠️ Must document data flows to vendor      | ✅ Data never leaves the device        |
+| Multi-change commit accuracy          | ⚠️ Typically captures only dominant change | ✅ All distinct concerns documented    |
+| Model behavior changes                | ⚠️ Provider can change model silently      | ✅ Pinned local model version          |
+| Availability                          | ⚠️ Requires internet + vendor uptime       | ✅ Works fully offline                 |
+| Cost                                  | ⚠️ Per-seat or per-token pricing           | ✅ Zero marginal cost                  |
 
 ---
 

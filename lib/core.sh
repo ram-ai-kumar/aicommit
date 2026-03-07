@@ -294,8 +294,7 @@ generate_commit_message() {
     local ollama_pid=$!
 
     local elapsed=0
-    # Prioritize AI_TIMEOUT as per TODO, fallback to AICOMMIT_TIMEOUT
-    local timeout_secs=${AI_TIMEOUT:-${AICOMMIT_TIMEOUT:-120}}
+    local timeout_secs=${AI_TIMEOUT:-120}
     printf "🧠 Generating commit message..." > /dev/tty
     while kill -0 "$ollama_pid" 2>/dev/null; do
         sleep 0.5

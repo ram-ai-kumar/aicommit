@@ -10,44 +10,7 @@ Upcoming improvements, organized by priority — high-impact items first, nice-t
 
 ---
 
-### 2. LLM Timeout and Error Handling
-
-**Area:** Reliability, developer experience
-
-#### Current State
-
-`ollama run` is called with no timeout. If Ollama hangs, is overloaded, or the model is large, aicommit blocks indefinitely with a static "🧠 Generating commit message..." spinner. There's no way to cancel gracefully, no retry logic, and `stderr` is silenced (`2>/dev/null`), hiding useful diagnostic output.
-
-#### Proposed Change
-
-1. **Add a timeout** — wrap the Ollama call with a configurable timeout:
-
-   ```bash
-   AI_TIMEOUT="${AI_TIMEOUT:-120}"  # seconds, configurable
-   timeout "$AI_TIMEOUT" ollama run "$model" < "$prompt_out"
-   ```
-
-2. **Handle timeout gracefully** — on timeout, show a clear message:
-
-   ```bash
-   ❌ LLM timed out after 120s
-   🔍 Try: reduce diff size, use a smaller model, or increase AI_TIMEOUT
-   ```
-
-3. **Capture stderr** — log Ollama errors to temp dir instead of discarding them.
-
-#### Trade-off Assessment
-
-| Dimension     | Before (now)       | After                            |
-| ------------- | ------------------ | -------------------------------- |
-| Hang recovery | ❌ Blocks forever  | ✅ Fails cleanly after timeout   |
-| Diagnostics   | ❌ stderr silenced | ✅ Errors captured and surfaced  |
-| Configuration | —                  | ✅ `AI_TIMEOUT` in `.aicommitrc` |
-| Complexity    | ✅ One line        | ⚠️ More error-handling logic     |
-
----
-
-### 3. LLM Backend Abstraction
+### 2. LLM Backend Abstraction
 
 **Area:** Vendor flexibility, governance
 
@@ -67,15 +30,15 @@ AI_BACKEND="ollama"        # default
 
 #### Trade-off Assessment
 
-| Dimension          | Before (now)                          | After                                          |
-| ------------------ | ------------------------------------- | ---------------------------------------------- |
+| Dimension          | Before (now)                         | After                                         |
+| ------------------ | ------------------------------------ | --------------------------------------------- |
 | Simplicity         | ✅ Single codepath, easy to audit     | ⚠️ Slightly more indirection                   |
 | Vendor flexibility | ❌ Ollama-only                        | ✅ Swappable backends without code changes     |
 | Governance risk    | ⚠️ Tied to one runtime's availability | ✅ Organizations can mandate approved backends |
 
 ---
 
-### 4. Test Suite
+### 3. Test Suite
 
 **Area:** Quality assurance, compliance
 
@@ -93,8 +56,8 @@ Add a test suite using [BATS](https://github.com/bats-core/bats-core) (Bash Auto
 
 #### Trade-off Assessment
 
-| Dimension              | Before (now)               | After                                      |
-| ---------------------- | -------------------------- | ------------------------------------------ |
+| Dimension              | Before (now)              | After                                     |
+| ---------------------- | ------------------------- | ----------------------------------------- |
 | Development speed      | ✅ No test overhead        | ⚠️ Tests must be maintained alongside code |
 | Regression safety      | ❌ None                    | ✅ Automated detection                     |
 | Compliance posture     | ⚠️ "We test manually"      | ✅ Auditable test evidence                 |
@@ -118,8 +81,8 @@ The project lacks a unified way to sync development changes to the local install
 
 #### Trade-off Assessment
 
-| Dimension            | Before (now)           | After                     |
-| -------------------- | ---------------------- | ------------------------- |
+| Dimension            | Before (now)          | After                    |
+| -------------------- | --------------------- | ------------------------ |
 | Development speed    | ❌ Manual sync         | ✅ Automated sync         |
 | First-run experience | ❌ No global install   | ✅ Global install planned |
 | Cleanup              | ❌ Manual removal      | ✅ Uninstaller planned    |
@@ -145,10 +108,10 @@ REPO_URL="${AICOMMIT_REPO:-https://github.com/actual-user/aicommit.git}"
 
 #### Trade-off Assessment
 
-| Dimension      | Before (now)                 | After                       |
-| -------------- | ---------------------------- | --------------------------- |
+| Dimension      | Before (now)                | After                      |
+| -------------- | --------------------------- | -------------------------- |
 | Installability | ❌ Broken for external users | ✅ Works out of the box     |
-| Effort         | —                            | ✅ Trivial find-and-replace |
+| Effort         | —                           | ✅ Trivial find-and-replace |
 
 ---
 
@@ -182,8 +145,8 @@ Enhance `install.sh` with a guided, non-invasive onboarding flow:
 
 #### Trade-off Assessment
 
-| Dimension            | Before (now)                         | After                                         |
-| -------------------- | ------------------------------------ | --------------------------------------------- |
+| Dimension            | Before (now)                        | After                                        |
+| -------------------- | ----------------------------------- | -------------------------------------------- |
 | First-run experience | ❌ Fails with generic error          | ✅ Guided, actionable next steps              |
 | Model discovery      | ❌ None — user must manually check   | ✅ Shows available models, lets user pick     |
 | Config automation    | ❌ User must hand-edit `.aicommitrc` | ✅ Writes `AI_MODEL` to config automatically  |
@@ -228,8 +191,8 @@ validate_install_path() {
 
 #### Trade-off Assessment
 
-| Dimension        | Before (now)                       | After                                         |
-| ---------------- | ---------------------------------- | --------------------------------------------- |
+| Dimension        | Before (now)                      | After                                        |
+| ---------------- | --------------------------------- | -------------------------------------------- |
 | Destructive risk | ❌ `rm -rf /` possible via env var | ✅ Dangerous paths blocked                    |
 | User flexibility | ✅ Any path accepted               | ⚠️ Non-standard paths prompt for confirmation |
 | Complexity       | ✅ No validation                   | ⚠️ Extra case statement                       |
@@ -265,8 +228,8 @@ The documented install method (`sh -c "$(curl -fsSL ...)"`) is a known supply ch
 
 #### Trade-off Assessment
 
-| Dimension         | Before (now)                           | After                                   |
-| ----------------- | -------------------------------------- | --------------------------------------- |
+| Dimension         | Before (now)                          | After                                  |
+| ----------------- | ------------------------------------- | -------------------------------------- |
 | Supply chain risk | ❌ No verification whatsoever          | ✅ Pinned versions + checksums          |
 | Install friction  | ✅ One-liner                           | ⚠️ Slightly more steps for verification |
 | ZTA narrative     | ❌ Contradicts "never trust" principle | ✅ Verify-then-trust                    |
@@ -310,11 +273,11 @@ The LLM would see this as part of the prompt and could be tricked into generatin
 
 #### Trade-off Assessment
 
-| Dimension             | Before (now)                          | After                                          |
-| --------------------- | ------------------------------------- | ---------------------------------------------- |
+| Dimension             | Before (now)                         | After                                         |
+| --------------------- | ------------------------------------ | --------------------------------------------- |
 | Prompt injection risk | ❌ No defense                         | ✅ Delimiter sanitization + boundary markers   |
 | Commit message trust  | ⚠️ Could be adversarially manipulated | ✅ Sanity-checked against analysis             |
-| False positives       | —                                     | ⚠️ Sanity check may flag legitimate edge cases |
+| False positives       | —                                    | ⚠️ Sanity check may flag legitimate edge cases |
 | Complexity            | ✅ Simple pipe                        | ⚠️ Pre/post processing added                   |
 
 ---
@@ -348,8 +311,8 @@ get_aicommit_tmp_dir() {
 
 #### Trade-off Assessment
 
-| Dimension                  | Before (now)                        | After                                          |
-| -------------------------- | ----------------------------------- | ---------------------------------------------- |
+| Dimension                  | Before (now)                       | After                                         |
+| -------------------------- | ---------------------------------- | --------------------------------------------- |
 | Path traversal risk        | ❌ Possible with crafted repo names | ✅ Eliminated                                  |
 | Special character handling | ❌ Breaks silently                  | ✅ Normalized safely                           |
 | Repo name fidelity         | ✅ Exact name used                  | ⚠️ Special characters stripped (cosmetic only) |
@@ -380,8 +343,8 @@ Apply this pattern in both `build_file_context()` and `generate_commit_message()
 
 #### Trade-off Assessment
 
-| Dimension                  | Before (now)                      | After                                |
-| -------------------------- | --------------------------------- | ------------------------------------ |
+| Dimension                  | Before (now)                     | After                               |
+| -------------------------- | -------------------------------- | ----------------------------------- |
 | Shell session safety       | ❌ umask polluted after every run | ✅ Restored to original on exit      |
 | File security during write | ✅ Sensitive files are 700        | ✅ Same protection, correctly scoped |
 | Complexity                 | ✅ One line                       | ⚠️ Save/restore pattern (trivial)    |
@@ -392,7 +355,7 @@ Apply this pattern in both `build_file_context()` and `generate_commit_message()
 
 ---
 
-### 11. Robust Ollama Process Detection
+### 12. Robust Ollama Process Detection
 
 **Area:** Reliability
 
@@ -419,8 +382,8 @@ This is authoritative — if the API responds, Ollama is ready; if not, it isn't
 
 #### Trade-off Assessment
 
-| Dimension           | Before (now)                        | After                                        |
-| ------------------- | ----------------------------------- | -------------------------------------------- |
+| Dimension           | Before (now)                       | After                                       |
+| ------------------- | ---------------------------------- | ------------------------------------------- |
 | Detection accuracy  | ❌ False positives and negatives    | ✅ Authoritative health check                |
 | macOS compatibility | ⚠️ Fragile with GUI-launched Ollama | ✅ Works regardless of launch method         |
 | Dependency          | ✅ Only `pgrep`                     | ⚠️ Requires `curl` (universally available)   |
@@ -428,7 +391,7 @@ This is authoritative — if the API responds, Ollama is ready; if not, it isn't
 
 ---
 
-### 12. Deduplicate `aicommit()` and `aic()` Pipeline
+### 13. Deduplicate `aicommit()` and `aic()` Pipeline
 
 **Area:** Code quality, maintainability
 
@@ -447,15 +410,15 @@ aic()      { _aicommit_pipeline --auto "$@"; }
 
 #### Trade-off Assessment
 
-| Dimension     | Before (now)                           | After                                         |
-| ------------- | -------------------------------------- | --------------------------------------------- |
+| Dimension     | Before (now)                          | After                                        |
+| ------------- | ------------------------------------- | -------------------------------------------- |
 | Readability   | ✅ Each function is self-contained     | ⚠️ Requires understanding the shared function |
 | Bug surface   | ❌ Fixes must be applied twice         | ✅ Single source of truth                     |
 | Extensibility | ❌ Adding modes means more duplication | ✅ New modes (e.g., `--batch`) are trivial    |
 
 ---
 
-### 13. Bash Shell Support in Installer
+### 14. Bash Shell Support in Installer
 
 **Area:** Adoption reach, portability
 
@@ -477,8 +440,8 @@ fi
 
 #### Trade-off Assessment
 
-| Dimension            | Before (now)         | After                      |
-| -------------------- | -------------------- | -------------------------- |
+| Dimension            | Before (now)        | After                     |
+| -------------------- | ------------------- | ------------------------- |
 | Zsh users            | ✅ Fully supported   | ✅ Same                    |
 | Bash users           | ❌ Manual setup      | ✅ Automatic               |
 | Installer complexity | ✅ Single shell path | ⚠️ Two shell paths         |
@@ -486,7 +449,7 @@ fi
 
 ---
 
-### 14. Multi-Scope Commit Detection and Warning
+### 15. Multi-Scope Commit Detection and Warning
 
 **Area:** Commit quality, governance
 
@@ -511,16 +474,16 @@ Don't block — just warn. The user decides.
 
 #### Trade-off Assessment
 
-| Dimension       | Before (now)                                 | After                                      |
-| --------------- | -------------------------------------------- | ------------------------------------------ |
+| Dimension       | Before (now)                                | After                                     |
+| --------------- | ------------------------------------------- | ----------------------------------------- |
 | Commit quality  | ⚠️ Silently generates multi-purpose messages | ✅ Guides toward atomic commits            |
 | Audit trail     | ⚠️ Vague commits pass through                | ✅ Better traceability                     |
 | Developer flow  | ✅ No friction                               | ⚠️ Extra prompt when changes are scattered |
-| False positives | —                                            | ⚠️ Monorepos may trigger this often        |
+| False positives | —                                           | ⚠️ Monorepos may trigger this often        |
 
 ---
 
-### 15. Fix Model Name Validation to Use Literal Grep
+### 16. Fix Model Name Validation to Use Literal Grep
 
 **Area:** Security, correctness
 
@@ -544,15 +507,15 @@ ollama list 2>/dev/null | grep -qF "$model"
 
 #### Trade-off Assessment
 
-| Dimension           | Before (now)                               | After                           |
-| ------------------- | ------------------------------------------ | ------------------------------- |
+| Dimension           | Before (now)                              | After                          |
+| ------------------- | ----------------------------------------- | ------------------------------ |
 | Validation accuracy | ❌ Regex false positives possible          | ✅ Exact literal match          |
-| Change size         | —                                          | ✅ One-character fix (`-qF`)    |
+| Change size         | —                                         | ✅ One-character fix (`-qF`)    |
 | Edge cases          | ⚠️ `.` in version numbers matches anything | ✅ Dots treated as literal dots |
 
 ---
 
-### 16. Add `set -o pipefail` to bin Wrappers
+### 17. Add `set -o pipefail` to bin Wrappers
 
 **Area:** Reliability, shell correctness
 
@@ -570,15 +533,15 @@ set -eo pipefail
 
 #### Trade-off Assessment
 
-| Dimension                  | Before (now)      | After                                   |
-| -------------------------- | ----------------- | --------------------------------------- |
+| Dimension                  | Before (now)     | After                                  |
+| -------------------------- | ---------------- | -------------------------------------- |
 | Pipeline failure detection | ❌ Silent swallow | ✅ Fails fast on any stage              |
-| Change size                | —                 | ✅ One word per bin file                |
-| Compatibility              | —                 | ✅ Supported in all bash versions ≥ 3.1 |
+| Change size                | —                | ✅ One word per bin file                |
+| Compatibility              | —                | ✅ Supported in all bash versions ≥ 3.1 |
 
 ---
 
-### 17. Add `set -u` to Catch Undefined Variables
+### 18. Add `set -u` to Catch Undefined Variables
 
 **Area:** Reliability, correctness
 
@@ -597,15 +560,15 @@ local model="${AI_MODEL:-qwen2.5-coder:latest}"  # already done — this pattern
 
 #### Trade-off Assessment
 
-| Dimension                   | Before (now)                   | After                                                                   |
-| --------------------------- | ------------------------------ | ----------------------------------------------------------------------- |
+| Dimension                   | Before (now)                  | After                                                                  |
+| --------------------------- | ----------------------------- | ---------------------------------------------------------------------- |
 | Typo detection              | ❌ Silent empty expansion      | ✅ Immediate error with variable name                                   |
-| Existing code compatibility | —                              | ⚠️ All uses of potentially-unset vars need `:-` guards (audit required) |
+| Existing code compatibility | —                             | ⚠️ All uses of potentially-unset vars need `:-` guards (audit required) |
 | Debugging time              | ⚠️ Confusing downstream errors | ✅ Fails at the point of the bug                                        |
 
 ---
 
-### 18. Exclude `.env` Filenames from LLM Prompt
+### 19. Exclude `.env` Filenames from LLM Prompt
 
 **Area:** Security, information disclosure
 
@@ -623,11 +586,11 @@ Configuration (sensitive, names redacted): 2 .env files
 
 #### Trade-off Assessment
 
-| Dimension                | Before (now)                      | After                            |
-| ------------------------ | --------------------------------- | -------------------------------- |
+| Dimension                | Before (now)                     | After                           |
+| ------------------------ | -------------------------------- | ------------------------------- |
 | Env file name disclosure | ❌ Full filename in LLM context   | ✅ Redacted to count only        |
 | Commit message quality   | ⚠️ LLM may mention env file names | ✅ LLM knows count but not names |
-| Implementation effort    | —                                 | ⚠️ Small case statement addition |
+| Implementation effort    | —                                | ⚠️ Small case statement addition |
 
 ---
 
@@ -635,7 +598,7 @@ Configuration (sensitive, names redacted): 2 .env files
 
 ---
 
-### 15. Configurable Diff Context Cap
+### 20. Configurable Diff Context Cap
 
 **Area:** Flexibility, large-repo support
 
@@ -662,8 +625,8 @@ With guidance in `.aicommitrc`:
 
 #### Trade-off Assessment
 
-| Dimension    | Before (now)                | After                         |
-| ------------ | --------------------------- | ----------------------------- |
+| Dimension    | Before (now)               | After                        |
+| ------------ | -------------------------- | ---------------------------- |
 | Small models | ⚠️ May overflow context     | ✅ User can reduce            |
 | Large models | ⚠️ Truncates useful context | ✅ User can increase          |
 | Defaults     | ✅ Reasonable               | ✅ Same default, more control |
@@ -671,7 +634,7 @@ With guidance in `.aicommitrc`:
 
 ---
 
-### 16. Expand File Type Detection
+### 21. Expand File Type Detection
 
 **Area:** Context quality
 
@@ -717,16 +680,16 @@ esac
 
 #### Trade-off Assessment
 
-| Dimension         | Before (now)                      | After                                 |
-| ----------------- | --------------------------------- | ------------------------------------- |
-| Language coverage | ⚠️ 7 groups                       | ✅ 20+ types                          |
-| Context accuracy  | ⚠️ Many files show raw extensions | ✅ Meaningful type labels             |
-| Maintenance       | ✅ Short case statement           | ⚠️ Longer, needs occasional updates   |
-| Impact on LLM     | Low — it's a hint, not critical   | Slightly better commit type detection |
+| Dimension         | Before (now)                     | After                                 |
+| ----------------- | -------------------------------- | ------------------------------------- |
+| Language coverage | ⚠️ 7 groups                       | ✅ 20+ types                           |
+| Context accuracy  | ⚠️ Many files show raw extensions | ✅ Meaningful type labels              |
+| Maintenance       | ✅ Short case statement           | ⚠️ Longer, needs occasional updates    |
+| Impact on LLM     | Low — it's a hint, not critical  | Slightly better commit type detection |
 
 ---
 
-### 17. Prune Unused Reference File
+### 22. Prune Unused Reference File
 
 **Area:** Codebase hygiene
 
@@ -743,15 +706,15 @@ Either:
 
 #### Trade-off Assessment
 
-| Dimension            | Before (now)                            | After (Option A)                |
-| -------------------- | --------------------------------------- | ------------------------------- |
+| Dimension            | Before (now)                           | After (Option A)               |
+| -------------------- | -------------------------------------- | ------------------------------ |
 | File count           | ⚠️ Redundant file                       | ✅ Single source of truth       |
 | Spec discoverability | ✅ Standalone reference file            | ⚠️ Spec only in prompt template |
 | Maintenance          | ❌ Two places to update if spec changes | ✅ One place                    |
 
 ---
 
-### 18. Optimize `bin/` Wrapper Startup
+### 23. Optimize `bin/` Wrapper Startup
 
 **Area:** Performance, developer experience
 
@@ -772,11 +735,11 @@ source "$AICOMMIT_DIR/lib/core.sh"
 
 #### Trade-off Assessment
 
-| Dimension        | Before (now)                                         | After                               |
-| ---------------- | ---------------------------------------------------- | ----------------------------------- |
-| Startup time     | ⚠️ Loads everything including completions            | ✅ Loads only what's needed         |
-| Maintainability  | ✅ Single source path                                | ⚠️ Two source paths to keep in sync |
-| Impact magnitude | Minimal — completions overhead is negligible in bash | Low overall benefit                 |
+| Dimension        | Before (now)                                         | After                              |
+| ---------------- | ---------------------------------------------------- | ---------------------------------- |
+| Startup time     | ⚠️ Loads everything including completions             | ✅ Loads only what's needed         |
+| Maintainability  | ✅ Single source path                                 | ⚠️ Two source paths to keep in sync |
+| Impact magnitude | Minimal — completions overhead is negligible in bash | Low overall benefit                |
 
 ---
 
@@ -865,8 +828,8 @@ And in `config/defaults.sh`, add a header comment to the distributed template ma
 
 #### Trade-off Assessment
 
-| Dimension          | Before (now)                   | After                        |
-| ------------------ | ------------------------------ | ---------------------------- |
+| Dimension          | Before (now)                  | After                       |
+| ------------------ | ----------------------------- | --------------------------- |
 | User awareness     | ❌ Trust boundary undocumented | ✅ Explicitly called out     |
-| Behaviour change   | —                              | ✅ None — documentation only |
-| Maintenance burden | —                              | ✅ One-time comment addition |
+| Behaviour change   | —                             | ✅ None — documentation only |
+| Maintenance burden | —                             | ✅ One-time comment addition |

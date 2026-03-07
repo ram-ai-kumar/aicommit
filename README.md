@@ -143,7 +143,10 @@ git add -p && aic         # Stage and auto-commit
 Edit `~/.aicommitrc` to customize behavior:
 
 ```bash
-# LLM model (must be available in Ollama)
+# LLM backend to use for inference (ollama, llamacpp, localai)
+AI_BACKEND="ollama"
+
+# LLM model (must be available in selected backend)
 AI_MODEL="qwen2.5-coder:latest"
 
 # Custom prompt template

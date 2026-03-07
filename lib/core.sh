@@ -2,19 +2,9 @@
 # aicommit — Core Logic
 # Orchestrates context building, prompt assembly, and LLM commit generation.
 
-# Validate prerequisites
+# Validate prerequisites using backend abstraction
 validate_prerequisites() {
-    if ! pgrep -f "ollama" > /dev/null; then
-        display_error "Ollama is not running" "Start it with: ollama serve"
-        return 1
-    fi
-
-    local model="${AI_MODEL:-qwen2.5-coder:latest}"
-    if ! ollama list 2>/dev/null | grep -q "$model"; then
-        display_error "Model '$model' not found" "Pull it with: ollama pull $model"
-        return 1
-    fi
-
+    validate_backend_prerequisites
     return 0
 }
 
@@ -287,36 +277,12 @@ generate_commit_message() {
         return 0
     fi
 
-    # Run ollama in background to allow timeout and elapsed-time display
+    # Invoke LLM using backend abstraction
     local response_file="${tmp_dir}/RESPONSE"
     local error_file="${tmp_dir}/OLLAMA_ERROR"
-    ollama run "$model" < "$prompt_out" > "$response_file" 2> "$error_file" &
-    local ollama_pid=$!
-
-    local elapsed=0
     local timeout_secs=${AI_TIMEOUT:-120}
-    printf "🧠 Generating commit message..." > /dev/tty
-    while kill -0 "$ollama_pid" 2>/dev/null; do
-        sleep 0.5
-        elapsed=$((elapsed + 5)) # We add .5 seconds each time
-        # Only print every second to reduce terminal noise
-        if (( elapsed % 10 == 0 )); then
-            printf "\r🧠 Generating commit message... (%ds)" "$((elapsed / 10))" > /dev/tty
-        fi
-        if [ "$elapsed" -ge $((timeout_secs * 10)) ]; then
-            kill "$ollama_pid" 2>/dev/null
-            wait "$ollama_pid" 2>/dev/null
-            printf "\r\033[K" > /dev/tty
-            display_error "Ollama timed out after ${timeout_secs}s" "Model may be slow — try: ollama run $model"
-            return 1
-        fi
-    done
-    wait "$ollama_pid"
-    local exit_code=$?
-    printf "\n" > /dev/tty
 
-    if [ $exit_code -ne 0 ]; then
-        display_error "Ollama generation failed (exit $exit_code)" "Check diagnostic log: $error_file"
+    if ! invoke_llm "$model" "$prompt_out" "$response_file" "$error_file" "$timeout_secs"; then
         return 1
     fi
 

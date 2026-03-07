@@ -15,6 +15,7 @@ source "$AICOMMIT_DIR/config/defaults.sh"
 # Source libraries
 source "$AICOMMIT_DIR/lib/output-formatter.sh"
 source "$AICOMMIT_DIR/lib/context-analyzer.sh"
+source "$AICOMMIT_DIR/lib/backends.sh"
 source "$AICOMMIT_DIR/lib/core.sh"
 
 # Load completions
@@ -34,7 +35,7 @@ aicommit() {
                 echo "Usage: aicommit [OPTIONS]"
                 echo ""
                 echo "AI-powered conventional commit message generator."
-                echo "Analyzes staged changes and generates commit messages using Ollama."
+                echo "Analyzes staged changes and generates commit messages using local LLM."
                 echo ""
                 echo "Options:"
                 echo "  --help, -h         Show this help message"

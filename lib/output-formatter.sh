@@ -25,8 +25,8 @@ display_commit_message() {
 display_error() {
     local error_msg="$1" debug_info="$2"
 
-    echo "❌ $error_msg"
-    [ -n "$debug_info" ] && echo "🔍 Debug: $debug_info"
+    echo "❌ $error_msg" >&2
+    [ -n "$debug_info" ] && echo "🔍 Debug: $debug_info" >&2
 }
 
 display_success() {

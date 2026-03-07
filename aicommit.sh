@@ -77,9 +77,7 @@ aicommit() {
         [ "$verbose" = "true" ] && echo "📂 Prompt: ${tmp_dir}/FULL_PROMPT"
 
         local commit_msg
-        commit_msg=$(generate_commit_message)
-        if [ -z "$commit_msg" ]; then
-            display_error "AI generated empty response" "check ${tmp_dir} for debug files"
+        if ! commit_msg=$(generate_commit_message) || [ -z "$commit_msg" ]; then
             return 1
         fi
         display_commit_message "$commit_msg"
@@ -143,10 +141,7 @@ aicommit() {
 
     # Generate and display
     local commit_msg
-    commit_msg=$(generate_commit_message)
-
-    if [ -z "$commit_msg" ]; then
-        display_error "AI generated empty response" "check ${tmp_dir} for debug files"
+    if ! commit_msg=$(generate_commit_message) || [ -z "$commit_msg" ]; then
         return 1
     fi
 
@@ -197,10 +192,7 @@ aic() {
     fi
 
     local commit_msg
-    commit_msg=$(generate_commit_message)
-
-    if [ -z "$commit_msg" ]; then
-        display_error "AI generated empty response" "check /tmp/.aicommit/ for debug files"
+    if ! commit_msg=$(generate_commit_message) || [ -z "$commit_msg" ]; then
         return 1
     fi
 

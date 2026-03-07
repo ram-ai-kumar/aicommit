@@ -10,35 +10,7 @@ Upcoming improvements, organized by priority — high-impact items first, nice-t
 
 ---
 
-### 2. LLM Backend Abstraction
-
-**Area:** Vendor flexibility, governance
-
-#### Current State
-
-The tool is hardcoded to Ollama (`ollama run`). Organizations using other local inference engines (llama.cpp, vLLM, LocalAI) or those requiring a migration path cannot adopt aicommit without forking.
-
-#### Proposed Change
-
-Introduce a backend abstraction layer — a single function (`invoke_llm()`) that dispatches to the configured backend. Backends would be selectable via config:
-
-```bash
-AI_BACKEND="ollama"        # default
-# AI_BACKEND="llamacpp"    # future
-# AI_BACKEND="localai"     # future
-```
-
-#### Trade-off Assessment
-
-| Dimension          | Before (now)                         | After                                         |
-| ------------------ | ------------------------------------ | --------------------------------------------- |
-| Simplicity         | ✅ Single codepath, easy to audit     | ⚠️ Slightly more indirection                   |
-| Vendor flexibility | ❌ Ollama-only                        | ✅ Swappable backends without code changes     |
-| Governance risk    | ⚠️ Tied to one runtime's availability | ✅ Organizations can mandate approved backends |
-
----
-
-### 3. Test Suite
+### 2. Test Suite
 
 **Area:** Quality assurance, compliance
 
@@ -65,7 +37,7 @@ Add a test suite using [BATS](https://github.com/bats-core/bats-core) (Bash Auto
 
 ---
 
-### 4. Installer / Uninstaller Improvements [PARTIAL]
+### 3. Installer / Uninstaller Improvements [PARTIAL]
 
 **Area:** Distribution, first-run experience, developer workflow
 
@@ -90,7 +62,7 @@ The project lacks a unified way to sync development changes to the local install
 
 ---
 
-### 5. Publish-Ready Installer
+### 4. Publish-Ready Installer
 
 **Area:** Distribution readiness
 
@@ -115,7 +87,7 @@ REPO_URL="${AICOMMIT_REPO:-https://github.com/actual-user/aicommit.git}"
 
 ---
 
-### 6. Guided Ollama Onboarding in Installer
+### 5. Guided Ollama Onboarding in Installer
 
 **Area:** Developer experience, zero-friction adoption
 
@@ -155,7 +127,7 @@ Enhance `install.sh` with a guided, non-invasive onboarding flow:
 
 ---
 
-### 7. Install/Uninstall Path Validation — Guard Against Destructive `rm -rf`
+### 6. Install/Uninstall Path Validation — Guard Against Destructive `rm -rf`
 
 **Area:** Security, safety
 
@@ -199,7 +171,7 @@ validate_install_path() {
 
 ---
 
-### 8. Supply Chain Integrity Verification
+### 7. Supply Chain Integrity Verification
 
 **Area:** Security, trust
 
@@ -237,7 +209,7 @@ The documented install method (`sh -c "$(curl -fsSL ...)"`) is a known supply ch
 
 ---
 
-### 9. Prompt Injection Defense
+### 8. Prompt Injection Defense
 
 **Area:** Security, LLM safety
 
@@ -282,7 +254,7 @@ The LLM would see this as part of the prompt and could be tricked into generatin
 
 ---
 
-### 10. Sanitize Repo Name in Temp File Paths
+### 9. Sanitize Repo Name in Temp File Paths
 
 **Area:** Security, robustness
 
@@ -319,7 +291,7 @@ get_aicommit_tmp_dir() {
 
 ---
 
-### 11. Fix `umask 077` Session Pollution
+### 10. Fix `umask 077` Session Pollution
 
 **Area:** Security, shell correctness
 
@@ -355,7 +327,7 @@ Apply this pattern in both `build_file_context()` and `generate_commit_message()
 
 ---
 
-### 12. Robust Ollama Process Detection
+### 11. Robust Ollama Process Detection
 
 **Area:** Reliability
 
@@ -391,7 +363,7 @@ This is authoritative — if the API responds, Ollama is ready; if not, it isn't
 
 ---
 
-### 13. Deduplicate `aicommit()` and `aic()` Pipeline
+### 12. Deduplicate `aicommit()` and `aic()` Pipeline
 
 **Area:** Code quality, maintainability
 
@@ -418,7 +390,7 @@ aic()      { _aicommit_pipeline --auto "$@"; }
 
 ---
 
-### 14. Bash Shell Support in Installer
+### 13. Bash Shell Support in Installer
 
 **Area:** Adoption reach, portability
 
@@ -449,7 +421,7 @@ fi
 
 ---
 
-### 15. Multi-Scope Commit Detection and Warning
+### 14. Multi-Scope Commit Detection and Warning
 
 **Area:** Commit quality, governance
 
@@ -483,7 +455,7 @@ Don't block — just warn. The user decides.
 
 ---
 
-### 16. Fix Model Name Validation to Use Literal Grep
+### 15. Fix Model Name Validation to Use Literal Grep
 
 **Area:** Security, correctness
 
@@ -515,7 +487,7 @@ ollama list 2>/dev/null | grep -qF "$model"
 
 ---
 
-### 17. Add `set -o pipefail` to bin Wrappers
+### 16. Add `set -o pipefail` to bin Wrappers
 
 **Area:** Reliability, shell correctness
 
@@ -541,7 +513,7 @@ set -eo pipefail
 
 ---
 
-### 18. Add `set -u` to Catch Undefined Variables
+### 17. Add `set -u` to Catch Undefined Variables
 
 **Area:** Reliability, correctness
 
@@ -568,7 +540,7 @@ local model="${AI_MODEL:-qwen2.5-coder:latest}"  # already done — this pattern
 
 ---
 
-### 19. Exclude `.env` Filenames from LLM Prompt
+### 18. Exclude `.env` Filenames from LLM Prompt
 
 **Area:** Security, information disclosure
 
@@ -598,7 +570,7 @@ Configuration (sensitive, names redacted): 2 .env files
 
 ---
 
-### 20. Configurable Diff Context Cap
+### 19. Configurable Diff Context Cap
 
 **Area:** Flexibility, large-repo support
 
@@ -634,7 +606,7 @@ With guidance in `.aicommitrc`:
 
 ---
 
-### 21. Expand File Type Detection
+### 20. Expand File Type Detection
 
 **Area:** Context quality
 
@@ -689,7 +661,7 @@ esac
 
 ---
 
-### 22. Prune Unused Reference File
+### 21. Prune Unused Reference File
 
 **Area:** Codebase hygiene
 
@@ -714,7 +686,7 @@ Either:
 
 ---
 
-### 23. Optimize `bin/` Wrapper Startup
+### 22. Optimize `bin/` Wrapper Startup
 
 **Area:** Performance, developer experience
 

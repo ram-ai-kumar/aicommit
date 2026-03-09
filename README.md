@@ -55,6 +55,8 @@ AI Commit is designed around Zero Trust principles — no implicit trust in exte
 ## Security & Privacy
 
 > **Core guarantee:** No source code, diff content, or intellectual property is ever transmitted outside the developer's machine.
+> 
+> See [SECURITY_BY_DESIGN.md](docs/SECURITY_BY_DESIGN.md) for a comprehensive overview of our security architecture, threat models, and design principles.
 
 - **No network calls to AI services** — removes API interception, MITM, and token exfiltration attack surfaces
 - **Secrets excluded from AI analysis** — `.env` files and credentials are filtered before LLM input, by design

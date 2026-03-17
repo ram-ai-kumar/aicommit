@@ -40,7 +40,7 @@ Conventional Commits enforced across every developer, every repository, every da
 
 ## Zero Trust Architecture
 
-AI Commit is designed around Zero Trust principles — no implicit trust in external services, every operation validated, data never crosses trust boundaries.
+AI Commit is designed around Zero Trust principles. For complete security architecture and threat models, see [Security by Design](docs/SECURITY_BY_DESIGN.md). For technical architecture details, see [Architecture](docs/ARCHITECTURE.md).
 
 | ZTA Principle                              | Implementation                                                          |
 | ------------------------------------------ | ----------------------------------------------------------------------- |
@@ -52,10 +52,20 @@ AI Commit is designed around Zero Trust principles — no implicit trust in exte
 
 ---
 
+## Documentation
+
+- **[Getting Started](#prerequisites)** - Installation and basic usage
+- **[Architecture](docs/ARCHITECTURE.md)** - Technical reference and system design
+- **[Security by Design](docs/SECURITY_BY_DESIGN.md)** - Security architecture and threat models
+- **[Roadmap](docs/TODO.md)** - Planned features and development priorities
+- **[Documentation Index](docs/README.md)** - Complete documentation overview
+
+---
+
 ## Security & Privacy
 
 > **Core guarantee:** No source code, diff content, or intellectual property is ever transmitted outside the developer's machine.
-> 
+>
 > See [SECURITY_BY_DESIGN.md](docs/SECURITY_BY_DESIGN.md) for a comprehensive overview of our security architecture, threat models, and design principles.
 
 - **No network calls to AI services** — removes API interception, MITM, and token exfiltration attack surfaces

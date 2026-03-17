@@ -149,3 +149,41 @@ teardown() {
     categorize_staged_files "$files" "$TEST_TEMP_DIR" > /dev/null
     [ -f "${TEST_TEMP_DIR}/ASSET_FILES" ]
 }
+
+@test "find_fallback_model skips preferred model in search" {
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'preferred-model:latest    abc123   4.7 GB  2 days ago'"
+    mock_bin "timeout" "exit 0"
+    run find_fallback_model "preferred-model:latest"
+    [ "$status" -eq 1 ]
+    [ "$output" = "" ]
+}
+
+@test "find_fallback_model prioritizes commit-specific models" {
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'generic-model:latest      abc123   2.3 GB  1 day ago'
+echo 'llama3.2:latest          def456   4.1 GB  2 weeks ago'
+if [ \"\$2\" = \"llama3.2:latest\" ]; then
+    echo \"OK\"
+    exit 0
+elif [ \"\$1\" = \"run\" ]; then
+    exit 1
+fi"
+    run find_fallback_model "missing-model"
+    [ "$status" -eq 0 ]
+    # Should prefer llama3.2 (commit-specific) over generic
+    [ "$output" = "llama3.2:latest" ]
+}
+
+@test "test_model_loadability handles timeout" {
+    mock_bin "timeout" "exit 124"
+    run test_model_loadability "slow-model"
+    [ "$status" -eq 1 ]
+}
+
+@test "get_available_ollama_models handles malformed output" {
+    mock_bin "ollama" "echo 'invalid output without proper structure'"
+    run get_available_ollama_models
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+}

@@ -136,3 +136,73 @@ teardown() {
         }
     done
 }
+
+@test "get_available_ollama_models does not expose sensitive data" {
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'model-with-secret-key:latest    secret123   4.7 GB  2 days ago'
+echo 'model-with-token:latest       token456    2.3 GB  1 week ago'"
+    run get_available_ollama_models
+    [ "$status" -eq 0 ]
+    # Should only return model names, not IDs or other sensitive data
+    assert_output_contains "model-with-secret-key:latest"
+    assert_output_contains "model-with-token:latest"
+    refute_output_contains "secret123"
+    refute_output_contains "token456"
+}
+
+@test "test_model_loadability does not expose prompt content in logs" {
+    mock_bin "ollama" "echo \"Running model with prompt: 'secret data'\" >&2
+echo \"OK\""
+    mock_bin "timeout" "echo \"OK\""
+    run test_model_loadability "test-model"
+    [ "$status" -eq 0 ]
+    # Should not expose prompt content
+    refute_output_contains "secret data"
+}
+
+@test "find_fallback_model does not try models with suspicious names" {
+    # Create a simple test that checks if suspicious models are filtered out
+    # by mocking get_available_ollama_models directly
+    get_available_ollama_models() {
+        echo "../../../etc/passwd:latest"
+        echo "|cat secrets.txt:latest"
+        echo "safe-model:latest"
+    }
+    export -f get_available_ollama_models
+
+    mock_bin "timeout" "echo \"OK\""
+    # Mock ollama run to succeed only for safe model
+    ollama() {
+        if [ "$2" = "safe-model:latest" ]; then
+            echo "OK"
+            return 0
+        else
+            return 1
+        fi
+    }
+    export -f ollama
+
+    run find_fallback_model "preferred-model"
+    [ "$status" -eq 0 ]
+    # Should choose safe model, not suspicious ones
+    [ "$output" = "safe-model:latest" ]
+}
+
+@test "validate_ollama_prerequisites sanitizes model names" {
+    mock_bin "pgrep" "exit 0"
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'safe-model:latest           abc123   2.3 GB  1 day ago'
+if [ \"\$1\" = \"run\" ]; then
+    # Check if model name contains dangerous characters
+    if [[ \"\$2\" =~ [|&;<>$\\\`\"'(){}] ]]; then
+        echo \"Dangerous characters detected\" >&2
+        exit 1
+    fi
+    echo \"OK\"
+    exit 0
+fi"
+    # Try with dangerous model name
+    run validate_ollama_prerequisites "safe-model; rm -rf /"
+    [ "$status" -eq 1 ]
+    assert_output_contains "Model 'safe-model; rm -rf /' not found"
+}

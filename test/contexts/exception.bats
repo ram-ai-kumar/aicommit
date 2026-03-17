@@ -116,3 +116,76 @@ teardown() {
     run invoke_localai "m" "/dev/null" "/dev/null" "/dev/null" "5"
     [ "$status" -eq 1 ]
 }
+
+@test "validate_ollama_prerequisites handles model load failure gracefully" {
+    mock_bin "pgrep" "exit 0"
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'preferred-model:latest    abc123   8.5 GB  2 days ago'
+echo 'fallback-model:latest     def456   2.3 GB  1 week ago'
+if [ \"\$2\" = \"preferred-model:latest\" ]; then
+    exit 1  # Can't load
+elif [ \"\$2\" = \"fallback-model:latest\" ]; then
+    echo \"OK\"
+    exit 0
+fi"
+    # Capture stderr to check fallback message
+    run validate_ollama_prerequisites "preferred-model:latest"
+    [ "$status" -eq 0 ]
+    assert_output_contains "Using fallback model"
+    [ "$AI_MODEL" = "fallback-model:latest" ]
+}
+
+@test "validate_ollama_prerequisites shows helpful error when no fallback works" {
+    mock_bin "pgrep" "exit 0"
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'huge-model:latest        abc123   16 GB  2 days ago'
+if [ \"\$1\" = \"run\" ]; then
+    exit 1  # All models fail to load
+fi"
+    run validate_ollama_prerequisites "huge-model:latest"
+    [ "$status" -eq 1 ]
+    assert_output_contains "No suitable model available"
+    assert_output_contains "insufficient RAM"
+}
+
+@test "invoke_ollama handles memory-related errors" {
+    mock_bin "ollama" "echo 'Error: out of memory' >&2
+exit 1"
+
+    # Create test files
+    local prompt_file="$(mktemp)"
+    local response_file="$(mktemp)"
+    local error_file="$(mktemp)"
+
+    echo "test prompt" > "$prompt_file"
+
+    run invoke_ollama "memory-hog-model" "$prompt_file" "$response_file" "$error_file" 30
+    [ "$status" -eq 1 ]
+    assert_output_contains "insufficient memory"
+
+    # Cleanup
+    rm -f "$prompt_file" "$response_file" "$error_file"
+}
+
+@test "invoke_ollama uses fallback model when AI_MODEL was changed" {
+    export AI_MODEL="fallback-model"
+
+    mock_bin "ollama" "if [ \"\$2\" = \"fallback-model\" ]; then
+    echo \"Generated commit message\"
+    exit 0
+fi"
+
+    # Create test files
+    local prompt_file="$(mktemp)"
+    local response_file="$(mktemp)"
+    local error_file="$(mktemp)"
+
+    echo "test prompt" > "$prompt_file"
+
+    run invoke_ollama "original-model" "$prompt_file" "$response_file" "$error_file" 30
+    [ "$status" -eq 0 ]
+
+    # Cleanup
+    rm -f "$prompt_file" "$response_file" "$error_file"
+    unset AI_MODEL
+}

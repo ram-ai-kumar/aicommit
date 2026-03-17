@@ -94,3 +94,25 @@ teardown() {
     [ "$status" -eq 1 ]
     assert_output_contains "not running"
 }
+
+@test "test_model_loadability with failing model" {
+    mock_bin "ollama" "exit 1"
+    run test_model_loadability "test-model"
+    [ "$status" -eq 1 ]
+}
+
+@test "find_fallback_model returns 1 when no models available" {
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'"
+    run find_fallback_model "nonexistent-model"
+    [ "$status" -eq 1 ]
+    [ "$output" = "" ]
+}
+
+@test "validate_ollama_prerequisites fails when model not found" {
+    mock_bin "pgrep" "exit 0"
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'other-model:latest      abc123   2.3 GB  1 day ago'"
+    run validate_ollama_prerequisites "missing-model"
+    [ "$status" -eq 1 ]
+    assert_output_contains "Model 'missing-model' not found"
+}

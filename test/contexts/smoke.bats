@@ -34,6 +34,11 @@ teardown() {
     declare -f categorize_staged_files    > /dev/null
     declare -f validate_backend_prerequisites > /dev/null
     declare -f invoke_llm                 > /dev/null
+    declare -f get_available_ollama_models > /dev/null
+    declare -f test_model_loadability     > /dev/null
+    declare -f find_fallback_model        > /dev/null
+    declare -f validate_ollama_prerequisites > /dev/null
+    declare -f invoke_ollama              > /dev/null
 }
 
 # ─── Configuration ───────────────────────────────────────────────────────────
@@ -99,4 +104,37 @@ teardown() {
     local d
     d=$(get_aicommit_tmp_dir)
     [[ "$d" == /tmp/.aicommit/* ]]
+}
+
+@test "get_available_ollama_models returns model list" {
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'qwen2.5-coder:latest    abc123   4.7 GB  2 days ago'
+echo 'llama3.2:latest          def456   2.3 GB  1 week ago'"
+    run get_available_ollama_models
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "qwen2.5-coder:latest" ]
+    [ "${lines[1]}" = "llama3.2:latest" ]
+}
+
+@test "test_model_loadability with successful model" {
+    mock_bin "ollama" "echo \"OK\""
+    mock_bin "timeout" "echo \"OK\""
+    run test_model_loadability "test-model"
+    [ "$status" -eq 0 ]
+}
+
+@test "find_fallback_model returns suitable model" {
+    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
+echo 'llama3.2:latest          def456   2.3 GB  1 week ago'
+echo 'mistral:latest           ghi789   4.1 GB  2 weeks ago'
+if [ \"\$2\" = \"llama3.2:latest\" ]; then
+    echo \"OK\"
+    exit 0
+elif [ \"\$1\" = \"run\" ]; then
+    exit 1
+fi"
+    mock_bin "timeout" "echo \"OK\""
+    run find_fallback_model "qwen2.5-coder:latest"
+    [ "$status" -eq 0 ]
+    [ "$output" = "llama3.2:latest" ]
 }

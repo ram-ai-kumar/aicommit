@@ -140,11 +140,6 @@ validate_ollama_prerequisites() {
 
     # Test if the preferred model can be loaded
     if ! test_model_loadability "$model"; then
-        display_error "Model '$model' cannot be loaded (insufficient memory or other issue)" \
-            "Please try:" \
-            "1. Using a smaller model: export AI_MODEL=llama3.2:3b" \
-            "2. Free up system RAM and retry" \
-            "3. Check available models: ollama list"
         return 1
     fi
 

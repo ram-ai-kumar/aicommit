@@ -56,7 +56,12 @@ invoke_llm() {
 
 # Get list of available Ollama models
 get_available_ollama_models() {
-    ollama list 2>/dev/null | awk 'NR>1 && NF>=2 {print $1}' | grep -v '^$'
+    ollama list 2>/dev/null | awk 'NR>1 && NF>=2 {print $1}' || true
+}
+
+# Get list of already loaded Ollama models
+get_loaded_ollama_models() {
+    ollama ps 2>/dev/null | awk 'NR>1 && NF>=2 {print $1}' || true
 }
 
 # Test if a model can be loaded successfully
@@ -81,6 +86,23 @@ find_fallback_model() {
 
     # Security: Skip models with suspicious names
     local suspicious_pattern='(\.\./|\.\|.*[|&;<>$`'"'"'(){}].*|\|.*)'
+
+    # First try to use a model that is already loaded in memory
+    local loaded_models
+    loaded_models=$(get_loaded_ollama_models)
+    
+    if [ -n "$loaded_models" ]; then
+        while IFS= read -r model; do
+            if [ -n "$model" ] && [ "$model" != "$preferred_model" ]; then
+                if ! echo "$model" | grep -qE "$suspicious_pattern"; then
+                    if test_model_loadability "$model"; then
+                        echo "$model"
+                        return 0
+                    fi
+                fi
+            fi
+        done <<< "$loaded_models"
+    fi
 
     # Common models that are good for commit message generation
     local commit_models=(

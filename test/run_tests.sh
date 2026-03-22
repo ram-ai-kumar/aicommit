@@ -21,6 +21,7 @@ TEST_CATEGORIES=(
     "exception"
     "compliance"
     "integration"
+    "model_fallback"
 )
 
 # Results tracking
@@ -87,8 +88,7 @@ run_test_category() {
     print_header "Running $category Tests"
 
     # Run tests and capture results
-    local output_file
-    output_file=$(mktemp)
+    local output_file="/tmp/test-${category}-$RANDOM.log"
 
     if bats --formatter tap "$test_path" > "$output_file" 2>&1; then
         TEST_RESULTS["$category"]="PASS"
@@ -100,9 +100,9 @@ run_test_category() {
     
     # Count tests
     local category_total category_passed category_failed
-    category_total=$(grep -c "^ok" "$output_file" || echo "0")
-    category_passed=$(grep -c "^ok" "$output_file" || echo "0")
-    category_failed=$(grep -c "^not ok" "$output_file" || echo "0")
+    category_total=$(grep -c "^ok" "$output_file" || true)
+    category_passed=$(grep -c "^ok" "$output_file" || true)
+    category_failed=$(grep -c "^not ok" "$output_file" || true)
     
     TOTAL_TESTS=$((TOTAL_TESTS + category_total))
     PASSED_TESTS=$((PASSED_TESTS + category_passed))

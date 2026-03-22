@@ -15,7 +15,8 @@ ORIGINAL_DIR=""
 
 setup_test_env() {
     ORIGINAL_DIR="$(cd "$(pwd)" && pwd)"
-    TEST_TEMP_DIR="$(mktemp -d)"
+    TEST_TEMP_DIR="/tmp/aicommit-test-$RANDOM-$$"
+    mkdir -p "$TEST_TEMP_DIR"
     TEST_REPO_DIR="$TEST_TEMP_DIR/test_repo"
 
     mkdir -p "$TEST_REPO_DIR"
@@ -41,6 +42,13 @@ setup_test_env() {
 
     # aicommit.sh references $ZSH_VERSION; guard against set -u failures in bash
     export ZSH_VERSION="${ZSH_VERSION:-}"
+
+    # Global mock for timeout to respect internal mocked functions
+    timeout() {
+        shift
+        "$@"
+    }
+    export -f timeout
 
     source "$AICOMMIT_DIR/aicommit.sh"
 }

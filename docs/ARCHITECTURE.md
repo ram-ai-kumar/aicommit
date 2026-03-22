@@ -192,7 +192,9 @@ Provides unified interface for different LLM backends with intelligent model fal
 When the preferred model cannot be loaded (typically due to insufficient RAM):
 
 1. **Loadability Testing** - Attempts to load the preferred model with a simple test prompt
-2. **Intelligent Fallback** - Tries models known to work well for commit generation:
+2. **User Notification** - Clear error message with actionable suggestions
+
+The system no longer falls back to arbitrary available models. Instead, it only tries known good default models for commit generation.:
    - qwen2.5-coder:latest
    - qwen2.5:latest
    - llama3.2:latest

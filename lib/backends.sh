@@ -140,25 +140,12 @@ validate_ollama_prerequisites() {
 
     # Test if the preferred model can be loaded
     if ! test_model_loadability "$model"; then
-        echo "⚠️  Preferred model '$model' cannot be loaded (insufficient memory or other issue)"
-
-        # Try to find a fallback model
-        fallback_model=$(find_fallback_model "$model")
-        if [ $? -eq 0 ] && [ -n "$fallback_model" ]; then
-            echo "🔄 Using fallback model: $fallback_model"
-            export AI_MODEL="$fallback_model"
-            return 0
-        else
-            display_error "No suitable model available" "" \
-                "Preferred model '$model' failed to load (likely insufficient RAM)" \
-                "and no other suitable models found." \
-                "" \
-                "💡 Suggestions:" \
-                "1. Free up RAM and try again" \
-                "2. Pull a smaller model: ollama pull llama3.2:3b" \
-                "3. Check available models: ollama list"
-            return 1
-        fi
+        display_error "Model '$model' cannot be loaded (insufficient memory or other issue)" \
+            "Please try:" \
+            "1. Using a smaller model: export AI_MODEL=llama3.2:3b" \
+            "2. Free up system RAM and retry" \
+            "3. Check available models: ollama list"
+        return 1
     fi
 
     return 0

@@ -1,0 +1,13 @@
+# Cucumber Configuration
+default: --publish-quiet --format pretty
+
+# Test Profiles
+all: --format progress --format html --out test-results/report.html --format json --out test-results/results.json
+functional: --tags @functional --format progress --format html --out test-results/functional.html
+security: --tags @security --format progress --format html --out test-results/security.html
+compliance: --tags @compliance --format progress --format html --out test-results/compliance.html
+risk_management: --tags @risk --format progress --format html --out test-results/risk.html
+governance: --tags @governance --format progress --format html --out test-results/governance.html
+smoke: --tags @smoke --format progress
+critical: --tags @critical --format progress
+wip: --tags @wip --format pretty

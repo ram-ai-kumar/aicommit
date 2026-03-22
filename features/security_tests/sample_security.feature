@@ -7,5 +7,5 @@ Feature: Sample Security Test
   Scenario: Basic Cucumber functionality test
     Given I have a working aicommit installation
     When I run cucumber --dry-run
-    Then it should execute successfully
-    And it should show the feature scenarios
+    And Then it should execute successfully
+    And And it should show the feature scenarios

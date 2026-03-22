@@ -40,7 +40,7 @@ Conventional Commits enforced across every developer, every repository, every da
 
 ## Zero Trust Architecture
 
-AI Commit is designed around Zero Trust principles. For complete security architecture and threat models, see [Security by Design](docs/SECURITY_BY_DESIGN.md). For technical architecture details, see [Architecture](docs/ARCHITECTURE.md).
+AI Commit is designed around Zero Trust principles. For complete security architecture and threat models, see [Security by Design](docs/SECURITY_BY_DESIGN.md). For technical architecture details, see [Architecture](docs/architecture.md).
 
 | ZTA Principle                              | Implementation                                                          |
 | ------------------------------------------ | ----------------------------------------------------------------------- |
@@ -55,9 +55,10 @@ AI Commit is designed around Zero Trust principles. For complete security archit
 ## Documentation
 
 - **[Getting Started](#prerequisites)** - Installation and basic usage
-- **[Architecture](docs/ARCHITECTURE.md)** - Technical reference and system design
+- **[Architecture](docs/architecture.md)** - Technical reference and system design
 - **[Security by Design](docs/SECURITY_BY_DESIGN.md)** - Security architecture and threat models
-- **[Roadmap](docs/TODO.md)** - Planned features and development priorities
+- **[Product Roadmap](docs/roadmap.md)** - Planned features and development priorities
+- **[Testing Guide](docs/testing.md)** - Cucumber BDD testing setup and usage
 - **[Documentation Index](docs/README.md)** - Complete documentation overview
 
 ---

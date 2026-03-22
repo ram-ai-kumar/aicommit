@@ -6,9 +6,10 @@ Complete documentation for the AI Commit (`aicommit`) project.
 
 ### Core Documentation
 
-- **[Architecture](ARCHITECTURE.md)** - Technical reference, system design, and component overview
+- **[Architecture](architecture.md)** - Technical reference, system design, and component overview
 - **[Security by Design](SECURITY_BY_DESIGN.md)** - Security architecture, threat models, and privacy principles
-- **[Roadmap](TODO.md)** - Planned features, improvements, and development priorities
+- **[Testing Guide](testing.md)** - Cucumber BDD testing setup and usage
+- **[Product Roadmap](roadmap.md)** - Planned features, improvements, and development priorities
 
 ### Quick Reference
 
@@ -19,18 +20,20 @@ Complete documentation for the AI Commit (`aicommit`) project.
 ## 🎯 Getting Started
 
 1. **New Users**: Start with the main [README](../README.md) for installation and basic usage
-2. **Developers**: See [Architecture](ARCHITECTURE.md) for technical details
+2. **Developers**: See [Architecture](architecture.md) for technical details
 3. **Security Teams**: Review [Security by Design](SECURITY_BY_DESIGN.md) for security posture
-4. **Contributors**: Check [Roadmap](TODO.md) for planned improvements
+4. **QA Teams**: Use [Testing Guide](testing.md) for BDD testing setup
+5. **Product Managers**: Check [Product Roadmap](roadmap.md) for planned improvements
 
 ## 🔍 Documentation Structure
 
-```
+```text
 docs/
-├── README.md                   # This file - documentation index
-├── ARCHITECTURE.md             # Technical architecture and design
+├── README.md                   # Documentation index and navigation
 ├── SECURITY_BY_DESIGN.md       # Security principles and threat models
-└── TODO.md                     # Development roadmap and priorities
+├── architecture.md             # Technical architecture and design
+├── testing.md                  # Cucumber BDD testing guide
+└── roadmap.md                  # Product roadmap and development priorities
 ```
 
 ## 📝 Documentation Guidelines
@@ -43,15 +46,28 @@ docs/
 
 ### For Developers
 
-- [Architecture](ARCHITECTURE.md) provides system design and component details
+- [Architecture](architecture.md) provides system design and component details
 - [Security by Design](SECURITY_BY_DESIGN.md) outlines security architecture
-- [Roadmap](TODO.md) shows development priorities and planned features
+- [Testing Guide](testing.md) explains BDD testing setup and execution
+- [Product Roadmap](roadmap.md) shows development priorities and planned features
 
 ### For Security Teams
 
 - [Security by Design](SECURITY_BY_DESIGN.md) contains complete security analysis
 - Threat models and mitigation strategies are documented there
 - Privacy and compliance considerations are covered in detail
+
+### For QA Teams
+
+- [Testing Guide](testing.md) provides comprehensive BDD testing setup
+- Cucumber tag-based test execution is explained
+- CI/CD integration examples are included
+
+### For Product Managers
+
+- [Product Roadmap](roadmap.md) shows strategic development priorities
+- Feature timelines and release planning are documented
+- Business value and market positioning guidance
 
 ---
 

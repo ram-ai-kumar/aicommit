@@ -541,6 +541,7 @@ The following items have been implemented and are no longer in the roadmap:
 - ✅ **Comprehensive Testing** - 87 test cases covering all functionality
 - ✅ **Backend Abstraction** - Clean separation between LLM backends
 - ✅ **Documentation Organization** - Structured docs with clear navigation
+- ✅ **Model Selection Preference** - Strict configuration respect for configured/default models only
 
 ---
 

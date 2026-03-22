@@ -81,31 +81,7 @@ test_model_loadability() {
 # Find a suitable fallback model for commit generation
 find_fallback_model() {
     local preferred_model="$1"
-    local available_models
-    available_models=$(get_available_ollama_models)
-
-    # Security: Skip models with suspicious names
-    local suspicious_pattern='(\.\./|\.\|.*[|&;<>$`'"'"'(){}].*|\|.*)'
-
-    # First try to use a model that is already loaded in memory
-    local loaded_models
-    loaded_models=$(get_loaded_ollama_models)
-    
-    if [ -n "$loaded_models" ]; then
-        while IFS= read -r model; do
-            if [ -n "$model" ] && [ "$model" != "$preferred_model" ]; then
-                if ! echo "$model" | grep -qE "$suspicious_pattern"; then
-                    if test_model_loadability "$model"; then
-                        echo "$model"
-                        return 0
-                    fi
-                fi
-            fi
-        done <<< "$loaded_models"
-    fi
-
-    # Common models that are good for commit message generation
-    local commit_models=(
+    local default_models=(
         "qwen2.5-coder:latest"
         "qwen2.5:latest"
         "llama3.2:latest"
@@ -117,9 +93,23 @@ find_fallback_model() {
         "mixtral:latest"
     )
 
-    # First try models that are specifically good for coding/commit messages
-    for model in "${commit_models[@]}"; do
-        if echo "$available_models" | grep -qF "$model" && [ "$model" != "$preferred_model" ]; then
+    # Security: Skip models with suspicious names
+    local suspicious_pattern='(\.\./|\.\|.*[|&;<>$`'"'"'(){}].*|\|.*)'
+
+    # Only try to use the preferred model if it's available
+    if ollama list 2>/dev/null | grep -qF "$preferred_model"; then
+        # Security check: skip suspicious model names
+        if ! echo "$preferred_model" | grep -qE "$suspicious_pattern"; then
+            if test_model_loadability "$preferred_model"; then
+                echo "$preferred_model"
+                return 0
+            fi
+        fi
+    fi
+
+    # Only try known default models, not arbitrary available models
+    for model in "${default_models[@]}"; do
+        if ollama list 2>/dev/null | grep -qF "$model" && [ "$model" != "$preferred_model" ]; then
             # Security check: skip suspicious model names
             if ! echo "$model" | grep -qE "$suspicious_pattern"; then
                 if test_model_loadability "$model"; then
@@ -130,20 +120,7 @@ find_fallback_model() {
         fi
     done
 
-    # If no specific commit models work, try any available model
-    while IFS= read -r model; do
-        if [ -n "$model" ] && [ "$model" != "$preferred_model" ]; then
-            # Security check: skip suspicious model names
-            if ! echo "$model" | grep -qE "$suspicious_pattern"; then
-                if test_model_loadability "$model"; then
-                    echo "$model"
-                    return 0
-                fi
-            fi
-        fi
-    done <<< "$available_models"
-
-    return 1
+    return 1  # No suitable model found
 }
 
 validate_ollama_prerequisites() {

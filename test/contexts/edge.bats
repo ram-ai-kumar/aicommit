@@ -155,8 +155,9 @@ teardown() {
 echo 'preferred-model:latest    abc123   4.7 GB  2 days ago'"
     mock_bin "timeout" "exit 0"
     run find_fallback_model "preferred-model:latest"
-    [ "$status" -eq 1 ]
-    [ "$output" = "" ]
+    # With new implementation, preferred model should be returned since it's available
+    [ "$status" -eq 0 ]
+    [ "$output" = "preferred-model:latest" ]
 }
 
 @test "find_fallback_model prioritizes commit-specific models" {

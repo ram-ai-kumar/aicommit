@@ -1,62 +1,40 @@
-# AI Commit Cucumber Test Suite
+# AI Commit Test Suite
 
-This directory contains comprehensive Cucumber tests for the aicommit project, organized by category and designed to validate functionality across all levels of concern from development to board-level oversight.
+Comprehensive test coverage for AI-powered commit message generation, organized for business and technical stakeholders.
 
 ## Test Organization
 
-### Directory Structure
-
 ```
 features/
-├── functional/              # Core functionality tests
-│   ├── basic_functionality.feature     # Basic sanity checks
-│   ├── error_handling.feature          # Failure path validation
-│   ├── boundary_conditions.feature     # Boundary conditions
-│   └── system_resilience.feature      # Error recovery
-├── security/               # Security and Trust tests
-│   ├── data_protection.feature         # Security controls
-│   └── trust_and_safety.feature        # Trust principles
-├── compliance/             # Regulatory compliance tests
-│   └── regulatory_compliance.feature  # GDPR, SOC2, ISO27001, etc.
-├── risk_management/        # Risk assessment tests
-│   └── risk_assessment.feature         # Risk identification and mitigation
-├── governance/             # Business value tests
-│   └── business_value.feature          # Strategic validation
+├── core-workflows/         # How the system works
+├── business-features/      # Business value and compliance
+├── quality-assurance/      # Security and reliability
 ├── step_definitions/       # Test implementation
-│   ├── aicommit_steps.rb             # Core functionality steps
-│   └── security_test_steps.rb        # Security-specific steps
 └── support/                # Test configuration
-    ├── cucumber_config.rb            # Global test setup
-    └── env.rb                        # Environment configuration
 ```
 
 ## Test Categories
 
-### Functional Tests (`functional/`)
-- **Basic Functionality**: Core functionality validation in ideal conditions
-- **Error Handling**: Proper handling of invalid inputs and error conditions
-- **Boundary Conditions**: Edge cases and extreme inputs
-- **System Resilience**: Graceful error recovery and system stability
+### 🚀 Core Workflows (`core-workflows/`)
+**What it tests**: Basic functionality, end-to-end processes, and operational validation
+- **Basic Operations**: System startup, configuration, help system
+- **Commit Generation**: AI-powered message creation and formatting
+- **Error Handling**: Graceful failure management and user guidance
+- **Model Management**: AI model validation and fallback procedures
 
-### Security Tests (`security/`)
-- **Data Protection**: Security controls, access control, and data privacy
-- **Trust and Safety**: Zero Trust principles and threat mitigation
-- **Security Assurance**: Protection against common attack vectors
+### 💼 Business Features (`business-features/`)
+**What it tests**: Business value, regulatory compliance, and risk management
+- **Business Value**: ROI demonstration and strategic alignment
+- **Risk Management**: Risk assessment, mitigation, and monitoring
+- **Regulatory Compliance**: GDPR, SOC 2, ISO 27001, industry standards
+- **Governance**: Board-level reporting and stakeholder value
 
-### Compliance Tests (`compliance/`)
-- **Regulatory Compliance**: GDPR, SOC 2, ISO 27001, PCI DSS, HIPAA, FedRAMP
-- **Industry Standards**: Financial services, healthcare, energy sector regulations
-- **Audit Readiness**: Documentation and reporting requirements
-
-### Risk Management Tests (`risk_management/`)
-- **Risk Assessment**: Data leakage, supply chain, operational, and security risks
-- **Mitigation Strategies**: Risk identification, monitoring, and response
-- **Emerging Risks**: Threat landscape monitoring and proactive management
-
-### Governance Tests (`governance/`)
-- **Business Value**: Strategic alignment and ROI demonstration
-- **Enterprise Risk**: Board-level risk posture and tolerance validation
-- **Stakeholder Value**: Shareholder, customer, and employee value creation
+### 🔒 Quality Assurance (`quality-assurance/`)
+**What it tests**: Security, reliability, and trustworthiness
+- **Data Protection**: Sensitive data handling and privacy controls
+- **Trust & Safety**: Zero Trust principles and threat protection
+- **Security Testing**: Vulnerability assessment and penetration testing
+- **System Reliability**: Performance, stability, and resilience
 
 ## Running Tests
 

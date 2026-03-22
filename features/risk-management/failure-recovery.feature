@@ -11,136 +11,136 @@ Feature: AI Commit Negative Tests
 
   Scenario: Reject unknown command line options
     When I run "aicommit --not-a-real-flag"
-    And Then the command should fail with exit code 1
-    And And output should contain "Unknown option"
+    Then the command should fail with exit code 1
+    And output should contain "Unknown option"
 
   Scenario: Fail gracefully with no staged changes
     When I run "aicommit --dry-run"
-    And Then the command should fail with exit code 1
-    And And output should contain "No staged changes"
+    Then the command should fail with exit code 1
+    And output should contain "No staged changes"
 
   Scenario: Fail gracefully with no staged changes using aic
     When I run "aic"
-    And Then the command should fail with exit code 1
-    And And output should contain "No staged changes"
+    Then the command should fail with exit code 1
+    And output should contain "No staged changes"
 
   Scenario: Reject unsupported backend
     Given AI_BACKEND is set to "totally_bogus"
     When I validate backend prerequisites
-    And Then validation should fail
-    And And error should mention "Unsupported backend"
+    Then validation should fail
+    And error should mention "Unsupported backend"
 
   Scenario: Reject unimplemented llamacpp backend
     Given AI_BACKEND is set to "llamacpp"
     When I validate backend prerequisites
-    And Then validation should fail
-    And And error should indicate backend is not implemented
+    Then validation should fail
+    And error should indicate backend is not implemented
 
   Scenario: Reject unimplemented localai backend
     Given AI_BACKEND is set to "localai"
     When I validate backend prerequisites
-    And Then validation should fail
-    And And error should indicate backend is not implemented
+    Then validation should fail
+    And error should indicate backend is not implemented
 
   Scenario: Fail when changes context is missing
     Given aicommit temporary directory exists
     But CHANGES_CONTEXT file is missing
     When I run "generate_commit_message --dry-run"
-    And Then the command should fail
-    And And error should indicate missing context
+    Then the command should fail
+    And error should indicate missing context
 
   Scenario: Fail when changes context is empty
     Given aicommit temporary directory exists
     And CHANGES_CONTEXT file exists but is empty
     When I run "generate_commit_message --dry-run"
-    And Then the command should fail
-    And And error should indicate empty context
+    Then the command should fail
+    And error should indicate empty context
 
   Scenario: Fail build_ai_context with no staged files
     When I build AI context with empty staged files
-    And Then the command should fail with exit code 1
-    And And output should contain "No staged files"
+    Then the command should fail with exit code 1
+    And output should contain "No staged files"
 
   Scenario: Fail ollama validation when process not running
     Given pgrep finds no ollama process
     When I validate ollama prerequisites for "qwen2.5-coder:latest"
-    And Then validation should fail
-    And And error should mention "not running"
+    Then validation should fail
+    And error should mention "not running"
 
   Scenario: Fail model loadability test with failing model
     Given ollama command fails for test model
     When I test model loadability for "test-model"
-    And Then the test should fail
-    And And exit code should be 1
+    Then the test should fail
+    And exit code should be 1
 
   Scenario: Fail fallback model search when no models available
     Given ollama returns empty model list
     When I search for fallback model for "nonexistent-model"
-    And Then search should fail with exit code 1
-    And And output should be empty
+    Then search should fail with exit code 1
+    And output should be empty
 
   Scenario: Fail ollama validation when model not found
     Given ollama is running
     But model list does not contain "missing-model"
     When I validate ollama prerequisites for "missing-model"
-    And Then validation should fail
-    And And error should mention model not found
+    Then validation should fail
+    And error should mention model not found
 
   Scenario: Reject dangerous model names
     Given ollama is running
     When I validate ollama prerequisites for "safe-model; rm -rf /"
-    And Then validation should fail
-    And And error should mention model not found
+    Then validation should fail
+    And error should mention model not found
 
   Scenario: Handle malformed ollama output gracefully
     Given ollama returns malformed output
     When I list available models
-    And Then command should succeed
+    Then command should succeed
     And But output should be empty
 
   Scenario: Reject invalid timeout values
     Given AI_TIMEOUT is set to "invalid_number"
     When I validate configuration
-    And Then validation should fail
-    And And error should mention invalid timeout
+    Then validation should fail
+    And error should mention invalid timeout
 
   Scenario: Handle missing prompt file gracefully
     Given AI_PROMPT_FILE points to non-existent file
     When I validate configuration
-    And Then validation should fail
-    And And error should mention missing prompt file
+    Then validation should fail
+    And error should mention missing prompt file
 
   Scenario: Fail when git repository is not initialized
     Given current directory is not a git repository
     When I run "aicommit --dry-run"
-    And Then the command should fail
-    And And error should mention git repository
+    Then the command should fail
+    And error should mention git repository
 
   Scenario: Fail when git is not available
     Given git command is not available
     When I validate prerequisites
-    And Then validation should fail
-    And And error should mention git installation
+    Then validation should fail
+    And error should mention git installation
 
   Scenario: Handle permission denied on temporary directory
     Given temporary directory cannot be created due to permissions
     When I request aicommit temporary directory
-    And Then the operation should fail
-    And And error should mention permissions
+    Then the operation should fail
+    And error should mention permissions
 
   Scenario: Reject concurrent aicommit instances
     Given an aicommit instance is already running
     When I try to start another aicommit instance
-    And Then the second instance should fail
+    Then the second instance should fail
     And wait for the first to complete
 
   Scenario: Handle network timeouts gracefully
     Given ollama is running but responding slowly
     When I invoke ollama with timeout
-    And Then the operation should timeout gracefully
-    And And error should mention timeout
+    Then the operation should timeout gracefully
+    And error should mention timeout
 
   Scenario: Validate input sanitization
     When I pass malicious input to aicommit
-    And Then the input should be sanitized
-    And And no command injection should occur
+    Then the input should be sanitized
+    And no command injection should occur

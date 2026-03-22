@@ -6,9 +6,9 @@ Complete documentation for the AI Commit (`aicommit`) project.
 
 ### Core Documentation
 
-- **[Architecture](architecture.md)** - Technical reference, system design, and component overview
-- **[Security by Design](SECURITY_BY_DESIGN.md)** - Security architecture, threat models, and privacy principles
-- **[Testing Guide](testing.md)** - Cucumber BDD testing setup and usage
+- **[Architecture and Security](ARCHITECTURE_AND_SECURITY.md)** - Technical reference, system design, component overview, and security framework
+- **[BDD and Testing](BDD_AND_TESTING.md)** - Complete BDD implementation guide, testing setup, and business-oriented feature organization
+- **[Feature Organization](FEATURE_ORGANIZATION.md)** - Business-oriented BDD feature structure and reorganization details
 - **[Product Roadmap](roadmap.md)** - Planned features, improvements, and development priorities
 
 ### Quick Reference
@@ -19,26 +19,21 @@ Complete documentation for the AI Commit (`aicommit`) project.
 
 ## 🎯 Getting Started
 
-1. **New Users**: Start with the main [README](../README.md) for installation and basic usage
-2. **Developers**: See [Architecture](architecture.md) for technical details
-3. **Security Teams**: Review [Security by Design](SECURITY_BY_DESIGN.md) for security posture
-4. **QA Teams**: Use [Testing Guide](testing.md) for BDD testing setup
-5. **Product Managers**: Check [Product Roadmap](roadmap.md) for planned improvements
+1. **New to aicommit?** Start with the [main project README](../README.md)
+2. **Interested in technical details?** See [Architecture and Security](ARCHITECTURE_AND_SECURITY.md)
+3. **Working with tests?** Check [BDD and Testing](BDD_AND_TESTING.md)
+4. **Planning features?** Review the [Product Roadmap](roadmap.md)
 
-## 🔍 Documentation Structure
+## 📖 Documentation Structure
 
-```text
-docs/
-├── README.md                   # Documentation index and navigation
-├── SECURITY_BY_DESIGN.md       # Security principles and threat models
-├── architecture.md             # Technical architecture and design
-├── testing.md                  # Cucumber BDD testing guide
-└── roadmap.md                  # Product roadmap and development priorities
-```
+The documentation is organized into logical, consolidated files:
 
-## 📝 Documentation Guidelines
+- **Architecture & Security**: Combined technical architecture, system design, and security principles
+- **BDD & Testing**: Unified testing guide including implementation stages and business organization
+- **Feature Organization**: Complete feature reorganization process and business structure
+- **Roadmap**: Strategic planning and development priorities
 
-### For Users
+This structure reduces documentation fragmentation while maintaining comprehensive coverage of all project aspects.
 
 - Main [README](../README.md) contains all user-facing documentation
 - Configuration and usage examples are in the main README

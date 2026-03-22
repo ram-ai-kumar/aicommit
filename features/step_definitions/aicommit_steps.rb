@@ -3,9 +3,10 @@ require 'tempfile'
 require 'json'
 
 Given(/^aicommit is properly installed$/) do
-  # Check if aicommit script exists and is executable
-  expect(File.exist?('/Users/ram/Work/code/dev-stack/aicommit/aicommit.sh')).to be true
-  expect(File.executable?('/Users/ram/Work/code/dev-stack/aicommit/aicommit.sh')).to be true
+  # Check if aicommit is installed in the user directory
+  expect(File.exist?('/Users/ram/.aicommit/aicommit.sh')).to be true
+  expect(File.exist?('/Users/ram/.aicommit/lib/core.sh')).to be true
+  expect(File.exist?('/Users/ram/.aicommit/config/defaults.sh')).to be true
 end
 
 Given(/^a git repository is initialized$/) do

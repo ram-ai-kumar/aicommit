@@ -45,9 +45,184 @@ Feature: AI Commit Library Function Tests
     Then validation should fail
     And error should mention "not running"
 
-  Scenario: Ollama validation fails when model not found
-    Given ollama is running
-    But model list does not contain the requested model
+  Scenario: Temporary directory creation and permissions
+    When I request aicommit temporary directory
+    Then the directory should be created
+    And the directory should be under "/tmp/.aicommit"
+    And the directory should have 700 permissions
+    And the directory should not be world-readable
+    And the directory should not be world-writable
+    And the directory should not be world-executable
+
+  Scenario: Temporary directory uniqueness per repository
+    When I request aicommit temporary directory
+    Then the directory path should include repository name
+    And the directory should be unique per repository
+    And the directory should not be global "/tmp/.aicommit"
+
+  Scenario: Project type detection for Ruby on Rails
+    Given a Gemfile exists in the repository
+    When I detect project type
+    Then the type should be "rails/ruby"
+
+  Scenario: Project type detection for Node.js
+    Given a package.json exists in the repository
+    When I detect project type
+    Then the type should be "node/javascript"
+
+  Scenario: Project type detection for Python
+    Given a requirements.txt exists in the repository
+    When I detect project type
+    Then the type should be "python"
+
+  Scenario: Project type detection for Go
+    Given a go.mod exists in the repository
+    When I detect project type
+    Then the type should be "go"
+
+  Scenario: Project type detection for Rust
+    Given a Cargo.toml exists in the repository
+    When I detect project type
+    Then the type should be "rust"
+
+  Scenario: Project type detection for Java Maven
+    Given a pom.xml exists in the repository
+    When I detect project type
+    Then the type should be "java/maven"
+
+  Scenario: Project type detection for Java Gradle
+    Given a build.gradle exists in the repository
+    When I detect project type
+    Then the type should be "java/gradle"
+
+  Scenario: Project type detection for PHP
+    Given a composer.json exists in the repository
+    When I detect project type
+    Then the type should be "php"
+
+  Scenario: Project type detection for Docker
+    Given a Dockerfile exists in the repository
+    When I detect project type
+    Then the type should be "docker"
+
+  Scenario: Project type detection for Terraform
+    Given a main.tf exists in the repository
+    When I detect project type
+    Then the type should be "terraform"
+
+  Scenario: Project type detection for Kubernetes
+    Given a k8s-deployment.yaml exists in the repository
+    When I detect project type
+    Then the type should be "kubernetes"
+
+  Scenario: Project type detection for generic
+    Given no known project files exist
+    When I detect project type
+    Then the type should be "generic"
+
+  Scenario: File categorization for configuration files
+    Given I have staged configuration files
+    When I categorize staged files
+    Then config files should be categorized as "config"
+    And source files should be categorized as "source"
+    And documentation files should be categorized as "docs"
+
+  Scenario: File categorization excludes sensitive files
+    Given I have staged sensitive files
+    When I categorize staged files
+    Then .env files should be excluded
+    And .key files should be excluded
+    And .pem files should be excluded
+    And secret files should be excluded
+
+  Scenario: Output formatter displays setup information
+    Given I have 3 staged files
+    When I display setup information
+    Then output should mention file count
+    And output should list file names
+    And output should mention Ollama status
+
+  Scenario: Output formatter handles single file
+    Given I have 1 staged file
+    When I display setup information
+    Then output should mention "1 file"
+    And output should mention the file name
+
+  Scenario: Output formatter handles multiple files
+    Given I have 5 staged files
+    When I display setup information
+    Then output should mention "5 files"
+    And output should list multiple files
+
+  Scenario: Error formatter displays error message
+    When I display error message "Test error"
+    Then error should be displayed prominently
+    And error should be clearly formatted
+
+  Scenario: Setup info formatter includes model information
+    Given AI_MODEL is set to "test-model"
+    When I display setup information
+    Then output should mention the model name
+    And output should include backend information
+
+  Scenario: Context builder handles empty staged files
+    Given no files are staged
+    When I build file context
+    Then context should be empty
+    And no files should be processed
+
+  Scenario: Context builder handles multiple file types
+    Given I have staged multiple file types
+    When I build file context
+    Then each file type should be processed appropriately
+    And context should include file statistics
+
+  Scenario: Context builder excludes lock files
+    Given I have staged package-lock.json
+    When I build file context
+    Then lock file content should be excluded
+    And file should be mentioned in statistics
+
+  Scenario: Context builder excludes binary files
+    Given I have staged binary files
+    When I build file context
+    Then binary diffs should be excluded
+    And binary files should be mentioned in statistics
+
+  Scenario: Diff filter handles completely empty input
+    When I filter and truncate empty diff
+    Then result should be empty
+    And no error should occur
+
+  Scenario: Diff filter handles large diffs
+    Given I have a very large diff
+    When I filter and truncate the diff
+    Then diff should be truncated appropriately
+    And important content should be preserved
+
+  Scenario: Cleanup functions remove ephemeral files
+    Given temporary files exist
+    When I cleanup ephemeral files
+    Then ephemeral files should be removed
+    And core files should remain
+
+  Scenario: Cleanup functions remove all files
+    Given all temporary files exist
+    When I cleanup all files
+    Then all temporary files should be removed
+    And directory should be clean
+
+  Scenario: Prerequisites validation checks core requirements
+    When I validate prerequisites
+    Then git should be available
+    And required directories should exist
+    And configuration files should be present
+
+  Scenario: Prerequisites validation fails without git
+    Given git is not available
+    When I validate prerequisites
+    Then validation should fail
+    And error should mention git requirement
     When I validate ollama prerequisites for "missing-model"
     Then validation should fail
     And error should mention model not found

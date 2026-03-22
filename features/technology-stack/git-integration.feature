@@ -32,6 +32,107 @@ Feature: AI Commit Basic Integration Testing
     Then the backend should respond successfully
     And a commit message should be generated
 
+  Scenario: Simple AI model interaction with small changes
+    Given I have made small code changes
+    And I add the files to staging area
+    When I run aicommit command "--dry-run"
+    Then the AI should analyze the changes
+    And generate an appropriate commit message
+    And the message should reflect the nature of changes
+
+  Scenario: File type detection for JavaScript files
+    Given I have modified JavaScript files
+    When I run aicommit command "--dry-run"
+    Then the file type should be detected as JavaScript
+    And the commit message should be relevant to JavaScript changes
+
+  Scenario: File type detection for Python files
+    Given I have modified Python files
+    When I run aicommit command "--dry-run"
+    Then the file type should be detected as Python
+    And the commit message should be relevant to Python changes
+
+  Scenario: File type detection for Ruby files
+    Given I have modified Ruby files
+    When I run aicommit command "--dry-run"
+    Then the file type should be detected as Ruby
+    And the commit message should be relevant to Ruby changes
+
+  Scenario: File type detection for configuration files
+    Given I have modified configuration files
+    When I run aicommit command "--dry-run"
+    Then the file type should be detected as configuration
+    And the commit message should reflect configuration changes
+
+  Scenario: File type detection for documentation files
+    Given I have modified documentation files
+    When I run aicommit command "--dry-run"
+    Then the file type should be detected as documentation
+    And the commit message should reflect documentation changes
+
+  Scenario: File type detection for test files
+    Given I have modified test files
+    When I run aicommit command "--dry-run"
+    Then the file type should be detected as test
+    And the commit message should reflect test changes
+
+  Scenario: File type detection for mixed file types
+    Given I have modified multiple file types
+    When I run aicommit command "--dry-run"
+    Then all file types should be detected correctly
+    And the commit message should reflect the mixed nature of changes
+
+  Scenario: Backend connectivity with timeout handling
+    Given ollama backend is configured
+    And ollama service is slow to respond
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then the command should handle timeout gracefully
+    And appropriate error should be displayed
+    And fallback mechanisms should be attempted
+
+  Scenario: Backend connectivity with authentication
+    Given ollama backend requires authentication
+    And valid credentials are configured
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then authentication should succeed
+    And a commit message should be generated
+
+  Scenario: Backend connectivity with invalid credentials
+    Given ollama backend requires authentication
+    And invalid credentials are configured
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then authentication should fail
+    And appropriate error should be displayed
+    And no commit message should be generated
+
+  Scenario: Integration with git hooks
+    Given git pre-commit hooks are configured
+    And I have made changes to a file
+    When I run aicommit command
+    Then git hooks should be respected
+    And commit should succeed if hooks pass
+    And commit should fail if hooks reject
+
+  Scenario: Integration with git submodules
+    Given repository contains git submodules
+    And I have made changes to submodule files
+    When I run aicommit command "--dry-run"
+    Then submodule changes should be detected
+    And commit message should reflect submodule changes
+
+  Scenario: Integration with git worktrees
+    Given repository uses git worktrees
+    And I have made changes in worktree
+    When I run aicommit command "--dry-run"
+    Then worktree context should be handled correctly
+    And commit message should be appropriate for worktree changes
+    When I run aicommit command "--dry-run"
+    Then the backend should respond successfully
+    And a commit message should be generated
+
   Scenario: Multiple backend basic connectivity fallback
     Given primary backend is not available
     And fallback backend is configured

@@ -1,13 +1,125 @@
-@unit-testing @critical
-Feature: AI Commit Library Function Tests
+@unit-testing @critical @configuration @stage2
+Feature: AI Commit Advanced Configuration Management
   As a developer maintaining aicommit
-  I want individual library functions to work correctly
-  So the overall system can rely on solid building blocks
+  I want comprehensive configuration management to work reliably
+  So the system can handle complex configuration scenarios
 
   Background:
     Given aicommit is properly installed
     And a git repository is initialized
     And the working directory is clean
+
+  Scenario: Configuration file hot reloading
+    Given aicommit is running with current configuration
+    And configuration file is modified during operation
+    When configuration changes are detected
+    Then new configuration should be loaded automatically
+    And ongoing operations should complete with old settings
+    And new operations should use updated settings
+    And user should be informed about configuration reload
+
+  Scenario: Configuration validation with complex nested structures
+    Given configuration file contains complex nested structures
+    And arrays and objects are properly formatted
+    When I load the configuration
+    Then nested structures should be parsed correctly
+    And array values should be accessible
+    And object properties should be accessible
+    And validation should pass for valid structures
+
+  Scenario: Configuration schema validation
+    Given configuration schema is defined
+    And configuration file is provided
+    When I validate configuration against schema
+    Then valid configurations should pass validation
+    And invalid configurations should fail with specific errors
+    And schema violations should be clearly reported
+    And default values should be used for missing optional fields
+
+  Scenario: Configuration inheritance and overrides
+    Given global configuration exists
+    And user configuration exists
+    And project configuration exists
+    When I load configuration
+    Then project settings should override user settings
+    And user settings should override global settings
+    And inheritance hierarchy should be respected
+    And final configuration should reflect all overrides
+
+  Scenario: Configuration template generation
+    Given user wants to create new configuration
+    When I generate configuration template
+    Then template should include all available options
+    And default values should be reasonable
+    And comments should explain each option
+    And template should be valid configuration
+
+  Scenario: Configuration migration between versions
+    Given old version configuration exists
+    And new version has different configuration structure
+    When I migrate configuration
+    Then old settings should be mapped to new structure
+    And deprecated settings should be handled gracefully
+    And migration warnings should be displayed
+    And new configuration should be functional
+
+  Scenario: Configuration backup and restore
+    Given working configuration exists
+    When I create configuration backup
+    Then backup should contain all current settings
+    And backup should be timestamped
+    And backup should be restorable
+    And restore should return system to previous state
+
+  Scenario: Configuration environment variable expansion
+    Given configuration contains environment variable references
+    And environment variables are set
+    When I load configuration
+    Then variables should be expanded correctly
+    And missing variables should use defaults
+    And expansion errors should be handled gracefully
+    And final values should be as expected
+
+  Scenario: Configuration validation with custom rules
+    Given custom validation rules are defined
+    And configuration file is provided
+    When I validate configuration
+    Then custom rules should be applied
+    And rule violations should be reported
+    And custom error messages should be displayed
+    And validation should be comprehensive
+
+  Scenario: Configuration performance optimization
+    Given configuration is large and complex
+    When I load configuration repeatedly
+    Then loading should be optimized with caching
+    And cache invalidation should work correctly
+    And performance should be acceptable
+    And memory usage should be reasonable
+
+  Scenario: Configuration security validation
+    Given configuration contains sensitive information
+    When I validate configuration security
+    Then sensitive values should be detected
+    And encryption should be validated
+    And access permissions should be checked
+    And security warnings should be displayed
+
+  Scenario: Configuration debugging and diagnostics
+    Given configuration is not working as expected
+    When I run configuration diagnostics
+    Then current configuration should be displayed
+    And effective values should be shown
+    And inheritance chain should be visible
+    And potential issues should be identified
+
+  Scenario: Configuration API integration
+    Given external configuration API is available
+    When I load configuration from API
+    Then API authentication should work
+    And remote configuration should be cached
+    And network failures should be handled
+    And local fallback should be available
 
   Scenario: Backend validation rejects unknown backend
     Given AI_BACKEND is set to "nonexistent"

@@ -87,3 +87,66 @@ Feature: AI Commit Installation and Setup Validation
     Then installation should succeed with local resources
     And offline installation should be documented
     And network-dependent features should be disabled gracefully
+
+  Scenario: Installation on different Linux distributions
+    Given system is Ubuntu-based
+    When I run installation script
+    Then installation should succeed
+    And distribution-specific requirements should be handled
+    And package manager dependencies should be installed
+
+  Scenario: Installation on macOS with Homebrew
+    Given system is macOS with Homebrew
+    When I install via Homebrew
+    Then installation should succeed
+    And Homebrew-specific paths should be handled
+    And macOS security permissions should be managed
+
+  Scenario: Installation on Windows with WSL
+    Given system is Windows with WSL
+    When I run installation script
+    Then installation should succeed in WSL environment
+    And Windows path integration should work
+    And WSL-specific requirements should be met
+
+  Scenario: Installation with custom shell
+    Given user uses fish shell
+    When I install aicommit
+    Then shell completion should be installed for fish
+    And PATH configuration should work for fish
+    And shell-specific features should be supported
+
+  Scenario: Installation validation with corrupted files
+    Given installation files are corrupted
+    When I attempt installation
+    Then corruption should be detected
+    And error should be clearly reported
+    And cleanup should be performed
+
+  Scenario: Installation rollback on failure
+    Given installation fails midway
+    When I check system state
+    Then partial installation should be cleaned up
+    And system should be restored to previous state
+    And error logs should be preserved
+
+  Scenario: Installation with minimal dependencies
+    Given system has minimal installed packages
+    When I run installation script
+    Then missing dependencies should be identified
+    And installation should guide dependency installation
+    And alternative installation methods should be suggested
+
+  Scenario: Installation in air-gapped environment
+    Given system has no internet access
+    When I install from offline package
+    Then installation should succeed completely
+    And all features should work offline
+    And documentation should be available locally
+
+  Scenario: Installation with custom Git configuration
+    Given user has custom Git configuration
+    When I install aicommit
+    Then Git configuration should be respected
+    And aicommit should integrate with custom Git setup
+    And no conflicts should occur

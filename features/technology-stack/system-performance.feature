@@ -1,13 +1,151 @@
-@functional
-Feature: AI Commit Exception Handling Tests
+@functional @performance @stage2
+Feature: AI Commit Performance and Scalability Testing
   As a developer using aicommit
-  I want the system to handle exceptions gracefully
-  So I can recover from errors and continue working
+  I want system to perform well under various load conditions
+  So I can rely on it for both small and large-scale projects
 
   Background:
     Given aicommit is properly installed
     And a git repository is initialized
     And the working directory is clean
+
+  Scenario: Large repository handling with 1000+ files
+    Given repository contains over 1000 files
+    And I have made changes to multiple files
+    When I run aicommit command "--dry-run"
+    Then processing should complete within reasonable time
+    And memory usage should remain within limits
+    And a commit message should be generated
+    And performance should be acceptable for large repos
+
+  Scenario: Concurrent processing testing
+    Given multiple aicommit processes run simultaneously
+    And I have made changes to multiple files
+    When I run aicommit command "--dry-run"
+    Then concurrent access should be detected
+    And lock mechanism should prevent conflicts
+    And the command should succeed
+    And overall performance should remain stable
+
+  Scenario: Memory usage validation under load
+    Given system has limited available memory
+    And I have made large changes requiring processing
+    When I run aicommit command "--dry-run"
+    Then memory constraints should be detected
+    And processing should be optimized for low memory
+    And large changes should be processed in chunks
+    And the command should succeed
+    And user should be informed about memory usage
+
+  Scenario: CPU usage optimization testing
+    Given system has limited CPU resources
+    And I have made complex changes
+    When I run aicommit command "--dry-run"
+    Then CPU usage should be optimized
+    And processing should complete efficiently
+    And system responsiveness should be maintained
+    And the command should succeed
+
+  Scenario: Disk I/O performance validation
+    Given disk I/O is slow
+    And I have made many file changes
+    When I run aicommit command "--dry-run"
+    Then disk operations should be optimized
+    And temporary file usage should be efficient
+    And processing should complete despite slow I/O
+    And the command should succeed
+    And user should be informed about I/O constraints
+
+  Scenario: Network bandwidth optimization
+    Given network bandwidth is limited
+    And ollama backend is configured
+    And I have made changes to multiple files
+    When I run aicommit command "--dry-run"
+    Then network usage should be optimized
+    And requests should be batched appropriately
+    And processing should complete within bandwidth limits
+    And the command should succeed
+    And user should be informed about network optimization
+
+  Scenario: Cache performance testing
+    Given aicommit cache is being used
+    And I have made repeated similar changes
+    When I run aicommit command "--dry-run"
+    Then cache should improve performance
+    And cache hits should be measured
+    And cache misses should be minimized
+    And overall processing should be faster
+    And the command should succeed
+
+  Scenario: Scalability with increasing file counts
+    Given repository contains over 1000 files
+    And I have made changes to multiple files
+    When I run aicommit command "--dry-run" with different loads
+    Then performance should scale linearly
+    And processing time should grow proportionally
+    And resource usage should remain predictable
+    And system should handle maximum expected load
+    And the command should succeed
+
+  Scenario: Performance regression detection
+    Given baseline performance metrics are established
+    And I have made standard changes
+    When I run aicommit command "--dry-run"
+    Then current performance should be compared to baseline
+    And regressions should be detected
+    And performance alerts should be triggered if needed
+    And user should be informed about performance issues
+    And the command should succeed
+
+  Scenario: Resource cleanup verification
+    Given aicommit has processed large changes
+    And temporary files were created
+    When processing completes
+    Then all temporary files should be cleaned up
+    And memory should be released
+    And no resource leaks should occur
+    And system should return to clean state
+    And the command should succeed
+
+  Scenario: Performance under different system loads
+    Given system has varying background load
+    And I have made changes to files
+    When I run aicommit command "--dry-run"
+    Then performance should adapt to system load
+    And processing should complete successfully
+    And priority should be given to aicommit processing
+    And system responsiveness should be maintained
+    And the command should succeed
+
+  Scenario: Database performance optimization
+    Given aicommit uses database for caching
+    And I have made many changes
+    When I run aicommit command "--dry-run"
+    Then database operations should be optimized
+    And queries should be efficient
+    And transactions should be batched
+    And database performance should not be bottleneck
+    And the command should succeed
+
+  Scenario: Parallel processing capabilities
+    Given multiple files can be processed independently
+    And I have made changes to many files
+    When I run aicommit command "--dry-run"
+    Then files should be processed in parallel where possible
+    And parallel processing should improve performance
+    And thread safety should be maintained
+    And results should be consistent
+    And the command should succeed
+
+  Scenario: Performance monitoring and reporting
+    Given performance monitoring is enabled
+    And I have made changes to files
+    When I run aicommit command "--dry-run"
+    Then performance metrics should be collected
+    And timing data should be accurate
+    And resource usage should be tracked
+    And performance report should be available
+    And the command should succeed
 
   Scenario: Handle git command failures gracefully
     Given git commands are failing

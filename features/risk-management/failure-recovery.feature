@@ -1,13 +1,122 @@
-@functional
-Feature: AI Commit Negative Tests
+@functional @error-handling @stage2
+Feature: AI Commit Advanced Error Handling
   As a developer using aicommit
-  I want the system to properly handle invalid inputs and error conditions
-  So I can trust that failures are handled gracefully
+  I want advanced error handling to work reliably under challenging conditions
+  So I can trust that the system gracefully handles complex failure scenarios
 
   Background:
     Given aicommit is properly installed
     And a git repository is initialized
     And the working directory is clean
+
+  Scenario: Network connectivity failures during AI communication
+    Given ollama backend is configured
+    And network connection is unstable
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then network failures should be detected
+    And retry mechanisms should be attempted
+    And graceful degradation should occur
+    And user should be informed about network issues
+
+  Scenario: AI service rate limiting handling
+    Given ollama backend has rate limits
+    And I have made multiple changes
+    When I run aicommit command "--dry-run"
+    Then rate limiting should be detected
+    And backoff strategy should be applied
+    And request should be retried after delay
+    And user should be informed about rate limiting
+
+  Scenario: Malformed response handling from AI service
+    Given ollama backend returns malformed JSON
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then malformed response should be detected
+    And error should be logged with details
+    And fallback response should be attempted
+    And user should receive clear error message
+
+  Scenario: Concurrent access conflicts during processing
+    Given multiple aicommit instances attempt to run
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then concurrent access should be detected
+    And lock mechanism should prevent conflicts
+    And operation should wait or fail gracefully
+    And user should be informed about concurrent access
+
+  Scenario: Resource exhaustion scenarios
+    Given system has limited memory available
+    And I have made large changes
+    When I run aicommit command "--dry-run"
+    Then memory constraints should be detected
+    And processing should be optimized for low memory
+    And large changes should be processed in chunks
+    And user should be informed about resource limitations
+
+  Scenario: File system permission edge cases
+    Given files have complex permission structure
+    And I have made changes to restricted files
+    When I run aicommit command "--dry-run"
+    Then permission issues should be handled gracefully
+    And accessible files should be processed
+    And restricted files should be skipped with warning
+    And user should be informed about permission issues
+
+  Scenario: Graceful degradation testing
+    Given ollama backend is partially available
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then partial functionality should be detected
+    And available features should be used
+    And unavailable features should be disabled
+    And user should be informed about degraded mode
+
+  Scenario: Database corruption handling
+    Given aicommit cache is corrupted
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then corruption should be detected
+    And cache should be rebuilt automatically
+    And processing should continue with fresh cache
+    And user should be informed about cache recovery
+
+  Scenario: Temporary file system failures
+    Given temporary directory cannot be created
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then filesystem failure should be detected
+    And alternative temporary location should be attempted
+    And operation should continue if possible
+    And user should be informed about filesystem issues
+
+  Scenario: AI model timeout during processing
+    Given AI model takes too long to respond
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then timeout should be detected
+    And operation should be cancelled gracefully
+    And partial results should be discarded
+    And user should be informed about timeout
+
+  Scenario: Configuration corruption recovery
+    Given configuration file is corrupted
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then configuration corruption should be detected
+    And default configuration should be used
+    And user should be informed about configuration issues
+    And operation should continue with defaults
+
+  Scenario: External dependency failures
+    Given required external tools are unavailable
+    And I have made changes to a file
+    When I run aicommit command "--dry-run"
+    Then missing dependencies should be detected
+    And alternative approaches should be attempted
+    And functionality should be limited appropriately
+    And user should be informed about missing dependencies
 
   Scenario: Reject unknown command line options
     When I run "aicommit --not-a-real-flag"

@@ -1,17 +1,20 @@
 # BDD Step Definitions Optimization Guide
 
 ## Overview
+
 This guide explains how to use the standardized step definitions to make BDD tests modular and reusable across all feature files.
 
 ## Standardized Step Categories
 
 ### 1. Environment Setup Steps
+
 - `Given aicommit is properly installed`
 - `Given a git repository is initialized`
 - `Given the working directory is clean`
 - `Given a clean system environment`
 
 ### 2. File and Change Management Steps
+
 - `Given I have made changes to a file`
 - `Given I have made changes to multiple files`
 - `Given I have made small code changes`
@@ -22,6 +25,7 @@ This guide explains how to use the standardized step definitions to make BDD tes
 - `Given I have made standard changes`
 
 ### 3. Configuration Steps
+
 - `Given AI_BACKEND is set to "backend_name"`
 - `Given AI_TIMEOUT is set to "timeout_value"`
 - `Given AI_PROMPT_FILE points to non-existent file`
@@ -30,6 +34,7 @@ This guide explains how to use the standardized step definitions to make BDD tes
 - `Given a configuration file with invalid AI_TIMEOUT value`
 
 ### 4. System Condition Steps
+
 - `Given network connection is unstable`
 - `Given system has limited available memory`
 - `Given system has limited CPU resources`
@@ -42,6 +47,7 @@ This guide explains how to use the standardized step definitions to make BDD tes
 - `Given ollama backend returns malformed JSON`
 
 ### 5. Repository and File Type Steps
+
 - `Given repository contains over 1000 files`
 - `Given I have modified JavaScript files`
 - `Given I have modified Python files`
@@ -52,6 +58,7 @@ This guide explains how to use the standardized step definitions to make BDD tes
 - `Given I have modified multiple file types`
 
 ### 6. Action Steps
+
 - `When I run aicommit command "command"`
 - `When I run "command"`
 - `When I load the configuration`
@@ -65,6 +72,7 @@ This guide explains how to use the standardized step definitions to make BDD tes
 - `When I check system dependencies`
 
 ### 7. Verification Steps
+
 - `Then the command should succeed`
 - `Then the command should fail`
 - `Then the command should fail with exit code 1`
@@ -85,6 +93,7 @@ This guide explains how to use the standardized step definitions to make BDD tes
 - `Then default configuration should be used as fallback`
 
 ### 8. Performance Steps
+
 - `Then processing should complete within reasonable time`
 - `Then memory usage should remain within limits`
 - `Then performance should be acceptable for large repos`
@@ -102,6 +111,7 @@ This guide explains how to use the standardized step definitions to make BDD tes
 - `Then system responsiveness should be maintained`
 
 ### 9. Configuration Management Steps
+
 - `Then new configuration should be loaded automatically`
 - `Then ongoing operations should complete with old settings`
 - `Then new operations should use updated settings`
@@ -121,14 +131,18 @@ This guide explains how to use the standardized step definitions to make BDD tes
 ## Usage Guidelines
 
 ### 1. Use Standardized Steps
+
 Always prefer using the standardized steps over creating new ones. This ensures:
+
 - Reusability across features
 - Consistent behavior
 - Easier maintenance
 - Better test coverage
 
 ### 2. Parameterize Steps
+
 Use parameters to make steps more flexible:
+
 ```gherkin
 Given I have modified JavaScript files  # Standard
 Given I have modified Python files     # Standard
@@ -136,7 +150,9 @@ Given I have modified Ruby files        # Standard
 ```
 
 ### 3. Combine Standard Steps
+
 Create complex scenarios by combining standard steps:
+
 ```gherkin
 Scenario: Complex workflow with performance constraints
   Given aicommit is properly installed
@@ -152,13 +168,17 @@ Scenario: Complex workflow with performance constraints
 ```
 
 ### 4. Add New Steps Only When Necessary
+
 Only add new steps when:
+
 - No existing step covers the functionality
 - The step is fundamentally different from existing ones
 - The step will be reused across multiple features
 
 ### 5. Keep Steps Atomic
+
 Each step should:
+
 - Do one thing well
 - Be independent of other steps
 - Have clear, descriptive names
@@ -167,13 +187,17 @@ Each step should:
 ## Migration Strategy
 
 ### Step 1: Identify Common Patterns
+
 Review existing feature files and identify:
+
 - Repeated step patterns
 - Similar functionality with different wording
 - Opportunities for standardization
 
 ### Step 2: Replace with Standard Steps
+
 Replace non-standard steps with standardized equivalents:
+
 ```gherkin
 # Before
 Given the system is Linux-based
@@ -189,11 +213,13 @@ Then the command should succeed
 ```
 
 ### Step 3: Test and Validate
+
 - Run tests to ensure functionality is preserved
 - Verify that all scenarios still pass
 - Check for any missing step definitions
 
 ### Step 4: Document and Share
+
 - Document any new standard steps created
 - Share the updated patterns with the team
 - Update this guide with new learnings

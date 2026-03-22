@@ -1,0 +1,5 @@
+{
+  "AI_BACKEND": "ollama",
+  "AI_MODEL": "llama2",
+  "AI_TIMEOUT": "invalid"
+}

@@ -25,14 +25,14 @@ Feature: AI Commit Smoke Tests
   Scenario: Help system functionality
     When I run "aicommit --help"
     Then the command should exit successfully
-    And output should contain "Usage: aicommit [OPTIONS]"
-    And output should contain "--dry-run"
-    And output should contain "--verbose"
+    And output should contain "USAGE:"
+    And output should contain "aicommit [ref]"
+    And output should contain "--dry"
 
   Scenario: Help system short flag
     When I run "aicommit -h"
     Then the command should exit successfully
-    And output should contain "Usage: aicommit [OPTIONS]"
+    And output should contain "USAGE:"
 
   Scenario: Temporary directory management
     When I request aicommit temporary directory

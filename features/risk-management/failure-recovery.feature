@@ -57,7 +57,7 @@ Feature: AI Commit Advanced Error Handling
 
   Scenario: File system permission edge cases
     Given files have complex permission structure
-    And I have made changes to restricted files
+    And I have made changes to restricted files only
     When I run aicommit command "--dry-run"
     Then permission issues should be handled gracefully
     And accessible files should be processed

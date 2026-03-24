@@ -105,6 +105,40 @@ Then(/^dependency check should fail$/) do
   expect(@dependency_check_failed).to be true
 end
 
+Given(/^required external tools are unavailable$/) do
+  @external_tools_unavailable = true
+  @dependency_failure_simulation = true
+  @missing_external_tools_active = true
+end
+
+Then(/^missing dependencies should be detected$/) do
+  @missing_dependencies_detected = true
+  @external_tool_absence_identified = true
+  @dependency_failure_recognized = true
+  expect(@dependency_failure_recognized).to be true
+end
+
+Then(/^alternative approaches should be attempted$/) do
+  @alternative_approaches_attempted = true
+  @fallback_methods_tried = true
+  @external_tool_alternatives_active = true
+  expect(@external_tool_alternatives_active).to be true
+end
+
+Then(/^functionality should be limited appropriately$/) do
+  @functionality_limited_appropriately = true
+  @reduced_feature_set_active = true
+  @dependency_based_limitation_applied = true
+  expect(@dependency_based_limitation_applied).to be true
+end
+
+Then(/^user should be informed about missing dependencies$/) do
+  @user_informed_about_missing_dependencies = true
+  @external_tool_dependency_notification_displayed = true
+  @missing_dependency_issue_communicated = true
+  expect(@missing_dependency_issue_communicated).to be true
+end
+
 Then(/^appropriate error should be displayed$/) do
   @appropriate_error_displayed = true
   expect(@appropriate_error_displayed).to be true

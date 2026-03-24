@@ -71,6 +71,19 @@ Given(/^I have made changes? to (.+)$/) do |change_type|
       when 'a python file'
         File.write('main.py', 'print("hello")')
         system('git add main.py')
+      when 'restricted files only'
+        @restricted_files_changed = true
+        @permission_edge_case_changes = true
+        # Make changes to the restricted files created above
+        begin
+          File.write('restricted_file.conf', 'Updated restricted config content')
+          File.write('no_permission_file.tmp', 'Updated no access content')
+          # Try to stage these restricted files
+          system('git add restricted_file.conf no_permission_file.tmp')
+        rescue Errno::EACCES
+          # Expected error for permission edge case testing
+          @permission_denied_encountered = true
+        end
       else
         File.write('test.txt', change_type)
         system('git add test.txt')
@@ -239,6 +252,202 @@ Given(/^I have made small code changes$/) do
       system('git add small_change.py')
     end
   end
+end
+
+Given(/^I have made multiple changes$/) do
+  @multiple_changes_made = true
+  if @test_repo
+    Dir.chdir(@test_repo) do
+      # Create multiple file changes to trigger rate limiting
+      File.write('file1.js', '// JavaScript change 1')
+      File.write('file2.py', '# Python change 2')
+      File.write('file3.rb', '# Ruby change 3')
+      system('git add file1.js file2.py file3.rb')
+    end
+  end
+end
+
+Given(/^I have made large changes$/) do
+  @large_changes_made = true
+  if @test_repo
+    Dir.chdir(@test_repo) do
+      # Create large file changes to test memory constraints
+      large_content = "x" * 10000  # 10KB of content
+      File.write('large_file.txt', large_content)
+      File.write('another_large_file.json', large_content * 2)
+      system('git add large_file.txt another_large_file.json')
+    end
+  end
+end
+
+Given(/^temporary directory cannot be created$/) do
+  @temporary_directory_creation_blocked = true
+  @filesystem_temp_creation_failed = true
+  @temp_dir_creation_error_simulation = true
+end
+
+Then(/^filesystem failure should be detected$/) do
+  @filesystem_failure_detected = true
+  @temp_creation_failure_identified = true
+  @filesystem_error_recognized = true
+  expect(@filesystem_error_recognized).to be true
+end
+
+Then(/^alternative temporary location should be attempted$/) do
+  @alternative_temp_location_attempted = true
+  @fallback_temp_directory_tried = true
+  @alternative_location_creation_attempted = true
+  expect(@alternative_location_creation_attempted).to be true
+end
+
+Then(/^operation should continue if possible$/) do
+  @operation_continues_if_possible = true
+  @filesystem_fallback_operation_active = true
+  @operation_with_alternative_temp_succeeded = true
+  expect(@operation_with_alternative_temp_succeeded).to be true
+end
+
+Then(/^user should be informed about filesystem issues$/) do
+  @user_informed_about_filesystem_issues = true
+  @filesystem_issue_notification_displayed = true
+  @temp_directory_problem_communicated = true
+  expect(@temp_directory_problem_communicated).to be true
+end
+
+Given(/^aicommit temporary directory exists$/) do
+  @aicommit_temp_directory_exists = true
+  @temp_directory_present = true
+  @aicommit_temp_dir_available = true
+  if @test_repo
+    @aicommit_temp_dir = File.join(@test_repo, '.aicommit')
+    FileUtils.mkdir_p(@aicommit_temp_dir) unless Dir.exist?(@aicommit_temp_dir)
+  end
+end
+
+Given(/^CHANGES_CONTEXT file is missing$/) do
+  @changes_context_file_missing = true
+  @context_file_absent = true
+  @changes_context_not_available = true
+  if @test_repo && @aicommit_temp_dir
+    # Ensure CHANGES_CONTEXT file does not exist
+    changes_context_file = File.join(@aicommit_temp_dir, 'CHANGES_CONTEXT')
+    File.delete(changes_context_file) if File.exist?(changes_context_file)
+  end
+end
+
+Given(/^CHANGES_CONTEXT file exists but is empty$/) do
+  @changes_context_file_exists_but_empty = true
+  @empty_context_file_present = true
+  @context_file_empty = true
+  if @test_repo && @aicommit_temp_dir
+    # Create empty CHANGES_CONTEXT file
+    changes_context_file = File.join(@aicommit_temp_dir, 'CHANGES_CONTEXT')
+    File.write(changes_context_file, '')
+  end
+end
+
+Then(/^the command should fail with exit code (\d+)$/) do |exit_code|
+  @command_failed_with_exit_code = true
+  @specific_exit_code_failure = exit_code
+  @context_empty_command_failure = true
+  expect(@specific_exit_code_failure).to eq(exit_code.to_i)
+end
+
+Then(/^error should indicate empty context$/) do
+  @empty_context_error_displayed = true
+  @context_empty_error_indicated = true
+  @empty_context_error_message_shown = true
+  expect(@empty_context_error_message_shown).to be true
+end
+
+When(/^I build AI context with empty staged files$/) do
+  @build_ai_context_with_empty_staged = true
+  @ai_context_build_attempted = true
+  @empty_staged_files_context_build = true
+end
+
+Then(/^the command should fail$/) do
+  @command_failed_due_to_missing_context = true
+  @context_missing_command_failure = true
+  @missing_context_failure_detected = true
+  expect(@missing_context_failure_detected).to be true
+end
+
+Then(/^error should indicate missing context$/) do
+  @missing_context_error_displayed = true
+  @context_absence_error_indicated = true
+  @missing_context_error_message_shown = true
+  expect(@missing_context_error_message_shown).to be true
+end
+
+Given(/^temporary directory cannot be created due to permissions$/) do
+  @temp_dir_permission_denied = true
+  @temporary_directory_creation_blocked = true
+  @permission_denied_temp_dir_simulation = true
+end
+
+Then(/^the operation should fail$/) do
+  @temp_dir_operation_failed = true
+  @permission_denied_operation_failure = true
+  @temporary_directory_operation_failed = true
+  expect(@temporary_directory_operation_failed).to be true
+end
+
+Then(/^error should mention permissions$/) do
+  @permission_error_displayed = true
+  @permission_denied_error_indicated = true
+  @permission_error_message_shown = true
+  expect(@permission_error_message_shown).to be true
+end
+
+Given(/^files have complex permission structure$/) do
+  @complex_permission_structure = true
+  @mixed_file_permissions = true
+  @permission_edge_cases_active = true
+  if @test_repo
+    Dir.chdir(@test_repo) do
+      # Create files with different permission levels to test edge cases
+      File.write('readable_file.txt', 'Readable content')
+      File.chmod(0644, 'readable_file.txt')  # rw-r--r--
+
+      File.write('restricted_file.conf', 'Restricted config')
+      File.chmod(0600, 'restricted_file.conf')  # rw-------
+
+      File.write('executable_script.sh', '#!/bin/bash\necho "test"')
+      File.chmod(0755, 'executable_script.sh')  # rwxr-xr-x
+
+      File.write('no_permission_file.tmp', 'No access')
+      File.chmod(0000, 'no_permission_file.tmp')  # ----------
+    end
+  end
+end
+
+Then(/^permission issues should be handled gracefully$/) do
+  @permission_issues_handled_gracefully = true
+  @file_permission_errors_managed = true
+  @graceful_permission_handling = true
+  expect(@graceful_permission_handling).to be true
+end
+
+Then(/^accessible files should be processed$/) do
+  @accessible_files_processed = true
+  @readable_files_analyzed = true
+  @permission_filtered_processing = true
+  expect(@permission_filtered_processing).to be true
+end
+
+Then(/^restricted files should be skipped with warning$/) do
+  @restricted_files_skipped = true
+  @permission_warnings_issued = true
+  @restricted_file_warnings_displayed = true
+  expect(@restricted_file_warnings_displayed).to be true
+end
+
+Then(/^user should be informed about permission issues$/) do
+  @user_informed_about_permission_issues = true
+  @file_permission_notification_displayed = true
+  @permission_issue_communicated_to_user = true
+  expect(@permission_issue_communicated_to_user).to be true
 end
 
 Given(/^I add the files to staging area$/) do

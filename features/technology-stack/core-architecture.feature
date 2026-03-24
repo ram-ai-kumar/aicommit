@@ -10,92 +10,92 @@ Feature: AI Commit Advanced Configuration Management
     And the working directory is clean
 
   Scenario: Configuration file hot reloading
-    Given aicommit is running with current configuration
-    And configuration file is modified during operation
-    When configuration changes are detected
-    Then new configuration should be loaded automatically
-    And ongoing operations should complete with old settings
-    And new operations should use updated settings
-    And user should be informed about configuration reload
+    Given aicommit is running with current configuration #1
+    And configuration file is modified during operation #2
+    When configuration changes are detected #3
+    Then new configuration should be loaded automatically #4
+    And ongoing operations should complete with old settings #5
+    And new operations should use updated settings #6
+    And user should be informed about configuration reload #7
 
   Scenario: Configuration validation with complex nested structures
-    Given configuration file contains complex nested structures
-    And arrays and objects are properly formatted
-    When I load the configuration
-    Then nested structures should be parsed correctly
-    And array values should be accessible
-    And object properties should be accessible
-    And validation should pass for valid structures
+    Given configuration file contains complex nested structures #8
+    And arrays and objects are properly formatted #9
+    When I load the configuration #10
+    Then nested structures should be parsed correctly #11
+    And array values should be accessible #12
+    And object properties should be accessible #13
+    And validation should pass for valid structures #14
 
   Scenario: Configuration schema validation
-    Given configuration schema is defined
-    And configuration file is provided
-    When I validate configuration against schema
-    Then valid configurations should pass validation
-    And invalid configurations should fail with specific errors
-    And schema violations should be clearly reported
-    And default values should be used for missing optional fields
+    Given configuration schema is defined #15
+    And configuration file is provided #16
+    When I validate configuration against schema #17
+    Then valid configurations should pass validation #18
+    And invalid configurations should fail with specific errors #19
+    And schema violations should be clearly reported #20
+    And default values should be used for missing optional fields #21
 
   Scenario: Configuration inheritance and overrides
-    Given global configuration exists
-    And user configuration exists
-    And project configuration exists
-    When I load configuration
-    Then project settings should override user settings
-    And user settings should override global settings
-    And inheritance hierarchy should be respected
-    And final configuration should reflect all overrides
+    Given global configuration exists #22
+    And user configuration exists #23
+    And project configuration exists #24
+    When I load configuration #25
+    Then project settings should override user settings #26
+    And user settings should override global settings #27
+    And inheritance hierarchy should be respected #28
+    And final configuration should reflect all overrides #29
 
   Scenario: Configuration template generation
-    Given user wants to create new configuration
-    When I generate configuration template
-    Then template should include all available options
-    And default values should be reasonable
-    And comments should explain each option
-    And template should be valid configuration
+    Given user wants to create new configuration #30
+    When I generate configuration template #31
+    Then template should include all available options #32
+    And default values should be reasonable #33
+    And comments should explain each option #34
+    And template should be valid configuration #35
 
   Scenario: Configuration migration between versions
-    Given old version configuration exists
-    And new version has different configuration structure
-    When I migrate configuration
-    Then old settings should be mapped to new structure
-    And deprecated settings should be handled gracefully
-    And migration warnings should be displayed
-    And new configuration should be functional
+    Given old version configuration exists #36
+    And new version has different configuration structure #37
+    When I migrate configuration #38
+    Then old settings should be mapped to new structure #39
+    And deprecated settings should be handled gracefully #40
+    And migration warnings should be displayed #41
+    And new configuration should be functional #42
 
   Scenario: Configuration backup and restore
-    Given working configuration exists
-    When I create configuration backup
-    Then backup should contain all current settings
-    And backup should be timestamped
-    And backup should be restorable
-    And restore should return system to previous state
+    Given working configuration exists #43
+    When I create configuration backup #44
+    Then backup should contain all current settings #45
+    And backup should be timestamped #46
+    And backup should be restorable #47
+    And restore should return system to previous state #48
 
   Scenario: Configuration environment variable expansion
-    Given configuration contains environment variable references
-    And environment variables are set
-    When I load configuration
-    Then variables should be expanded correctly
-    And missing variables should use defaults
-    And expansion errors should be handled gracefully
-    And final values should be as expected
+    Given configuration contains environment variable references #49
+    And environment variables are set #50
+    When I load configuration #51
+    Then variables should be expanded correctly #52
+    And missing variables should use defaults #53
+    And expansion errors should be handled gracefully #54
+    And final values should be as expected #55
 
   Scenario: Configuration validation with custom rules
-    Given custom validation rules are defined
-    And configuration file is provided
-    When I validate configuration
-    Then custom rules should be applied
-    And rule violations should be reported
-    And custom error messages should be displayed
-    And validation should be comprehensive
+    Given custom validation rules are defined #56
+    And configuration file is provided #57
+    When I validate configuration #58
+    Then custom rules should be applied #59
+    And rule violations should be reported #60
+    And custom error messages should be displayed #61
+    And validation should be comprehensive #62
 
   Scenario: Configuration performance optimization
-    Given configuration is large and complex
-    When I load configuration repeatedly
-    Then loading should be optimized with caching
-    And cache invalidation should work correctly
-    And performance should be acceptable
-    And memory usage should be reasonable
+    Given configuration is large and complex #63
+    When I load configuration repeatedly #64
+    Then loading should be optimized with caching #65
+    And cache invalidation should work correctly #66
+    And performance should be acceptable #67
+    And memory usage should be reasonable #68
 
   Scenario: Configuration security validation
     Given configuration contains sensitive information

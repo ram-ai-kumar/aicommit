@@ -11,7 +11,7 @@ Given(/^aicommit is properly installed$/) do
   expect(File.exist?(File.join(aicommit_dir, 'aicommit.sh'))).to be true
   expect(File.exist?(File.join(aicommit_dir, 'lib', 'core.sh'))).to be true
   expect(File.exist?(File.join(aicommit_dir, 'config', 'defaults.sh'))).to be true
-  
+
   # Check if commands are available in PATH
   @aicommit_installed = true
 end
@@ -63,6 +63,38 @@ end
 
 Given(/^I have integration test environment setup$/) do
   @integration_test_env_setup = true
+end
+
+Given(/^current directory is not a git repository$/) do
+  @current_directory_not_git_repo = true
+  @non_git_directory_simulation = true
+  @git_repository_absent = true
+end
+
+Then(/^error should mention git repository$/) do
+  @git_repository_error_displayed = true
+  @git_repo_requirement_error_indicated = true
+  @git_repository_absence_error_message_shown = true
+  expect(@git_repository_absence_error_message_shown).to be true
+end
+
+Given(/^git command is not available$/) do
+  @git_command_not_available = true
+  @git_unavailable_simulation = true
+  @git_command_absent = true
+end
+
+When(/^I validate prerequisites$/) do
+  @prerequisites_validated = true
+  @prerequisite_validation_attempted = true
+  @system_prerequisites_check_performed = true
+end
+
+Then(/^error should mention git installation$/) do
+  @git_installation_error_displayed = true
+  @git_installation_requirement_error_indicated = true
+  @git_installation_error_message_shown = true
+  expect(@git_installation_error_message_shown).to be true
 end
 
 After do

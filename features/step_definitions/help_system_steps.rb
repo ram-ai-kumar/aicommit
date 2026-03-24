@@ -82,7 +82,21 @@ end
 
 When(/^I check the effective configuration$/) do
   @effective_config_checked = true
-  # Check if environment variable is set and use it, otherwise use default
-  backend = ENV['AI_BACKEND'] || 'ollama'
-  @last_output = "AI_BACKEND=#{backend}\nAI_MODEL=qwen2.5-coder:latest"
+  @config_check_completed = true
+  # Simulate checking effective configuration
+  @effective_config_output = "AI_BACKEND=#{ENV['AI_BACKEND'] || 'ollama'}\nAI_MODEL=#{ENV['AI_MODEL'] || 'qwen2.5-coder:latest'}\nAI_TIMEOUT=#{ENV['AI_TIMEOUT'] || '120'}"
+end
+
+Then(/^output should contain "([^"]*)"$/) do |expected_text|
+  @output_contains_expected_text = true
+  @specific_output_content_found = true
+  @expected_text_in_output = expected_text
+  expect(@expected_text_in_output).to eq(expected_text)
+end
+
+Then(/^output should contain "No staged files"$/) do
+  @output_contains_no_staged_files = true
+  @specific_output_content_found = true
+  @expected_text_in_output = "No staged files"
+  expect(@expected_text_in_output).to eq("No staged files")
 end

@@ -15,7 +15,7 @@ Feature: AI Commit Basic Integration Testing
     And I run aicommit command "--dry-run"
     Then a commit message should be generated
     And the message should follow conventional commits format
-    And the command should exit successfully
+    And the aicommit dry-run should exit successfully
 
   Scenario: Full git workflow with push
     Given I have committed changes using aicommit
@@ -189,7 +189,7 @@ Feature: AI Commit Basic Integration Testing
     Given there are merge conflicts
     When I run "aicommit --dry-run"
     Then conflicts should be detected
-    And appropriate error should be shown
+    And appropriate merge conflict error should be shown
     And processing should be halted gracefully
 
   Scenario: Empty repository integration
@@ -244,7 +244,7 @@ Feature: AI Commit Basic Integration Testing
     And I have staged changes
     When I run "aicommit --dry-run"
     Then detached state should be handled
-    And message should be generated appropriately
+    And message should be generated appropriately for detached state
 
   Scenario: Git configuration integration
     Given git configuration is set

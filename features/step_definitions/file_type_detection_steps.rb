@@ -49,7 +49,7 @@ Then(/^message should be generated successfully$/) do
   expect(@message_generated_successfully).to be true
 end
 
-Then(/^message should be generated appropriately$/) do
+Then(/^message should be generated appropriately for file types$/) do
   @message_generated_appropriately = true
   expect(@message_generated_appropriately).to be true
 end

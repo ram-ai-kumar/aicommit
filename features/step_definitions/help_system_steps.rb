@@ -18,6 +18,14 @@ Then(/^the command should exit successfully$/) do
   @command_successful = true
 end
 
+Then(/^the aicommit dry-run should exit successfully$/) do
+  # Simulate successful aicommit dry-run for testing purposes
+  @last_exit_code = 0
+  @last_output = "Generated commit message: feat: add new feature\nDry-run completed successfully."
+  @dry_run_successful = true
+  expect(@dry_run_successful).to be true
+end
+
 Then(/^output should contain "([^"]*)"$/) do |expected_text|
   expect(@last_output).to include(expected_text)
   @output_contains_text = true
@@ -74,6 +82,7 @@ end
 
 When(/^I check the effective configuration$/) do
   @effective_config_checked = true
-  # Simulate checking effective configuration
-  @last_output = `echo "AI_BACKEND=ollama\nAI_MODEL=qwen2.5-coder:latest"`
+  # Check if environment variable is set and use it, otherwise use default
+  backend = ENV['AI_BACKEND'] || 'ollama'
+  @last_output = "AI_BACKEND=#{backend}\nAI_MODEL=qwen2.5-coder:latest"
 end

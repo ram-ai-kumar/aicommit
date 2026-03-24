@@ -90,7 +90,7 @@ Then(/^conflicts should be detected$/) do
   expect(@conflicts_detected).to be true
 end
 
-Then(/^appropriate error should be shown$/) do
+Then(/^appropriate merge conflict error should be shown$/) do
   @appropriate_error_shown = true
   expect(@appropriate_error_shown).to be true
 end
@@ -158,7 +158,7 @@ Then(/^detached state should be handled$/) do
   expect(@detached_state_handled).to be true
 end
 
-Then(/^message should be generated appropriately$/) do
+Then(/^message should be generated appropriately for detached state$/) do
   @message_generated_appropriately = true
   expect(@message_generated_appropriately).to be true
 end

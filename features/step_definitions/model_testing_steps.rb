@@ -116,7 +116,7 @@ Then(/^cached responses should be used if available$/) do
   expect(@cached_responses_used).to be true
 end
 
-Then(/^appropriate error should be shown$/) do
+Then(/^appropriate model error should be shown$/) do
   @appropriate_error_shown = true
   expect(@appropriate_error_shown).to be true
 end

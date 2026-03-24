@@ -27,7 +27,7 @@ Feature: Enhanced AI Commit Basic Functionality
     And a configuration file sets AI_BACKEND to "config-backend"
     When I check the effective configuration
     Then the environment variable should take precedence
-    And AI_BACKEND should be "test-backend"
+    And AI_BACKEND should be "test-backend" in effective configuration
 
   Scenario: Cross-platform compatibility on Linux
     Given the system is Linux-based

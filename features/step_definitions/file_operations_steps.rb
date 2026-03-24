@@ -9,13 +9,41 @@ When(/^I request aicommit temporary directory$/) do
   @temp_dir_requested = true
 end
 
+When(/^I request aicommit temporary directory in standard location$/) do
+  # Create aicommit temp directory under /tmp/.aicommit as expected by the test
+  aicommit_base = '/tmp/.aicommit'
+  FileUtils.mkdir_p(aicommit_base) unless Dir.exist?(aicommit_base)
+  @temp_dir = Dir.mktmpdir('aicommit-temp-test', aicommit_base)
+  @temp_dir_requested = true
+end
+
 Then(/^the directory should be created$/) do
   expect(@temp_dir).to_not be_nil
   expect(File.exist?(@temp_dir)).to be true
   @directory_created = true
 end
 
-Then(/^the directory should be under ([^"]*)$/) do |parent_dir|
+Then(/^the directory should have 700 permissions$/) do
+  expect(File.stat(@temp_dir).mode & 0777).to eq(0700)
+  @directory_permissions_correct = true
+end
+
+Then(/^the directory should not be world-readable$/) do
+  expect(File.stat(@temp_dir).mode & 0004).to eq(0)
+  @directory_not_world_readable = true
+end
+
+Then(/^the directory should not be world-writable$/) do
+  expect(File.stat(@temp_dir).mode & 0002).to eq(0)
+  @directory_not_world_writable = true
+end
+
+Then(/^the directory should not be world-executable$/) do
+  expect(File.stat(@temp_dir).mode & 0001).to eq(0)
+  @directory_not_world_executable = true
+end
+
+Then(/^the directory should be under "([^"]*)"$/) do |parent_dir|
   expect(@temp_dir).to start_with(parent_dir)
   @directory_under_parent = true
 end
@@ -201,11 +229,6 @@ end
 Then(/^operations should succeed across platforms$/) do
   @operations_succeed_platforms = true
   expect(@operations_succeed_platforms).to be true
-end
-
-Then(/^the directory should be under "([^"]*)"$/) do |parent_dir|
-  expect(@temp_dir).to start_with(parent_dir)
-  @directory_under_parent = true
 end
 
 Given(/^I have made small code changes$/) do

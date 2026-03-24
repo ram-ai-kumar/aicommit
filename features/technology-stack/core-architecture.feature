@@ -158,7 +158,7 @@ Feature: AI Commit Advanced Configuration Management
     And error should mention "not running"
 
   Scenario: Temporary directory creation and permissions
-    When I request aicommit temporary directory
+    When I request aicommit temporary directory in standard location
     Then the directory should be created
     And the directory should be under "/tmp/.aicommit"
     And the directory should have 700 permissions

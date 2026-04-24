@@ -83,10 +83,12 @@ aicommit() {
         display_commit_message "$commit_msg"
         display_commit_confirmation
         read -r response
+        response=${response:-y}
         case $response in
-            y|Y) process_commit "$commit_msg"; cleanup_aicommit_all; display_success ;;
-            e|E) git commit -e -m "$commit_msg"; cleanup_aicommit_all ;;
-            *)   echo "❌ Cancelled" ;;
+            y|Y)          process_commit "$commit_msg"; cleanup_aicommit_all; display_success ;;
+            e|E)          git commit -e -m "$commit_msg"; cleanup_aicommit_all ;;
+            $'\033'|n|N)  echo "❌ Cancelled" ;;
+            *)             echo "❌ Cancelled" ;;
         esac
         return 0
     fi
@@ -148,11 +150,13 @@ aicommit() {
     display_commit_message "$commit_msg"
     display_commit_confirmation
     read -r response
+    response=${response:-y}
 
     case $response in
-        y|Y) process_commit "$commit_msg"; cleanup_aicommit_all; display_success ;;
-        e|E) git commit -e -m "$commit_msg"; cleanup_aicommit_all ;;
-        *)   echo "❌ Cancelled" ;;
+        y|Y)          process_commit "$commit_msg"; cleanup_aicommit_all; display_success ;;
+        e|E)          git commit -e -m "$commit_msg"; cleanup_aicommit_all ;;
+        $'\033'|n|N)  echo "❌ Cancelled" ;;
+        *)             echo "❌ Cancelled" ;;
     esac
 }
 

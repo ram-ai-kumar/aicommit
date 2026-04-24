@@ -34,5 +34,5 @@ display_success() {
 }
 
 display_commit_confirmation() {
-    echo "Use this message? (y/n/e for edit)"
+    echo "Use this message? ([Y]/n/e to edit)"
 }

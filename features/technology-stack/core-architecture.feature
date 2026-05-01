@@ -133,18 +133,6 @@ Feature: AI Commit Advanced Configuration Management
     Then validation should fail
     And error should mention "Unsupported backend"
 
-  Scenario: LLM routing to unimplemented backends fails gracefully
-    Given AI_BACKEND is set to "llamacpp"
-    When I invoke LLM with test parameters
-    Then the command should fail
-    And error should mention "not yet implemented"
-
-  Scenario: LLM routing to localai fails gracefully
-    Given AI_BACKEND is set to "localai"
-    When I invoke LLM with test parameters
-    Then the command should fail
-    And error should mention "not yet implemented"
-
   Scenario: LLM routing with unknown backend fails
     Given AI_BACKEND is set to "unknown_llm"
     When I invoke LLM with test parameters

@@ -112,18 +112,6 @@ Feature: AI Model Management Tests
     Then validation should fail
     And error should mention "Unsupported backend"
 
-  Scenario: LLM routing to unimplemented backends fails gracefully
-    Given AI_BACKEND is set to "llamacpp"
-    When I invoke LLM with test parameters
-    Then the command should fail
-    And error should mention "not yet implemented"
-
-  Scenario: LLM routing to localai fails gracefully
-    Given AI_BACKEND is set to "localai"
-    When I invoke LLM with test parameters
-    Then the command should fail
-    And error should mention "not yet implemented"
-
   Scenario: Ollama validation fails when process not running
     Given pgrep finds no ollama process
     When I validate ollama prerequisites for "qwen2.5-coder:latest"

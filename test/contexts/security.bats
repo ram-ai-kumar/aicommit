@@ -93,18 +93,6 @@ teardown() {
     assert_output_contains "Unsupported backend"
 }
 
-@test "llamacpp backend refused until implemented" {
-    export AI_BACKEND="llamacpp"
-    run validate_backend_prerequisites
-    [ "$status" -eq 1 ]
-}
-
-@test "localai backend refused until implemented" {
-    export AI_BACKEND="localai"
-    run validate_backend_prerequisites
-    [ "$status" -eq 1 ]
-}
-
 # ─── Micro-segmentation: temp dirs are repo-scoped ───────────────────────────
 
 @test "get_aicommit_tmp_dir path is unique per repo name" {

@@ -97,25 +97,7 @@ teardown() {
     [ "$status" -eq 1 ]
 }
 
-@test "validate_llamacpp_prerequisites always returns 1" {
-    run validate_llamacpp_prerequisites "any"
-    [ "$status" -eq 1 ]
-}
 
-@test "validate_localai_prerequisites always returns 1" {
-    run validate_localai_prerequisites "any"
-    [ "$status" -eq 1 ]
-}
-
-@test "invoke_llamacpp always returns 1" {
-    run invoke_llamacpp "m" "/dev/null" "/dev/null" "/dev/null" "5"
-    [ "$status" -eq 1 ]
-}
-
-@test "invoke_localai always returns 1" {
-    run invoke_localai "m" "/dev/null" "/dev/null" "/dev/null" "5"
-    [ "$status" -eq 1 ]
-}
 
 @test "validate_ollama_prerequisites handles model load failure gracefully" {
     mock_bin "pgrep" "exit 0"

@@ -93,11 +93,10 @@ load_configuration() {
   - `validate_message()` - Validate commit message format
 
 #### backends.sh
-- **Purpose**: AI backend integration (Ollama, OpenAI, etc.)
+- **Purpose**: AI backend integration (Ollama)
 - **Functions**:
   - `detect_backend()` - Detect available AI backends
   - `call_ollama()` - Local LLM inference
-  - `call_openai()` - Cloud API integration
   - `fallback_backend()` - Backend fallback logic
 
 #### context-analyzer.sh
@@ -211,18 +210,12 @@ ai_context[sensitive_files]=".env config.json"
 - **Type**: Local LLM inference
 - **Models**: qwen2.5-coder, llama3.2, etc.
 - **Communication**: HTTP API on localhost:11434
-- **Advantages**: Privacy, offline operation, no API costs
 
 #### OpenAI (Fallback)
 - **Type**: Cloud API integration
 - **Models**: GPT-3.5-turbo, GPT-4
 - **Communication**: HTTPS API
 - **Authentication**: API key required
-
-#### Custom Backends
-- **Type**: Extensible backend system
-- **Interface**: Standardized API contract
-- **Examples**: LocalAI, llama.cpp, custom models
 
 ### Backend Selection Logic
 
@@ -379,8 +372,6 @@ select_backend() {
 
 #### Local Backends
 - **Ollama**: Native local LLM support
-- **llama.cpp**: Direct model integration
-- **LocalAI**: Local API server support
 
 #### Cloud Backends
 - **OpenAI**: GPT model integration

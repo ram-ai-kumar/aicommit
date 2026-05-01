@@ -139,18 +139,6 @@ Feature: AI Commit Advanced Error Handling
     Then validation should fail
     And error should mention "Unsupported backend"
 
-  Scenario: Reject unimplemented llamacpp backend
-    Given AI_BACKEND is set to "llamacpp"
-    When I validate backend prerequisites
-    Then validation should fail
-    And error should indicate backend is not implemented
-
-  Scenario: Reject unimplemented localai backend
-    Given AI_BACKEND is set to "localai"
-    When I validate backend prerequisites
-    Then validation should fail
-    And error should indicate backend is not implemented
-
   Scenario: Fail when changes context is missing
     Given aicommit temporary directory exists
     But CHANGES_CONTEXT file is missing

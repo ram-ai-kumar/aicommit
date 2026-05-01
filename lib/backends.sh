@@ -11,14 +11,8 @@ validate_backend_prerequisites() {
         ollama)
             validate_ollama_prerequisites "$model"
             ;;
-        llamacpp)
-            validate_llamacpp_prerequisites "$model"
-            ;;
-        localai)
-            validate_localai_prerequisites "$model"
-            ;;
         *)
-            display_error "Unsupported backend: $backend" "Supported backends: ollama, llamacpp, localai"
+            display_error "Unsupported backend: $backend" "Supported backends: ollama"
             return 1
             ;;
     esac
@@ -39,14 +33,8 @@ invoke_llm() {
         ollama)
             invoke_ollama "$model" "$prompt_file" "$response_file" "$error_file" "$timeout_secs"
             ;;
-        llamacpp)
-            invoke_llamacpp "$model" "$prompt_file" "$response_file" "$error_file" "$timeout_secs"
-            ;;
-        localai)
-            invoke_localai "$model" "$prompt_file" "$response_file" "$error_file" "$timeout_secs"
-            ;;
         *)
-            display_error "Unsupported backend: $backend" "Supported backends: ollama, llamacpp, localai"
+            display_error "Unsupported backend: $backend" "Supported backends: ollama"
             return 1
             ;;
     esac
@@ -211,42 +199,4 @@ invoke_ollama() {
         fi
         return 1
     fi
-}
-
-# Llama.cpp backend implementation (placeholder)
-validate_llamacpp_prerequisites() {
-    local model="$1"
-
-    display_error "Llama.cpp backend not yet implemented" "Use AI_BACKEND=ollama for now"
-    return 1
-}
-
-invoke_llamacpp() {
-    local model="$1"
-    local prompt_file="$2"
-    local response_file="$3"
-    local error_file="$4"
-    local timeout_secs="$5"
-
-    display_error "Llama.cpp backend not yet implemented" "Use AI_BACKEND=ollama for now"
-    return 1
-}
-
-# LocalAI backend implementation (placeholder)
-validate_localai_prerequisites() {
-    local model="$1"
-
-    display_error "LocalAI backend not yet implemented" "Use AI_BACKEND=ollama for now"
-    return 1
-}
-
-invoke_localai() {
-    local model="$1"
-    local prompt_file="$2"
-    local response_file="$3"
-    local error_file="$4"
-    local timeout_secs="$5"
-
-    display_error "LocalAI backend not yet implemented" "Use AI_BACKEND=ollama for now"
-    return 1
 }

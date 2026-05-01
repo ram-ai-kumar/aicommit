@@ -3,11 +3,11 @@
 # User overrides via ~/.aicommitrc take precedence.
 
 # LLM
-# LLM backend to use for inference (ollama, llamacpp, localai)
+# LLM backend to use for inference (ollama)
 AI_BACKEND="${AI_BACKEND:-ollama}"
 
 # LLM model to use for commit message generation (must be available in selected backend)
-AI_MODEL="${AI_MODEL:-qwen2.5-coder:latest}"
+AI_MODEL="${AI_MODEL:-granite4.1:8b}"
 
 # Path to custom prompt template for commit message generation
 # Override in ~/.aicommitrc: AI_PROMPT_FILE="$HOME/.aicommit/templates/custom-prompt.txt"

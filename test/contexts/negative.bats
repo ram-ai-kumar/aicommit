@@ -44,18 +44,6 @@ teardown() {
     [ "$status" -eq 1 ]
 }
 
-@test "validate_backend_prerequisites rejects llamacpp (not implemented)" {
-    export AI_BACKEND="llamacpp"
-    run validate_backend_prerequisites
-    [ "$status" -eq 1 ]
-}
-
-@test "validate_backend_prerequisites rejects localai (not implemented)" {
-    export AI_BACKEND="localai"
-    run validate_backend_prerequisites
-    [ "$status" -eq 1 ]
-}
-
 # ─── generate_commit_message ─────────────────────────────────────────────────
 
 @test "generate_commit_message --dry-run fails when CHANGES_CONTEXT is missing" {

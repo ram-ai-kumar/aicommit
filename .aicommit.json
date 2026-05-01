@@ -1,5 +1,5 @@
 {
   "AI_BACKEND": "ollama",
-  "AI_MODEL": "llama2",
+  "AI_MODEL": "granite4.1:8b",
   "AI_TIMEOUT": "invalid"
 }

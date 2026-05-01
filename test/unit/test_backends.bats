@@ -26,20 +26,6 @@ teardown() {
 
 # ─── invoke_llm routing ───────────────────────────────────────────────────────
 
-@test "invoke_llm routes llamacpp to invoke_llamacpp (returns 1)" {
-    export AI_BACKEND="llamacpp"
-    run invoke_llm "m" "/dev/null" "/dev/null" "/dev/null" "5"
-    [ "$status" -eq 1 ]
-    assert_output_contains "not yet implemented"
-}
-
-@test "invoke_llm routes localai to invoke_localai (returns 1)" {
-    export AI_BACKEND="localai"
-    run invoke_llm "m" "/dev/null" "/dev/null" "/dev/null" "5"
-    [ "$status" -eq 1 ]
-    assert_output_contains "not yet implemented"
-}
-
 @test "invoke_llm with unknown backend returns 1" {
     export AI_BACKEND="unknown_llm"
     run invoke_llm "m" "/dev/null" "/dev/null" "/dev/null" "5"
@@ -66,53 +52,7 @@ teardown() {
     assert_output_contains "not found"
 }
 
-# ─── validate_llamacpp_prerequisites ─────────────────────────────────────────
 
-@test "validate_llamacpp_prerequisites returns 1 (not yet implemented)" {
-    run validate_llamacpp_prerequisites "any-model"
-    [ "$status" -eq 1 ]
-}
-
-@test "validate_llamacpp_prerequisites explains it is not implemented" {
-    run validate_llamacpp_prerequisites "any-model"
-    assert_output_contains "not yet implemented"
-}
-
-# ─── validate_localai_prerequisites ──────────────────────────────────────────
-
-@test "validate_localai_prerequisites returns 1 (not yet implemented)" {
-    run validate_localai_prerequisites "any-model"
-    [ "$status" -eq 1 ]
-}
-
-@test "validate_localai_prerequisites explains it is not implemented" {
-    run validate_localai_prerequisites "any-model"
-    assert_output_contains "not yet implemented"
-}
-
-# ─── invoke_llamacpp ─────────────────────────────────────────────────────────
-
-@test "invoke_llamacpp returns 1 (not yet implemented)" {
-    run invoke_llamacpp "m" "/dev/null" "/dev/null" "/dev/null" "5"
-    [ "$status" -eq 1 ]
-}
-
-@test "invoke_llamacpp explains it is not implemented" {
-    run invoke_llamacpp "m" "/dev/null" "/dev/null" "/dev/null" "5"
-    assert_output_contains "not yet implemented"
-}
-
-# ─── invoke_localai ──────────────────────────────────────────────────────────
-
-@test "invoke_localai returns 1 (not yet implemented)" {
-    run invoke_localai "m" "/dev/null" "/dev/null" "/dev/null" "5"
-    [ "$status" -eq 1 ]
-}
-
-@test "invoke_localai explains it is not implemented" {
-    run invoke_localai "m" "/dev/null" "/dev/null" "/dev/null" "5"
-    assert_output_contains "not yet implemented"
-}
 
 # ─── invoke_ollama ────────────────────────────────────────────────────────────
 

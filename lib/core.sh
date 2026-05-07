@@ -309,6 +309,14 @@ generate_commit_message() {
     local commit_msg
     commit_msg=$(cat "$response_file" 2>/dev/null)
 
+    # Strip <think>...</think> blocks emitted by reasoning models (qwen3, qwen3.5, deepseek-r1, etc.)
+    # Uses awk for reliable multi-line block removal; handles blocks that don't start on their own line.
+    commit_msg=$(printf '%s' "$commit_msg" | awk '
+        /<think>/ { in_think = 1 }
+        !in_think  { print }
+        /<\/think>/ { in_think = 0 }
+    ')
+
     # Extract message from @@@ delimiters
     local extracted
     extracted=$(echo "$commit_msg" | sed -n '/^@@@$/,/^@@@$/{ /^@@@$/d; p; }')

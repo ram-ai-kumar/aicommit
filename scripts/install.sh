@@ -20,11 +20,11 @@ mkdir -p "$TARGET_DIR/completions"
 
 # 2. Sync files
 # Using cp -r for simplicity as we want exact mirror of core components
-cp "$SOURCE_DIR/aicommit.sh" "$TARGET_DIR/"
-cp -r "$SOURCE_DIR/lib/"* "$TARGET_DIR/lib/"
-cp -r "$SOURCE_DIR/templates/"* "$TARGET_DIR/templates/"
-cp -r "$SOURCE_DIR/config/"* "$TARGET_DIR/config/"
-[ -d "$SOURCE_DIR/completions" ] && cp -r "$SOURCE_DIR/completions/"* "$TARGET_DIR/completions/"
+cp "$SOURCE_DIR/../aicommit.sh" "$TARGET_DIR/"
+cp -r "$SOURCE_DIR/../lib/"* "$TARGET_DIR/lib/"
+cp -r "$SOURCE_DIR/../templates/"* "$TARGET_DIR/templates/"
+cp -r "$SOURCE_DIR/../config/"* "$TARGET_DIR/config/"
+[ -d "$SOURCE_DIR/../completions" ] && cp -r "$SOURCE_DIR/../completions/"* "$TARGET_DIR/completions/"
 
 # 3. Set permissions (owner only for everything in target)
 chmod -R 700 "$TARGET_DIR"

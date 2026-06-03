@@ -1,5 +1,5 @@
 {
   "AI_BACKEND": "ollama",
-  "AI_MODEL": "qwen2.5-coder:7b",
+  "AI_MODEL": "qwen2.5-coder",
   "AI_TIMEOUT": "invalid"
 }

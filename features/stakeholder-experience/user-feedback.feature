@@ -51,7 +51,7 @@ Feature: AI Commit Negative Tests
 
   Scenario: Fail ollama validation when process not running
     Given pgrep finds no ollama process
-    When I validate ollama prerequisites for "qwen2.5-coder:latest"
+    When I validate ollama prerequisites for "qwen2.5-coder:14b"
     Then validation should fail
     And error should mention "not running"
 

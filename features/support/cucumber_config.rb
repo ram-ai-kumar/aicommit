@@ -88,7 +88,7 @@ def get_aicommit_temp_dir
   end
 end
 
-def mock_ollama_service(models: ['qwen2.5-coder:latest', 'llama3.2:latest'], available: true)
+def mock_ollama_service(models: ['qwen2.5-coder:14b'], available: true)
   @config.mock_services[:ollama] = {
     models: models,
     available: available,

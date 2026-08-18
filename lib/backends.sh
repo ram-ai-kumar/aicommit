@@ -5,7 +5,7 @@
 # Validate backend prerequisites and model availability
 validate_backend_prerequisites() {
     local backend="${AI_BACKEND:-ollama}"
-    local model="${AI_MODEL:-qwen2.5-coder:latest}"
+    local model="${AI_MODEL:-qwen2.5-coder:14b}"
 
     case "$backend" in
         ollama)
@@ -71,14 +71,6 @@ find_fallback_model() {
     local preferred_model="$1"
     local default_models=(
         "qwen2.5-coder:latest"
-        "qwen2.5:latest"
-        "llama3.2:latest"
-        "llama3.1:latest"
-        "llama3:latest"
-        "codellama:latest"
-        "deepseek-coder:latest"
-        "mistral:latest"
-        "mixtral:latest"
     )
 
     # Security: Skip models with suspicious names
@@ -170,7 +162,7 @@ invoke_ollama() {
                     "Model '$current_model' may be too large for available RAM/GPU" \
                     "" \
                     "💡 Try:" \
-                    "1. Using a smaller model: export AI_MODEL=llama3.2:3b" \
+                    "1. Try the fallback model: export AI_MODEL=qwen2.5-coder:latest" \
                     "2. Free up system RAM and retry" \
                     "3. Check available models: ollama list"
             else
@@ -192,8 +184,8 @@ invoke_ollama() {
             display_error "Ollama generation failed (insufficient memory)" \
                 "Model '$current_model' is too large for available RAM/GPU" \
                 "" \
-                "💡 Try a smaller model:" \
-                "export AI_MODEL=llama3.2:3b && aicommit"
+                "💡 Try the fallback model:" \
+                "export AI_MODEL=qwen2.5-coder:latest && aicommit"
         else
             display_error "Ollama generation failed (exit $exit_code)" "Check diagnostic log: $error_file"
         fi

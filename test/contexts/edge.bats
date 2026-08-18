@@ -162,9 +162,8 @@ echo 'preferred-model:latest    abc123   4.7 GB  2 days ago'"
 
 @test "find_fallback_model prioritizes commit-specific models" {
     mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
-echo 'generic-model:latest      abc123   2.3 GB  1 day ago'
-echo 'llama3.2:latest          def456   4.1 GB  2 weeks ago'
-if [ \"\$2\" = \"llama3.2:latest\" ]; then
+echo 'qwen2.5-coder:latest    abc123   4.7 GB  2 days ago'
+if [ \"\$2\" = \"qwen2.5-coder:latest\" ]; then
     echo \"OK\"
     exit 0
 elif [ \"\$1\" = \"run\" ]; then
@@ -172,8 +171,8 @@ elif [ \"\$1\" = \"run\" ]; then
 fi"
     run find_fallback_model "missing-model"
     [ "$status" -eq 0 ]
-    # Should prefer llama3.2 (commit-specific) over generic
-    [ "$output" = "llama3.2:latest" ]
+    # Should fall back to qwen2.5-coder:latest
+    [ "$output" = "qwen2.5-coder:latest" ]
 }
 
 @test "test_model_loadability handles timeout" {

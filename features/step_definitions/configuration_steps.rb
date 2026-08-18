@@ -39,7 +39,7 @@ When(/^I check the default configuration$/) do
   if File.exist?(config_file)
     @default_config = File.read(config_file)
   else
-    @default_config = "AI_BACKEND=ollama\nAI_MODEL=qwen2.5-coder:latest\nAI_TIMEOUT=120"
+    @default_config = "AI_BACKEND=ollama\nAI_MODEL=qwen2.5-coder:14b\nAI_TIMEOUT=120"
   end
 end
 
@@ -69,7 +69,7 @@ Given(/^a JSON configuration file exists with valid settings$/) do
   @config_file = File.join(@test_repo, '.aicommitrc.json')
   File.write(@config_file, JSON.pretty_generate({
     'AI_BACKEND' => 'ollama',
-    'AI_MODEL' => 'qwen2.5-coder:latest',
+    'AI_MODEL' => 'qwen2.5-coder:14b',
     'AI_TIMEOUT' => 120
   }))
   @json_config_exists = true
@@ -79,7 +79,7 @@ Given(/^a YAML configuration file exists with valid settings$/) do
   @config_file = File.join(@test_repo, '.aicommitrc.yaml')
   File.write(@config_file, YAML.dump({
     'AI_BACKEND' => 'ollama',
-    'AI_MODEL' => 'qwen2.5-coder:latest',
+    'AI_MODEL' => 'qwen2.5-coder:14b',
     'AI_TIMEOUT' => 120
   }))
   @yaml_config_exists = true
@@ -93,13 +93,13 @@ end
 
 Given(/^a configuration file contains malformed YAML$/) do
   @config_file = File.join(@test_repo, '.aicommitrc.yaml')
-  File.write(@config_file, 'AI_BACKEND: ollama\nAI_MODEL: qwen2.5-coder:latest\nINVALID: [')  # Malformed YAML
+  File.write(@config_file, 'AI_BACKEND: ollama\nAI_MODEL: qwen2.5-coder:14b\nINVALID: [')  # Malformed YAML
   @malformed_yaml_config = true
 end
 
 Given(/^I have a configuration file with environment variables$/) do
   @config_file = File.join(@test_repo, '.aicommitrc')
-  File.write(@config_file, "AI_BACKEND=ollama\nAI_MODEL=${AI_MODEL:-qwen2.5-coder:latest}\nAI_TIMEOUT=${AI_TIMEOUT:-120}")
+  File.write(@config_file, "AI_BACKEND=ollama\nAI_MODEL=${AI_MODEL:-qwen2.5-coder:14b}\nAI_TIMEOUT=${AI_TIMEOUT:-120}")
   @env_config_exists = true
 end
 
@@ -107,14 +107,14 @@ Given(/^I have a configuration file with nested structures$/) do
   @config_file = File.join(@test_repo, '.aicommitrc.json')
   File.write(@config_file, JSON.pretty_generate({
     'AI_BACKEND' => 'ollama',
-    'AI_MODEL' => 'qwen2.5-coder:latest',
+    'AI_MODEL' => 'qwen2.5-coder:14b',
     'PROJECT_CONFIGS' => {
       'javascript' => {
-        'AI_MODEL' => 'qwen2.5-coder:latest',
+        'AI_MODEL' => 'qwen2.5-coder:14b',
         'CONVENTIONAL_COMMITS' => true
       },
       'python' => {
-        'AI_MODEL' => 'qwen2.5-coder:latest',
+        'AI_MODEL' => 'qwen2.5-coder:14b',
         'INCLUDE_TYPE_HINTS' => true
       }
     }
@@ -126,7 +126,7 @@ Given(/^I have a configuration file with arrays$/) do
   @config_file = File.join(@test_repo, '.aicommitrc.json')
   File.write(@config_file, JSON.pretty_generate({
     'AI_BACKEND' => 'ollama',
-    'AI_MODEL' => 'qwen2.5-coder:latest',
+    'AI_MODEL' => 'qwen2.5-coder:14b',
     'SUPPORTED_FILE_TYPES' => ['js', 'py', 'rb', 'go'],
     'EXCLUDED_PATTERNS' => ['*.log', '*.tmp', 'node_modules/*']
   }))
@@ -205,7 +205,7 @@ Then(/^AI_BACKEND should be set from the config file$/) do
 end
 
 Then(/^AI_MODEL should be set from the config file$/) do
-  expect(@loaded_config['AI_MODEL']).to eq('qwen2.5-coder:latest')
+  expect(@loaded_config['AI_MODEL']).to eq('qwen2.5-coder:14b')
   @ai_model_from_config = true
 end
 
@@ -220,7 +220,7 @@ Then(/^missing variables should be handled gracefully$/) do
 end
 
 Then(/^nested values should be accessible$/) do
-  expect(@loaded_config['PROJECT_CONFIGS']['javascript']['AI_MODEL']).to eq('qwen2.5-coder:latest')
+  expect(@loaded_config['PROJECT_CONFIGS']['javascript']['AI_MODEL']).to eq('qwen2.5-coder:14b')
   @nested_values_accessible = true
 end
 
@@ -263,7 +263,7 @@ Given(/^configuration file is corrupted$/) do
   if @test_repo
     @config_file = File.join(@test_repo, '.aicommitrc')
     # Create a corrupted configuration file
-    File.write(@config_file, "AI_BACKEND=ollama\nAI_MODEL=qwen2.5-coder:latest\nINVALID_JSON_CONTENT_HERE\n\0\0\0 MALFORMED")
+    File.write(@config_file, "AI_BACKEND=ollama\nAI_MODEL=qwen2.5-coder:14b\nINVALID_JSON_CONTENT_HERE\n\0\0\0 MALFORMED")
   end
 end
 
@@ -622,7 +622,7 @@ Given(/^a configuration file uses UTF-(\d+) encoding with special characters$/) 
   @config_file = File.join(@test_repo, '.aicommitrc.json')
   File.write(@config_file, JSON.pretty_generate({
     'AI_BACKEND' => 'ollama',
-    'AI_MODEL' => 'qwen2.5-coder:latest',
+    'AI_MODEL' => 'qwen2.5-coder:14b',
     'SPECIAL_CHARS' => 'café résumé naïve 🚀',
     'ENCODING' => "UTF-#{encoding}"
   }))

@@ -262,7 +262,7 @@ generate_commit_message() {
     local dry_run=false
     [ "$1" = "--dry-run" ] && dry_run=true
 
-    local model="${AI_MODEL:-qwen2.5-coder:latest}"
+    local model="${AI_MODEL:-qwen2.5-coder:14b}"
     local prompt_file="${AI_PROMPT_FILE}"
     local tmp_dir
     tmp_dir=$(get_aicommit_tmp_dir)
@@ -309,7 +309,7 @@ generate_commit_message() {
     local commit_msg
     commit_msg=$(cat "$response_file" 2>/dev/null)
 
-    # Strip <think>...</think> blocks emitted by reasoning models (qwen3, qwen3.5, deepseek-r1, etc.)
+    # Strip <think>...</think> blocks emitted by reasoning models (qwen2.5-coder:14b, etc.)
     # Uses awk for reliable multi-line block removal; handles blocks that don't start on their own line.
     commit_msg=$(printf '%s' "$commit_msg" | awk '
         /<think>/ { in_think = 1 }

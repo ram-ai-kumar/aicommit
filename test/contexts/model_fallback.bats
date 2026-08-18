@@ -20,15 +20,13 @@ teardown() {
     # Mock ollama list command
     ollama() {
         echo "NAME            ID              SIZE    MODIFIED"
-        echo "qwen2.5-coder:latest    abc123   4.7 GB  2 days ago"
-        echo "llama3.2:latest          def456   2.3 GB  1 week ago"
+        echo "qwen2.5-coder:14b    abc123   4.7 GB  2 days ago"
     }
     export -f ollama
 
     run get_available_ollama_models
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "qwen2.5-coder:latest" ]
-    [ "${lines[1]}" = "llama3.2:latest" ]
+    [ "${lines[0]}" = "qwen2.5-coder:14b" ]
 }
 
 @test "test_model_loadability with successful model" {
@@ -51,9 +49,8 @@ teardown() {
     ollama() {
         if [ "$1" = "list" ]; then
             echo "NAME            ID              SIZE    MODIFIED"
-            echo "llama3.2:latest          def456   2.3 GB  1 week ago"
-            echo "mistral:latest           ghi789   4.1 GB  2 weeks ago"
-        elif [ "$1" = "run" ] && [ "$2" = "llama3.2:latest" ]; then
+            echo "qwen2.5-coder:latest    abc123   4.7 GB  2 days ago"
+        elif [ "$1" = "run" ] && [ "$2" = "qwen2.5-coder:latest" ]; then
             echo "OK"
             return 0
         elif [ "$1" = "run" ]; then
@@ -62,9 +59,9 @@ teardown() {
     }
     export -f ollama
 
-    run find_fallback_model "qwen2.5-coder:latest"
+    run find_fallback_model "missing-model"
     [ "$status" -eq 0 ]
-    [ "$output" = "llama3.2:latest" ]
+    [ "$output" = "qwen2.5-coder:latest" ]
 }
 
 # ─── NEGATIVE TESTS ─────────────────────────────────────────────────────────────
@@ -145,13 +142,12 @@ teardown() {
 }
 
 @test "find_fallback_model prioritizes commit-specific models" {
-    # Mock scenario with both commit-specific and generic models
+    # Mock scenario where qwen2.5-coder:latest is the only commit-capable fallback
     ollama() {
         if [ "$1" = "list" ]; then
             echo "NAME            ID              SIZE    MODIFIED"
-            echo "generic-model:latest      abc123   2.3 GB  1 day ago"
-            echo "llama3.2:latest          def456   4.1 GB  2 weeks ago"
-        elif [ "$1" = "run" ] && [ "$2" = "llama3.2:latest" ]; then
+            echo "qwen2.5-coder:latest    abc123   4.7 GB  2 days ago"
+        elif [ "$1" = "run" ] && [ "$2" = "qwen2.5-coder:latest" ]; then
             echo "OK"
             return 0
         elif [ "$1" = "run" ]; then
@@ -162,20 +158,19 @@ teardown() {
 
     run find_fallback_model "missing-model"
     [ "$status" -eq 0 ]
-    # Should prefer llama3.2 (commit-specific) over generic
-    [ "$output" = "llama3.2:latest" ]
+    # Should fall back to qwen2.5-coder:latest
+    [ "$output" = "qwen2.5-coder:latest" ]
 }
 
 @test "find_fallback_model prioritizes loaded models" {
-    # Mock scenario with one loaded model and one commit-specific model
+    # Mock scenario with qwen2.5-coder:latest already loaded
     ollama() {
         if [ "$1" = "list" ]; then
             echo "NAME            ID              SIZE    MODIFIED"
-            echo "generic-loaded:latest     abc123   2.3 GB  1 day ago"
-            echo "llama3.2:latest          def456   4.1 GB  2 weeks ago"
+            echo "qwen2.5-coder:latest    abc123   4.7 GB  2 days ago"
         elif [ "$1" = "ps" ]; then
             echo "NAME            ID              SIZE    PROCESSOR       UNTIL"
-            echo "generic-loaded:latest     abc123   2.3 GB  100% GPU        4 mins"
+            echo "qwen2.5-coder:latest    abc123   4.7 GB  100% GPU        4 mins"
         elif [ "$1" = "run" ]; then
             echo "OK"
             return 0
@@ -185,8 +180,8 @@ teardown() {
 
     run find_fallback_model "missing-model"
     [ "$status" -eq 0 ]
-    # Should prefer generic-loaded because it's already loaded in memory
-    [ "$output" = "generic-loaded:latest" ]
+    # Should use qwen2.5-coder:latest since it's the only available model
+    [ "$output" = "qwen2.5-coder:latest" ]
 }
 
 @test "test_model_loadability handles timeout" {

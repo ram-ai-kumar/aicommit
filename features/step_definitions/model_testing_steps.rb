@@ -13,7 +13,7 @@ Then(/^I should see model names only$/) do
 end
 
 Given(/^a test model is available$/) do
-  # Check if qwen2.5-coder or similar model is available
+  # Check if qwen2.5-coder:14b or similar model is available
   @model_output = `ollama list 2>&1`
   @test_model_available = @model_output.include?('qwen') || @model_output.include?('llama')
 end

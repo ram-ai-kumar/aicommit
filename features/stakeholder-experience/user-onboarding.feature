@@ -18,7 +18,7 @@ Feature: AI Commit Smoke Tests
   Scenario: Default configuration validation
     When I check the default configuration
     Then AI_BACKEND should be "ollama"
-    And AI_MODEL should be "qwen2.5-coder:latest"
+    And AI_MODEL should be "qwen2.5-coder:14b"
     And AI_TIMEOUT should be "120"
     And AI_PROMPT_FILE should exist
 

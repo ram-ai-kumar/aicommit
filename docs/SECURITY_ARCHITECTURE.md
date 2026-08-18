@@ -88,18 +88,18 @@ AI Commit implements a Zero Trust philosophy, removing any implicit trust in thi
 
 ### Identified Threats
 
-| Threat | Description | Risk Level | Impact |
-|---------|-------------|-------------|---------|
-| **Data Exfiltration** | Accidental upload of proprietary source code | Critical | Business loss, IP theft |
-| **Credential Leakage** | Passwords in staging area processed by model | High | Security breach |
-| **Supply Chain Attack** | Compromised third-party AI services | Critical | System compromise |
-| **Command Injection** | Malicious input executing system commands | High | System compromise |
-| **Path Traversal** | Accessing files outside intended scope | Medium | Data disclosure |
-| **Privilege Escalation** | Gaining elevated system access | High | System compromise |
-| **Information Disclosure** | Leaking system information in error messages | Low | Information leakage |
-| **Denial of Service** | Large diffs causing environment hangs | Medium | Service disruption |
-| **Telemetry Abuse** | Unwanted data collection | Low | Privacy violation |
-| **Vendor Lock-in** | Third-party services requiring API tokens | Medium | Business risk |
+| Threat                     | Description                                  | Risk Level | Impact                  |
+| -------------------------- | -------------------------------------------- | ---------- | ----------------------- |
+| **Data Exfiltration**      | Accidental upload of proprietary source code | Critical   | Business loss, IP theft |
+| **Credential Leakage**     | Passwords in staging area processed by model | High       | Security breach         |
+| **Supply Chain Attack**    | Compromised third-party AI services          | Critical   | System compromise       |
+| **Command Injection**      | Malicious input executing system commands    | High       | System compromise       |
+| **Path Traversal**         | Accessing files outside intended scope       | Medium     | Data disclosure         |
+| **Privilege Escalation**   | Gaining elevated system access               | High       | System compromise       |
+| **Information Disclosure** | Leaking system information in error messages | Low        | Information leakage     |
+| **Denial of Service**      | Large diffs causing environment hangs        | Medium     | Service disruption      |
+| **Telemetry Abuse**        | Unwanted data collection                     | Low        | Privacy violation       |
+| **Vendor Lock-in**         | Third-party services requiring API tokens    | Medium     | Business risk           |
 
 ### Mitigation Strategies
 
@@ -232,7 +232,7 @@ sensitive_patterns=(
 #### Local Processing Preference
 
 1. **Primary Backend**: Ollama (local LLM)
-2. **Fallback Logic**: Only use cloud backends if explicitly configured
+2. **Fallback Logic**: Local fallback to qwen2.5-coder:latest if qwen2.5-coder:14b fails (no cloud backends)
 3. **User Consent**: Clear disclosure before any external processing
 4. **Data Minimization**: Send only necessary context to AI
 

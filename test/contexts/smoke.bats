@@ -47,8 +47,8 @@ teardown() {
     [ "$AI_BACKEND" = "ollama" ]
 }
 
-@test "default AI_MODEL is qwen2.5-coder:latest" {
-    [ "$AI_MODEL" = "qwen2.5-coder:latest" ]
+@test "default AI_MODEL is qwen2.5-coder:14b" {
+    [ "$AI_MODEL" = "qwen2.5-coder:14b" ]
 }
 
 @test "default AI_TIMEOUT is 120" {
@@ -108,12 +108,10 @@ teardown() {
 
 @test "get_available_ollama_models returns model list" {
     mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
-echo 'qwen2.5-coder:latest    abc123   4.7 GB  2 days ago'
-echo 'llama3.2:latest          def456   2.3 GB  1 week ago'"
+echo 'qwen2.5-coder:14b    abc123   4.7 GB  2 days ago'"
     run get_available_ollama_models
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "qwen2.5-coder:latest" ]
-    [ "${lines[1]}" = "llama3.2:latest" ]
+    [ "${lines[0]}" = "qwen2.5-coder:14b" ]
 }
 
 @test "test_model_loadability with successful model" {
@@ -125,16 +123,15 @@ echo 'llama3.2:latest          def456   2.3 GB  1 week ago'"
 
 @test "find_fallback_model returns suitable model" {
     mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
-echo 'llama3.2:latest          def456   2.3 GB  1 week ago'
-echo 'mistral:latest           ghi789   4.1 GB  2 weeks ago'
-if [ \"\$2\" = \"llama3.2:latest\" ]; then
+echo 'qwen2.5-coder:latest    abc123   4.7 GB  2 days ago'
+if [ \"\$2\" = \"qwen2.5-coder:latest\" ]; then
     echo \"OK\"
     exit 0
 elif [ \"\$1\" = \"run\" ]; then
     exit 1
 fi"
     mock_bin "timeout" "echo \"OK\""
-    run find_fallback_model "qwen2.5-coder:latest"
+    run find_fallback_model "missing-model"
     [ "$status" -eq 0 ]
-    [ "$output" = "llama3.2:latest" ]
+    [ "$output" = "qwen2.5-coder:latest" ]
 }

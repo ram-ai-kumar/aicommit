@@ -60,12 +60,14 @@ This document covers the complete technical architecture, system design, and imp
 **Purpose**: Main entry point and orchestration script  
 **Language**: Bash shell script  
 **Responsibilities**:
+
 - Environment setup and configuration loading
 - Git integration and diff analysis
 - AI backend communication
 - Output formatting and user interaction
 
 **Key Functions**:
+
 ```bash
 # Main execution flow
 main() {
@@ -86,6 +88,7 @@ load_configuration() {
 ### 2. Library Functions (`lib/`)
 
 #### core.sh
+
 - **Purpose**: Core business logic and commit message generation
 - **Functions**:
   - `generate_prompt()` - Build AI prompt with context
@@ -93,6 +96,7 @@ load_configuration() {
   - `validate_message()` - Validate commit message format
 
 #### backends.sh
+
 - **Purpose**: AI backend integration (Ollama)
 - **Functions**:
   - `detect_backend()` - Detect available AI backends
@@ -100,6 +104,7 @@ load_configuration() {
   - `fallback_backend()` - Backend fallback logic
 
 #### context-analyzer.sh
+
 - **Purpose**: Git diff analysis and context building
 - **Functions**:
   - `analyze_diff()` - Analyze git diff output
@@ -108,6 +113,7 @@ load_configuration() {
   - `filter_sensitive_data()` - Remove sensitive information
 
 #### output-formatter.sh
+
 - **Purpose**: Result formatting and display
 - **Functions**:
   - `format_commit_message()` - Format conventional commits
@@ -117,6 +123,7 @@ load_configuration() {
 ### 3. Configuration Management (`config/`)
 
 #### defaults.sh
+
 - **Purpose**: Default configuration values
 - **Settings**:
   - Default AI model preferences
@@ -124,11 +131,13 @@ load_configuration() {
   - Security and privacy settings
 
 #### User Configuration
+
 - **Location**: `~/.aicommitrc`
 - **Format**: Key-value pairs
 - **Override**: Environment variables take precedence
 
 #### Configuration Hierarchy
+
 1. **Environment Variables** (highest priority)
 2. **User Config** (`~/.aicommitrc`)
 3. **Default Config** (`config/defaults.sh`)
@@ -136,6 +145,7 @@ load_configuration() {
 ### 4. Templates (`templates/`)
 
 #### prompt.txt
+
 - **Purpose**: AI model prompt template
 - **Variables**:
   - `{{CONTEXT}}` - Git diff context
@@ -144,6 +154,7 @@ load_configuration() {
   - `{{RULES}}` - Commit message rules
 
 #### Custom Templates
+
 - User-defined prompt templates
 - Project-specific templates
 - Language-specific templates
@@ -181,6 +192,7 @@ Git Repository → Diff Analysis → Context Building → AI Backend → Message
 ### Data Structures
 
 #### Git Diff Processing
+
 ```bash
 # Diff analysis output structure
 declare -A diff_analysis
@@ -192,6 +204,7 @@ diff_analysis[project_type]="javascript"
 ```
 
 #### AI Context Building
+
 ```bash
 # Context structure for AI prompt
 declare -A ai_context
@@ -207,22 +220,17 @@ ai_context[sensitive_files]=".env config.json"
 ### Supported AI Backends
 
 #### Ollama (Primary)
-- **Type**: Local LLM inference
-- **Models**: qwen2.5-coder, llama3.2, etc.
-- **Communication**: HTTP API on localhost:11434
 
-#### OpenAI (Fallback)
-- **Type**: Cloud API integration
-- **Models**: GPT-3.5-turbo, GPT-4
-- **Communication**: HTTPS API
-- **Authentication**: API key required
+- **Type**: Local LLM inference
+- **Models**: qwen2.5-coder:14b
+- **Communication**: HTTP API on localhost:11434
 
 ### Backend Selection Logic
 
 ```bash
 select_backend() {
     local preferred_model="$1"
-    
+
     # 1. Check configured backend preference
     if [[ -n "$AI_BACKEND" ]]; then
         if verify_backend "$AI_BACKEND"; then
@@ -230,13 +238,13 @@ select_backend() {
             return 0
         fi
     fi
-    
+
     # 2. Try Ollama (local preference)
     if check_ollama_available; then
         echo "ollama"
         return 0
     fi
-    
+
     # 3. Try configured fallback backends
     for backend in "${FALLBACK_BACKENDS[@]}"; do
         if verify_backend "$backend"; then
@@ -244,7 +252,7 @@ select_backend() {
             return 0
         fi
     done
-    
+
     # 4. No backend available
     return 1
 }
@@ -253,16 +261,19 @@ select_backend() {
 ### Model Management
 
 #### Model Detection
+
 - Automatic detection of available models
 - Model capability assessment
 - Size and performance optimization
 
 #### Model Selection
+
 - User preference configuration
 - Automatic fallback logic
 - Performance-based optimization
 
 #### Model Validation
+
 - Model availability checking
 - Load testing and validation
 - Error handling and recovery
@@ -272,12 +283,14 @@ select_backend() {
 ### Error Handling Strategy
 
 #### Graceful Degradation
+
 - **Backend Failures**: Fallback to alternative backends
 - **Network Issues**: Local processing when possible
 - **Invalid Input**: Helpful error messages and suggestions
 - **Resource Limits**: Configurable timeouts and limits
 
 #### Recovery Mechanisms
+
 - **Automatic Retry**: Configurable retry logic for transient failures
 - **State Recovery**: Resume interrupted operations
 - **Cleanup Procedures**: Ensure system cleanup on errors
@@ -286,12 +299,14 @@ select_backend() {
 ### Performance Considerations
 
 #### Optimization Strategies
+
 - **Caching**: Cache AI responses for similar changes
 - **Parallel Processing**: Parallel file analysis when possible
 - **Resource Management**: Efficient memory and CPU usage
 - **Batch Processing**: Process multiple files together
 
 #### Scalability Design
+
 - **Modular Architecture**: Easy to extend with new features
 - **Configuration Flexibility**: Adaptable to different environments
 - **Backend Abstraction**: Support for multiple AI providers
@@ -300,12 +315,14 @@ select_backend() {
 ### Monitoring and Observability
 
 #### Logging Strategy
+
 - **Structured Logging**: Consistent log format for analysis
 - **Security Events**: Log security-relevant events
 - **Performance Metrics**: Track response times and success rates
 - **Debug Information**: Detailed debugging capabilities
 
 #### Debugging Support
+
 - **Verbose Mode**: Detailed debugging information
 - **Dry Run**: Preview changes without committing
 - **Configuration Validation**: Verify setup before processing
@@ -316,16 +333,19 @@ select_backend() {
 ### Installation Methods
 
 #### System Installation
+
 - **Global Install**: System-wide availability
 - **Path Integration**: Automatic PATH configuration
 - **Shell Integration**: Zsh/Bash completion setup
 
 #### User Installation
+
 - **Per-User**: Individual user installation
 - **Home Directory**: Installation in user home
 - **No Sudo Required**: User-level permissions only
 
 #### Portable Operation
+
 - **Standalone**: Operation without installation
 - **Self-Contained**: All dependencies included
 - **Cross-Platform**: Linux, macOS, Windows support
@@ -333,17 +353,20 @@ select_backend() {
 ### Configuration Management
 
 #### Environment Variables
+
 - **AI_MODEL**: Preferred AI model
 - **AI_BACKEND**: AI backend selection
 - **AICOMMIT_DEBUG**: Enable debug mode
 - **AICOMMIT_CONFIG**: Custom config file path
 
 #### Configuration Files
+
 - **~/.aicommitrc**: User configuration
 - **config/defaults.sh**: Default settings
 - **Project Config**: Project-specific settings
 
 #### Command Line Options
+
 - **--model**: Override AI model
 - **--backend**: Override AI backend
 - **--dry-run**: Preview without committing
@@ -354,16 +377,19 @@ select_backend() {
 ### Git Integration
 
 #### Git Hooks
+
 - **Pre-commit**: Automatic commit message generation
 - **Prepare-commit-msg**: Message validation
 - **Post-commit**: Cleanup and logging
 
 #### Workflow Integration
+
 - **CI/CD Pipeline**: Automated commit generation
 - **Build System**: Integration with build tools
 - **IDE Integration**: Editor plugin support
 
 #### Version Control
+
 - **Git Compatibility**: Full Git workflow support
 - **Branch Support**: Multi-branch development
 - **Merge Handling**: Merge commit message generation
@@ -371,14 +397,15 @@ select_backend() {
 ### AI Backend Integration
 
 #### Local Backends
+
 - **Ollama**: Native local LLM support
 
 #### Cloud Backends
-- **OpenAI**: GPT model integration
-- **Anthropic**: Claude model support
-- **Custom APIs**: Extensible API integration
+
+- Not supported in air-gapped mode
 
 #### Backend Abstraction
+
 - **Standard Interface**: Consistent API across backends
 - **Configuration**: Backend-specific configuration
 - **Fallback Logic**: Automatic backend switching
@@ -395,18 +422,21 @@ select_backend() {
 ### Future Roadmap
 
 #### v2.0 - Modular Rewrite
+
 - **Language**: Go or Rust rewrite
 - **Architecture**: Component-based microservices
 - **API**: RESTful API interface
 - **Plugin System**: Extensible plugin architecture
 
 #### v2.5 - Enhanced Features
+
 - **Web Interface**: Browser-based management
 - **Team Features**: Multi-user support
 - **Analytics**: Usage analytics and insights
 - **Enterprise**: SSO and enterprise features
 
 #### v3.0 - Cloud Native
+
 - **Container Support**: Docker/Kubernetes deployment
 - **Microservices**: Distributed architecture
 - **API Gateway**: Centralized API management
@@ -415,12 +445,14 @@ select_backend() {
 ### Technical Debt
 
 #### Current Limitations
+
 - **Shell Script Limitations**: Error handling, performance
 - **Single-threaded**: No parallel processing
 - **Limited Testing**: Manual testing process
 - **Configuration**: Basic configuration management
 
 #### Improvement Areas
+
 - **Error Handling**: Improve error recovery mechanisms
 - **Performance**: Optimize for large repositories
 - **Testing**: Expand automated test coverage
@@ -431,18 +463,21 @@ select_backend() {
 ### Code Standards
 
 #### Shell Script Best Practices
+
 - **Error Handling**: Comprehensive error checking
 - **Variable Handling**: Proper variable quoting
 - **Function Organization**: Modular function design
 - **Documentation**: Inline code documentation
 
 #### Security Considerations
+
 - **Input Validation**: Validate all user inputs
 - **Path Security**: Secure file path handling
 - **Permission Management**: Proper permission settings
 - **Data Protection**: Sensitive data handling
 
 #### Performance Optimization
+
 - **Efficient Algorithms**: Optimize for performance
 - **Resource Management**: Memory and CPU optimization
 - **Caching**: Implement appropriate caching
@@ -451,18 +486,21 @@ select_backend() {
 ### Testing Strategy
 
 #### Unit Testing
+
 - **Function Testing**: Individual function testing
 - **Integration Testing**: Component interaction testing
 - **Mock Testing**: Backend mocking for testing
 - **Edge Cases**: Boundary condition testing
 
 #### Integration Testing
+
 - **Backend Testing**: AI backend integration
 - **Git Testing**: Git workflow testing
 - **Configuration Testing**: Configuration management testing
 - **End-to-End**: Complete workflow testing
 
 #### Performance Testing
+
 - **Load Testing**: Large repository handling
 - **Stress Testing**: Resource limit testing
 - **Timing Testing**: Performance measurement

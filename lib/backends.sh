@@ -5,7 +5,7 @@
 # Validate backend prerequisites and model availability
 validate_backend_prerequisites() {
     local backend="${AI_BACKEND:-ollama}"
-    local model="${AI_MODEL:-qwen2.5-coder:14b}"
+    local model="${AI_MODEL:-qwen2.5-coder:latest}"
 
     case "$backend" in
         ollama)
@@ -66,12 +66,9 @@ test_model_loadability() {
     fi
 }
 
-# Find a suitable fallback model for commit generation
+# Find a suitable model for commit generation
 find_fallback_model() {
     local preferred_model="$1"
-    local default_models=(
-        "qwen2.5-coder:latest"
-    )
 
     # Security: Skip models with suspicious names
     local suspicious_pattern='(\.\./|\.\|.*[|&;<>$`'"'"'(){}].*|\|.*)'
@@ -86,19 +83,6 @@ find_fallback_model() {
             fi
         fi
     fi
-
-    # Only try known default models, not arbitrary available models
-    for model in "${default_models[@]}"; do
-        if ollama list 2>/dev/null | grep -qF "$model" && [ "$model" != "$preferred_model" ]; then
-            # Security check: skip suspicious model names
-            if ! echo "$model" | grep -qE "$suspicious_pattern"; then
-                if test_model_loadability "$model"; then
-                    echo "$model"
-                    return 0
-                fi
-            fi
-        fi
-    done
 
     return 1  # No suitable model found
 }
@@ -162,9 +146,8 @@ invoke_ollama() {
                     "Model '$current_model' may be too large for available RAM/GPU" \
                     "" \
                     "💡 Try:" \
-                    "1. Try the fallback model: export AI_MODEL=qwen2.5-coder:latest" \
-                    "2. Free up system RAM and retry" \
-                    "3. Check available models: ollama list"
+                    "1. Free up system RAM and retry" \
+                    "2. Check available models: ollama list"
             else
                 display_error "Ollama timed out after ${timeout_secs}s" "Model may be slow — try: ollama run $current_model"
             fi
@@ -184,8 +167,8 @@ invoke_ollama() {
             display_error "Ollama generation failed (insufficient memory)" \
                 "Model '$current_model' is too large for available RAM/GPU" \
                 "" \
-                "💡 Try the fallback model:" \
-                "export AI_MODEL=qwen2.5-coder:latest && aicommit"
+                "💡 Try freeing up RAM and retrying:" \
+                "aicommit"
         else
             display_error "Ollama generation failed (exit $exit_code)" "Check diagnostic log: $error_file"
         fi

@@ -84,7 +84,7 @@ When(/^I check the effective configuration$/) do
   @effective_config_checked = true
   @config_check_completed = true
   # Simulate checking effective configuration
-  @effective_config_output = "AI_BACKEND=#{ENV['AI_BACKEND'] || 'ollama'}\nAI_MODEL=#{ENV['AI_MODEL'] || 'qwen2.5-coder:14b'}\nAI_TIMEOUT=#{ENV['AI_TIMEOUT'] || '120'}"
+  @effective_config_output = "AI_BACKEND=#{ENV['AI_BACKEND'] || 'ollama'}\nAI_MODEL=#{ENV['AI_MODEL'] || 'qwen2.5-coder:latest'}\nAI_TIMEOUT=#{ENV['AI_TIMEOUT'] || '120'}"
 end
 
 Then(/^output should contain "([^"]*)"$/) do |expected_text|

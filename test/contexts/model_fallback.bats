@@ -20,13 +20,13 @@ teardown() {
     # Mock ollama list command
     ollama() {
         echo "NAME            ID              SIZE    MODIFIED"
-        echo "qwen2.5-coder:14b    abc123   4.7 GB  2 days ago"
+        echo "qwen2.5-coder:latest    abc123   4.7 GB  2 days ago"
     }
     export -f ollama
 
     run get_available_ollama_models
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "qwen2.5-coder:14b" ]
+    [ "${lines[0]}" = "qwen2.5-coder:latest" ]
 }
 
 @test "test_model_loadability with successful model" {
@@ -44,7 +44,7 @@ teardown() {
     [ "$status" -eq 0 ]
 }
 
-@test "find_fallback_model returns suitable model" {
+@test "find_fallback_model returns preferred model when available" {
     # Mock available models and loadability
     ollama() {
         if [ "$1" = "list" ]; then
@@ -59,7 +59,7 @@ teardown() {
     }
     export -f ollama
 
-    run find_fallback_model "missing-model"
+    run find_fallback_model "qwen2.5-coder:latest"
     [ "$status" -eq 0 ]
     [ "$output" = "qwen2.5-coder:latest" ]
 }
@@ -141,8 +141,8 @@ teardown() {
     [ "$output" = "" ]
 }
 
-@test "find_fallback_model prioritizes commit-specific models" {
-    # Mock scenario where qwen2.5-coder:latest is the only commit-capable fallback
+@test "find_fallback_model returns 1 when preferred model not available" {
+    # No fallback: if preferred model is not in the list, return 1
     ollama() {
         if [ "$1" = "list" ]; then
             echo "NAME            ID              SIZE    MODIFIED"
@@ -157,12 +157,11 @@ teardown() {
     export -f ollama
 
     run find_fallback_model "missing-model"
-    [ "$status" -eq 0 ]
-    # Should fall back to qwen2.5-coder:latest
-    [ "$output" = "qwen2.5-coder:latest" ]
+    [ "$status" -eq 1 ]
+    [ "$output" = "" ]
 }
 
-@test "find_fallback_model prioritizes loaded models" {
+@test "find_fallback_model returns preferred model when loaded" {
     # Mock scenario with qwen2.5-coder:latest already loaded
     ollama() {
         if [ "$1" = "list" ]; then
@@ -178,9 +177,8 @@ teardown() {
     }
     export -f ollama
 
-    run find_fallback_model "missing-model"
+    run find_fallback_model "qwen2.5-coder:latest"
     [ "$status" -eq 0 ]
-    # Should use qwen2.5-coder:latest since it's the only available model
     [ "$output" = "qwen2.5-coder:latest" ]
 }
 

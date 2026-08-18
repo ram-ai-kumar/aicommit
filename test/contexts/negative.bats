@@ -78,7 +78,7 @@ teardown() {
 
 @test "validate_ollama_prerequisites fails when pgrep finds no process" {
     mock_bin "pgrep" "exit 1"
-    run validate_ollama_prerequisites "qwen2.5-coder:14b"
+    run validate_ollama_prerequisites "qwen2.5-coder:latest"
     [ "$status" -eq 1 ]
     assert_output_contains "not running"
 }

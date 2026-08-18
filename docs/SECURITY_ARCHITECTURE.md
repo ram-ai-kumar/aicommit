@@ -232,7 +232,7 @@ sensitive_patterns=(
 #### Local Processing Preference
 
 1. **Primary Backend**: Ollama (local LLM)
-2. **Fallback Logic**: Local fallback to qwen2.5-coder:latest if qwen2.5-coder:14b fails (no cloud backends)
+2. **No Fallback**: Single model qwen2.5-coder:latest only (no cloud backends, no model fallback)
 3. **User Consent**: Clear disclosure before any external processing
 4. **Data Minimization**: Send only necessary context to AI
 

@@ -114,7 +114,7 @@ Feature: AI Model Management Tests
 
   Scenario: Ollama validation fails when process not running
     Given pgrep finds no ollama process
-    When I validate ollama prerequisites for "qwen2.5-coder:14b"
+    When I validate ollama prerequisites for "qwen2.5-coder:latest"
     Then validation should fail
     And error should mention "not running"
     And startup instructions should be provided

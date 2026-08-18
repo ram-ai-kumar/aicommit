@@ -160,7 +160,7 @@ echo 'preferred-model:latest    abc123   4.7 GB  2 days ago'"
     [ "$output" = "preferred-model:latest" ]
 }
 
-@test "find_fallback_model prioritizes commit-specific models" {
+@test "find_fallback_model returns 1 when preferred model not in list" {
     mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
 echo 'qwen2.5-coder:latest    abc123   4.7 GB  2 days ago'
 if [ \"\$2\" = \"qwen2.5-coder:latest\" ]; then
@@ -170,9 +170,8 @@ elif [ \"\$1\" = \"run\" ]; then
     exit 1
 fi"
     run find_fallback_model "missing-model"
-    [ "$status" -eq 0 ]
-    # Should fall back to qwen2.5-coder:latest
-    [ "$output" = "qwen2.5-coder:latest" ]
+    [ "$status" -eq 1 ]
+    [ "$output" = "" ]
 }
 
 @test "test_model_loadability handles timeout" {

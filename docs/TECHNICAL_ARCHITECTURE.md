@@ -101,7 +101,7 @@ load_configuration() {
 - **Functions**:
   - `detect_backend()` - Detect available AI backends
   - `call_ollama()` - Local LLM inference
-  - `fallback_backend()` - Backend fallback logic
+  - `find_fallback_model()` - Model availability check
 
 #### context-analyzer.sh
 
@@ -181,7 +181,6 @@ Git Repository → Diff Analysis → Context Building → AI Backend → Message
 
 3. **AI Communication**
    - Send context to AI backend for message generation
-   - Handle backend selection and fallback
    - Manage error handling and retries
 
 4. **Result Processing**
@@ -222,7 +221,7 @@ ai_context[sensitive_files]=".env config.json"
 #### Ollama (Primary)
 
 - **Type**: Local LLM inference
-- **Models**: qwen2.5-coder:14b
+- **Models**: qwen2.5-coder:latest
 - **Communication**: HTTP API on localhost:11434
 
 ### Backend Selection Logic
@@ -269,7 +268,7 @@ select_backend() {
 #### Model Selection
 
 - User preference configuration
-- Automatic fallback logic
+- Single model (no fallback)
 - Performance-based optimization
 
 #### Model Validation
@@ -284,7 +283,7 @@ select_backend() {
 
 #### Graceful Degradation
 
-- **Backend Failures**: Fallback to alternative backends
+- **Backend Failures**: Clear error messages (no fallback)
 - **Network Issues**: Local processing when possible
 - **Invalid Input**: Helpful error messages and suggestions
 - **Resource Limits**: Configurable timeouts and limits
@@ -408,7 +407,7 @@ select_backend() {
 
 - **Standard Interface**: Consistent API across backends
 - **Configuration**: Backend-specific configuration
-- **Fallback Logic**: Automatic backend switching
+- **No Fallback**: Single model only (no backend switching)
 
 ## 📊 Architecture Evolution
 

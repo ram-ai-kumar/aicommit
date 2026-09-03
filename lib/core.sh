@@ -249,11 +249,206 @@ ${stat_only_stat}"
     if [ -n "$commit_history" ]; then
         changes_context="${changes_context}
 
-=== RECENT COMMITS (for scope consistency) ===
+=== RECENT COMMITS (STYLE AND SCOPE REFERENCE ONLY - DO NOT DESCRIBE IN COMMIT) ===
 ${commit_history}"
     fi
 
     printf '%s' "$changes_context" > "${tmp_dir}/CHANGES_CONTEXT"
+}
+
+# Extract and sanitize clean conventional commit message from raw LLM output.
+# Handles reasoning model thinking blocks (<think>...</think>, </think> without open tag,
+# Thinking Process: preambles, duplicate keyword occurrences in draft vs final, etc.),
+# delimiters (@@@, code fences), conventional commit anchor discovery, and normalization.
+extract_conventional_commit() {
+    local raw_input="$1"
+    [ -z "$raw_input" ] && return 0
+
+    # Step 1: Strip ANSI escape sequences and carriage returns
+    local cleaned
+    cleaned=$(printf '%s' "$raw_input" | tr -d '\r' | sed -E $'s/\x1B\\[[0-9;]*[a-zA-Z]//g')
+
+    # Step 2: Handle reasoning / thinking closing tags
+    # If any closing tag (</think>, </thought>, </thinking>, </reasoning>) exists,
+    # discard EVERYTHING up to and including the last closing tag.
+    cleaned=$(printf '%s\n' "$cleaned" | awk '
+        /<\/(think|thought|thinking|reasoning)>/ {
+            sub(/.*<\/(think|thought|thinking|reasoning)>[[:space:]]*/, "")
+            last_close_line = NR
+            line_content = $0
+        }
+        {
+            lines[NR] = $0
+        }
+        END {
+            if (last_close_line > 0) {
+                if (line_content != "") {
+                    print line_content
+                }
+                for (i = last_close_line + 1; i <= NR; i++) {
+                    print lines[i]
+                }
+            } else {
+                for (i = 1; i <= NR; i++) {
+                    print lines[i]
+                }
+            }
+        }
+    ')
+
+    # Step 3: Remove any paired XML thinking blocks that might remain
+    cleaned=$(printf '%s\n' "$cleaned" | awk '
+        /<(think|thought|thinking|reasoning)>/ { in_block = 1; next }
+        /<\/(think|thought|thinking|reasoning)>/ { in_block = 0; next }
+        !in_block { print }
+    ')
+
+    # Step 4: Extract from @@@ delimiters if present
+    local delimited
+    delimited=$(printf '%s\n' "$cleaned" | awk '
+        /^@@@([[:space:]]*)$/ {
+            count++
+            next
+        }
+        count == 1 {
+            print
+        }
+        count >= 2 {
+            exit
+        }
+    ')
+
+    if [ -n "$(printf '%s' "$delimited" | tr -d '[:space:]')" ]; then
+        cleaned="$delimited"
+    else
+        # Step 4b: Check for markdown code blocks (``` or ```commit or ```gitcommit)
+        local code_block
+        code_block=$(printf '%s\n' "$cleaned" | awk '
+            /^```[a-zA-Z0-9_-]*[[:space:]]*$/ {
+                count++
+                next
+            }
+            count == 1 {
+                print
+            }
+            count >= 2 {
+                exit
+            }
+        ')
+        if [ -n "$(printf '%s' "$code_block" | tr -d '[:space:]')" ]; then
+            if printf '%s\n' "$code_block" | grep -qE '^[[:space:]]*(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)([(][^)]+[)])?!?: '; then
+                cleaned="$code_block"
+            fi
+        fi
+    fi
+
+    # Step 5: Locate Conventional Commit header
+    local commit_regex='^[[:space:]]*(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)([(][^)]+[)])?!?:[[:space:]].+'
+
+    # Extract conventional commit block:
+    # Handles multiple candidate headers (e.g. drafts in thinking) by tracking blocks.
+    # Lines starting with bullet markers (- or * or +) are ALWAYS treated as body lines, never headers.
+    local extracted
+    extracted=$(printf '%s\n' "$cleaned" | awk -v pattern="$commit_regex" '
+        BEGIN {
+            header_count = 0
+            curr_header = ""
+            curr_body = ""
+            in_body = 0
+        }
+        {
+            line = $0
+            trimmed = line
+            sub(/^[[:space:]]+/, "", trimmed)
+
+            # A bullet point line (- or * or +) is NEVER a commit header
+            is_bullet = (trimmed ~ /^[-*+][[:space:]]/)
+
+            candidate = trimmed
+            sub(/^[Ss]ubject:[[:space:]]*/, "", candidate)
+
+            # Check if this line is a conventional commit header candidate
+            if (!is_bullet && candidate ~ pattern) {
+                # Save previous block if any
+                if (curr_header != "") {
+                    headers[header_count] = curr_header
+                    bodies[header_count] = curr_body
+                    header_count++
+                }
+                curr_header = candidate
+                curr_body = ""
+                in_body = 1
+                next
+            }
+
+            if (in_body) {
+                # Stop if we hit trailing commentary or closing delimiters
+                if (line ~ /^[[:space:]]*(@@@|```)/ ||
+                    line ~ /^[[:space:]]*([Nn]ote|[Nn]otes|[Ee]xplanation|[Ss]ummary|[Cc]ommit [Mm]essage):/ ||
+                    line ~ /^[[:space:]]*([Hh]ope this|[Tt]his commit|[Ll]et me know|[Ii] have generated)/) {
+                    in_body = 0
+                    next
+                }
+                curr_body = (curr_body == "") ? line : curr_body "\n" line
+            }
+        }
+        END {
+            if (curr_header != "") {
+                headers[header_count] = curr_header
+                bodies[header_count] = curr_body
+                header_count++
+            }
+
+            if (header_count > 0) {
+                # Use the last detected commit block (the final decided commit message)
+                target = header_count - 1
+                print headers[target]
+                if (bodies[target] != "") {
+                    print bodies[target]
+                }
+            }
+        }
+    ')
+
+    if [ -n "$(printf '%s' "$extracted" | tr -d '[:space:]')" ]; then
+        cleaned="$extracted"
+    fi
+
+    # Step 6: Post-processing & Normalization
+    cleaned=$(printf '%s' "$cleaned" | sed 's/`//g; s/\*\*//g')
+
+    # Trim leading and trailing empty lines and normalize header-body separation
+    printf '%s\n' "$cleaned" | awk '
+        BEGIN { header = ""; body_count = 0; reading_body = 0 }
+        {
+            sub(/[[:space:]]+$/, "")
+            if (header == "") {
+                if ($0 != "") {
+                    header = $0
+                }
+                next
+            }
+            if (!reading_body) {
+                if ($0 == "") next
+                reading_body = 1
+            }
+            body_lines[body_count++] = $0
+        }
+        END {
+            if (header != "") {
+                print header
+                while (body_count > 0 && body_lines[body_count - 1] ~ /^[[:space:]]*$/) {
+                    body_count--
+                }
+                if (body_count > 0) {
+                    print ""
+                    for (i = 0; i < body_count; i++) {
+                        print body_lines[i]
+                    }
+                }
+            }
+        }
+    '
 }
 
 # Generate commit message — assembles prompt and calls Ollama
@@ -306,40 +501,9 @@ generate_commit_message() {
         return 1
     fi
 
-    local commit_msg
-    commit_msg=$(cat "$response_file" 2>/dev/null)
-
-    # Strip <think>...</think> blocks emitted by reasoning models
-    # Uses awk for reliable multi-line block removal; handles blocks that don't start on their own line.
-    commit_msg=$(printf '%s' "$commit_msg" | awk '
-        /<think>/ { in_think = 1 }
-        !in_think  { print }
-        /<\/think>/ { in_think = 0 }
-    ')
-
-    # Extract message from @@@ delimiters
-    local extracted
-    extracted=$(echo "$commit_msg" | sed -n '/^@@@$/,/^@@@$/{ /^@@@$/d; p; }')
-
-    if [ -n "$extracted" ]; then
-        commit_msg="$extracted"
-    else
-        # Fallback: strip common LLM preamble
-        commit_msg=$(echo "$commit_msg" | sed '/^$/d; s/\*\*//g' | sed '
-            /^[Hh]ere/d
-            /^[Ss]ure/d
-            /^[Bb]ased on/d
-            /^[Cc]ertainly/d
-            /^```/d
-        ')
-    fi
-
-    # Post-processing: strictly enforce plain text by stripping markdown symbols
-    # 1. Remove backticks (`)
-    # 2. Remove double asterisks (**) for bold
-    # 3. Remove single asterisks (*) or underscores (_) for italics (caution: might affect bullet points)
-    # We strip backticks and bolding specifically as they are most common formatting LLMs use for paths/variables.
-    commit_msg=$(echo "$commit_msg" | sed 's/`//g; s/\*\*//g')
+    local raw_response commit_msg
+    raw_response=$(cat "$response_file" 2>/dev/null)
+    commit_msg=$(extract_conventional_commit "$raw_response")
 
     echo "$commit_msg"
 }

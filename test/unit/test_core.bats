@@ -250,6 +250,112 @@ teardown() {
     refute_output_contains "@@@"
 }
 
+@test "generate_commit_message strips Thinking Process without open tag and extracts commit" {
+    echo "console.log('hello');" > app.js
+    git add app.js
+    local changes staged numstat
+    changes=$(git diff --staged)
+    staged=$(git diff --staged --name-only)
+    numstat=$(git diff --staged --numstat)
+    build_ai_context "$changes" "$staged" "$numstat"
+
+    # Mock the LLM call with the exact scenario reported by the user:
+    # Thinking Process without open <think> tag, ending in </think>, with docs: appearing twice
+    invoke_llm() {
+        local response_file="$3"
+        cat << 'EOF' > "$response_file"
+Thinking Process:
+1.  Analyze the Request:
+    *   Input: A log of recent git commits and a prompt indicating "Stage 12".
+    *   Task: Generate a commit message for the current action.
+    Subject: docs: create improvements plan for identified optimizations
+    Body:
+    - Implements Stage 12 deliverable
+    - Covers Performance, Security, Architecture, Ops
+    Okay, I'll construct the final response.cw
+</think>
+docs: create improvements plan for identified optimizations
+
+- Implements Stage 12 deliverable: docs/IMPROVEMENTS_PLAN.md
+- Consolidates findings
+EOF
+        return 0
+    }
+    export -f invoke_llm
+
+    run generate_commit_message
+    [ "$status" -eq 0 ]
+    assert_output_contains "docs: create improvements plan for identified optimizations"
+    assert_output_contains "- Implements Stage 12 deliverable: docs/IMPROVEMENTS_PLAN.md"
+    assert_output_contains "- Consolidates findings"
+    refute_output_contains "Thinking Process"
+    refute_output_contains "1.  Analyze the Request"
+    refute_output_contains "</think>"
+    refute_output_contains "construct the final response"
+}
+
+@test "extract_conventional_commit handles untagged thinking process with intermediate drafts" {
+    local input
+    input=$(cat << 'EOF'
+Thinking Process:
+1. Analyze the changes:
+   Option 1:
+   docs: intermediate draft that is incomplete
+2. Better option:
+docs(core): extract conventional commit cleanly from thinking
+
+- strip thinking blocks before anchor discovery
+- preserve body bullets
+EOF
+)
+    local result
+    result=$(extract_conventional_commit "$input")
+    echo "$result" | grep -qF "docs(core): extract conventional commit cleanly from thinking"
+    echo "$result" | grep -qF -- "- strip thinking blocks before anchor discovery"
+    ! echo "$result" | grep -qF "Thinking Process"
+    ! echo "$result" | grep -qF "intermediate draft"
+}
+
+@test "extract_conventional_commit preserves body bullets containing commit keywords" {
+    local input
+    input=$(cat << 'EOF'
+docs(plans): add stage 12 planning documentation
+
+- docs: add stage-12-identify-and-plan-overall-improvements.md
+- fix: clean up old documentation
+- test: verify all changes
+EOF
+)
+    local result
+    result=$(extract_conventional_commit "$input")
+    echo "$result" | grep -qF "docs(plans): add stage 12 planning documentation"
+    echo "$result" | grep -qF -- "- docs: add stage-12-identify-and-plan-overall-improvements.md"
+    echo "$result" | grep -qF -- "- fix: clean up old documentation"
+    echo "$result" | grep -qF -- "- test: verify all changes"
+}
+
+@test "extract_conventional_commit strips markdown fences and conversational preamble/postscript" {
+    local input
+    input=$(cat << 'EOF'
+Here is the conventional commit message:
+```
+feat(auth): add OAuth2 login with Google provider
+
+- integrate Google OAuth2 endpoint
+- add user token verification
+```
+Hope this helps! Let me know if you need changes.
+EOF
+)
+    local result
+    result=$(extract_conventional_commit "$input")
+    echo "$result" | grep -qF "feat(auth): add OAuth2 login with Google provider"
+    echo "$result" | grep -qF -- "- integrate Google OAuth2 endpoint"
+    ! echo "$result" | grep -qF "Here is the"
+    ! echo "$result" | grep -qF "Hope this helps"
+    ! echo "$result" | grep -qF '```'
+}
+
 # ─── cleanup_aicommit_all ────────────────────────────────────────────────────
 
 @test "cleanup_aicommit_all removes FULL_PROMPT" {

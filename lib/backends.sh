@@ -93,8 +93,15 @@ invoke_ollama() {
     # Use the configured AI_MODEL
     local current_model="${AI_MODEL:-$model}"
 
+    # Suppress thinking generation by default for reasoning models if supported
+    local -a extra_args=()
+    local think_setting="${AI_THINK:-false}"
+    if [ "$think_setting" = "false" ] && ollama run --help 2>&1 | grep -q -- "--think"; then
+        extra_args+=("--think=false")
+    fi
+
     # Run ollama in background to allow timeout and elapsed-time display
-    ollama run "$current_model" < "$prompt_file" > "$response_file" 2> "$error_file" &
+    ollama run "${extra_args[@]}" "$current_model" < "$prompt_file" > "$response_file" 2> "$error_file" &
     local ollama_pid=$!
 
     local elapsed=0

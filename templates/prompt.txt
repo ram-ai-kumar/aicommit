@@ -9,14 +9,11 @@ RULES:
    Each bullet describes WHAT CHANGED or WHY — never just names a file.
    BAD:  - update lib/core.sh
    GOOD: - replace head-800 truncation with per-file tiered filtering
-5. Output ONLY the raw commit message (no markdown, no backticks, no `**`).
-6. Output MUST be wrapped in @@@ delimiters.
-
-PROCESS:
-Step 1 — Identify distinct concerns from the diff (different features, behaviours, or removal of something).
-         Multiple files touching the SAME concern = one bullet or no body at all.
-Step 2 — Write header. Add body bullets only if 2+ distinct concerns exist.
-Step 3 — Output wrapped in @@@ delimiters.
+5. Scope strictly to changes: Base the commit message ONLY on staged changes in '=== CHANGES ==='.
+   Do NOT invent, assume, or reference files or deliverables not present in the changes.
+   Do NOT describe previous commits from '=== RECENT COMMITS ==='; those are for scope style only.
+6. Clean output: Output ONLY the raw commit message wrapped in @@@ delimiters.
+   Do NOT output any thinking process, reasoning steps, scratchpad, analysis, explanation, or preamble.
 
 EXAMPLES:
 @@@

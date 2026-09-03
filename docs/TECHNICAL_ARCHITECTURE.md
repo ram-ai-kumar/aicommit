@@ -221,7 +221,7 @@ ai_context[sensitive_files]=".env config.json"
 #### Ollama (Primary)
 
 - **Type**: Local LLM inference
-- **Models**: qwen3.5-9b-unsloth:latest
+- **Models**: Configured default model (see `config/defaults.sh` for current default)
 - **Communication**: HTTP API on localhost:11434
 
 ### Backend Selection Logic
@@ -470,26 +470,26 @@ select_backend() {
 
 ### Testing Strategy
 
-#### Unit Testing
+The project uses a single BATS (Bash Automated Testing System) suite under `test/`:
 
-- **Function Testing**: Individual function testing
-- **Integration Testing**: Component interaction testing
-- **Mock Testing**: Backend mocking for testing
-- **Edge Cases**: Boundary condition testing
+- **Smoke**: Script loading, defaults, help, temp directories
+- **Unit**: Individual shell function behavior in `lib/`
+- **Negative**: Missing Ollama, missing models, invalid backends
+- **Edge**: Empty input, binary files, long diffs, spaces in filenames
+- **Security**: Sensitive file exclusion, model-name injection, no model ID exposure
+- **Exception**: Ollama errors, memory errors, backend failures
+- **Compliance**: Conventional Commit type/scope/length validation
+- **Integration**: `--dry-run`, `--verbose`, multi-file staging, end-to-end commits
 
-#### Integration Testing
+Run the suite with:
 
-- **Backend Testing**: AI backend integration
-- **Git Testing**: Git workflow testing
-- **Configuration Testing**: Configuration management testing
-- **End-to-End**: Complete workflow testing
+```bash
+./test/run_tests.sh        # all categories
+bats test/contexts/smoke.bats   # single category
+bats test/unit/                 # all unit tests
+```
 
-#### Performance Testing
-
-- **Load Testing**: Large repository handling
-- **Stress Testing**: Resource limit testing
-- **Timing Testing**: Performance measurement
-- **Scalability Testing**: Scalability assessment
+Security scanning is performed with `gitleaks` and `trivy` from `test/run_tests.sh`.
 
 ---
 

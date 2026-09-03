@@ -243,9 +243,9 @@ ${changes_summary}"
 ${stat_only_stat}"
     fi
 
-    # Add recent commit history for scope consistency
+    # Add recent commit history for scope consistency (ignore new repos with no commits)
     local commit_history
-    commit_history=$(git log --oneline -10 2>/dev/null)
+    commit_history=$(git log --oneline -10 2>/dev/null) || true
     if [ -n "$commit_history" ]; then
         changes_context="${changes_context}
 
@@ -262,7 +262,7 @@ generate_commit_message() {
     local dry_run=false
     [ "$1" = "--dry-run" ] && dry_run=true
 
-    local model="${AI_MODEL:-qwen3.5-9b-unsloth:latest}"
+    local model="${AI_MODEL:-$DEFAULT_AI_MODEL}"
     local prompt_file="${AI_PROMPT_FILE}"
     local tmp_dir
     tmp_dir=$(get_aicommit_tmp_dir)

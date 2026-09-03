@@ -133,6 +133,35 @@ teardown() {
 
 # ─── cleanup after dry-run ────────────────────────────────────────────────────
 
+@test "aic commits a generated message end-to-end" {
+    echo "console.log('hello');" > app.js
+    git add app.js
+
+    # Mock Ollama as running and the model as present and responsive
+    pgrep() { return 0; }
+    ollama() {
+        case "$1" in
+            list)
+                echo "NAME            ID              SIZE    MODIFIED"
+                echo "test-model      abc123          4.7 GB  2 days ago"
+                ;;
+            run)
+                printf '%s\n' "<thinking>" "some reasoning" "</thinking>" "@@@" "feat(app): add app.js" "@@@"
+                return 0
+                ;;
+        esac
+    }
+    export -f pgrep ollama
+    export AI_MODEL="test-model"
+
+    run aic
+    [ "$status" -eq 0 ]
+
+    local msg
+    msg=$(git log --format="%s" -1)
+    [ "$msg" = "feat(app): add app.js" ]
+}
+
 @test "ephemeral context files are removed after dry-run" {
     echo "content" > app.js
     git add app.js

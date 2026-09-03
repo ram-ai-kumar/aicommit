@@ -5,7 +5,7 @@
 # Validate backend prerequisites and model availability
 validate_backend_prerequisites() {
     local backend="${AI_BACKEND:-ollama}"
-    local model="${AI_MODEL:-qwen3.5-9b-unsloth:latest}"
+    local model="${AI_MODEL:-$DEFAULT_AI_MODEL}"
 
     case "$backend" in
         ollama)

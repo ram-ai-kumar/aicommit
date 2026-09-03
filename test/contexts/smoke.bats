@@ -47,8 +47,8 @@ teardown() {
     [ "$AI_BACKEND" = "ollama" ]
 }
 
-@test "default AI_MODEL is qwen3.5-9b-unsloth:latest" {
-    [ "$AI_MODEL" = "qwen3.5-9b-unsloth:latest" ]
+@test "default AI_MODEL is the configured default" {
+    [ "$AI_MODEL" = "$(get_default_ai_model)" ]
 }
 
 @test "default AI_TIMEOUT is 120" {
@@ -62,6 +62,14 @@ teardown() {
 @test "AICOMMIT_DIR is set and exists" {
     [ -n "$AICOMMIT_DIR" ]
     [ -d "$AICOMMIT_DIR" ]
+}
+
+@test "prompt template contains CHANGES_CONTEXT placeholder" {
+    grep -qF '${CHANGES_CONTEXT}' "$AI_PROMPT_FILE"
+}
+
+@test "prompt template enforces Conventional Commit header length" {
+    grep -q "72" "$AI_PROMPT_FILE"
 }
 
 # ─── Help ────────────────────────────────────────────────────────────────────
@@ -107,16 +115,18 @@ teardown() {
 }
 
 @test "get_available_ollama_models returns model list" {
+    local default_model
+    default_model=$(get_default_ai_model)
     mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
-echo 'qwen3.5-9b-unsloth:latest    abc123   4.7 GB  2 days ago'"
+echo \"$default_model    abc123   4.7 GB  2 days ago\""
     run get_available_ollama_models
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "qwen3.5-9b-unsloth:latest" ]
+    [ "${lines[0]}" = "$default_model" ]
+    refute_output_contains "abc123"
 }
 
 @test "test_model_loadability with successful model" {
     mock_bin "ollama" "echo \"OK\""
-    mock_bin "timeout" "echo \"OK\""
     run test_model_loadability "test-model"
     [ "$status" -eq 0 ]
 }

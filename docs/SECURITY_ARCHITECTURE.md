@@ -232,7 +232,7 @@ sensitive_patterns=(
 #### Local Processing Preference
 
 1. **Primary Backend**: Ollama (local LLM)
-2. **Single Model**: Only the configured/default model is used (default: qwen3.5-9b-unsloth:latest); no cloud backends, no model switching
+2. **Single Model**: Only the configured/default model is used (see `config/defaults.sh` for the current default); no cloud backends, no model switching
 3. **User Consent**: Clear disclosure before any external processing
 4. **Data Minimization**: Send only necessary context to AI
 

@@ -149,24 +149,45 @@ generate_report() {
 
 run_security_scan() {
     print_header "Running Security Scan"
-    
-    echo "Scanning for potential security issues..."
-    
-    # Check for hardcoded secrets
-    if grep -rE "(password|secret|key|token)" --include="*.sh" --exclude-dir=test . 2>/dev/null; then
-        print_error "Potential secrets found in source code"
-        echo "Please review and remove any hardcoded credentials"
+
+    local found_issue=false
+
+    # Prefer gitleaks for actual secret detection (scans current files only)
+    if command -v gitleaks >/dev/null 2>&1; then
+        if gitleaks detect --source . --no-git --no-banner >/dev/null 2>&1; then
+            print_success "gitleaks found no hardcoded secrets in current files"
+        else
+            print_error "gitleaks detected potential secrets in current files"
+            gitleaks detect --source . --no-git --no-banner || true
+            found_issue=true
+        fi
     else
-        print_success "No hardcoded secrets detected"
+        print_warning "gitleaks not installed; skipping secret scan"
+        echo "Install with: brew install gitleaks  (or equivalent)"
     fi
-    
+
+    if command -v trivy >/dev/null 2>&1; then
+        if trivy fs --scanners secret --no-progress --quiet . >/dev/null 2>&1; then
+            print_success "trivy found no filesystem secrets"
+        else
+            print_error "trivy detected potential filesystem secrets"
+            trivy fs --scanners secret --no-progress . || true
+            found_issue=true
+        fi
+    fi
+
     # Check for unsafe permissions
     if find . -name "*.sh" -perm /o+w ! -path './test/*' 2>/dev/null | grep -q .; then
         print_warning "World-writable shell scripts found"
+        found_issue=true
     else
         print_success "Shell scripts have appropriate permissions"
     fi
-    
+
+    if [ "$found_issue" = true ]; then
+        return 1
+    fi
+
     echo
 }
 

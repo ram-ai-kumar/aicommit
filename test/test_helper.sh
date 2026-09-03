@@ -124,11 +124,29 @@ refute_output_contains() {
 
 # ─── Compliance Helpers ───────────────────────────────────────────────────────
 
-# Return 0 if the message matches Conventional Commits format.
+# Return 0 if the message matches Conventional Commits format and the header
+# is at most 72 characters, matching the rule in templates/prompt.txt.
 verify_conventional_commit() {
     local msg="$1"
-    echo "$msg" | grep -qE \
+    local first_line
+    first_line=$(printf '%s' "$msg" | head -n 1)
+
+    # Header length must not exceed 72 characters
+    if [ "${#first_line}" -gt 72 ]; then
+        return 1
+    fi
+
+    printf '%s' "$first_line" | grep -qE \
         "^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?!?: .+"
+}
+
+# ─── Default Model Helper ────────────────────────────────────────────────────
+
+# Return the configured default model name. Tests should use this instead of
+# hardcoding the model name, so the project has a single source of truth.
+get_default_ai_model() {
+    source "$AICOMMIT_DIR/config/defaults.sh"
+    printf '%s' "$DEFAULT_AI_MODEL"
 }
 
 # ─── Exports (when sourced from BATS) ────────────────────────────────────────
@@ -138,4 +156,5 @@ if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
     export -f create_test_files
     export -f assert_output_contains refute_output_contains
     export -f verify_conventional_commit
+    export -f get_default_ai_model
 fi

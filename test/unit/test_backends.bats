@@ -36,15 +36,17 @@ teardown() {
 # ─── get_available_ollama_models ─────────────────────────────────────────────
 
 @test "get_available_ollama_models returns model list" {
+    local default_model
+    default_model=$(get_default_ai_model)
     ollama() {
         echo "NAME            ID              SIZE    MODIFIED"
-        echo "qwen3.5-9b-unsloth:latest    abc123   4.7 GB  2 days ago"
+        echo "$default_model    abc123   4.7 GB  2 days ago"
     }
     export -f ollama
 
     run get_available_ollama_models
     [ "$status" -eq 0 ]
-    [ "${lines[0]}" = "qwen3.5-9b-unsloth:latest" ]
+    [ "${lines[0]}" = "$default_model" ]
 }
 
 @test "get_available_ollama_models handles malformed output" {
@@ -129,7 +131,7 @@ teardown() {
 
 @test "validate_ollama_prerequisites fails when ollama process not found" {
     mock_bin "pgrep" "exit 1"
-    run validate_ollama_prerequisites "qwen3.5-9b-unsloth:latest"
+    run validate_ollama_prerequisites "$(get_default_ai_model)"
     [ "$status" -eq 1 ]
     assert_output_contains "not running"
 }

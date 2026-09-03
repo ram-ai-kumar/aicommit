@@ -102,6 +102,17 @@ teardown() {
     [ "$status" -eq 1 ]
 }
 
+# ─── Header length ───────────────────────────────────────────────────────────
+
+@test "header at exactly 72 characters is accepted" {
+    verify_conventional_commit "feat: $(printf 'a%.0s' {1..66})"
+}
+
+@test "header longer than 72 characters is rejected" {
+    run verify_conventional_commit "feat: $(printf 'a%.0s' {1..67})"
+    [ "$status" -eq 1 ]
+}
+
 # ─── Commit message generation audit ─────────────────────────────────────────
 
 @test "process_commit records message verbatim in git log" {

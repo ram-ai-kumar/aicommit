@@ -24,6 +24,7 @@ Complete documentation for the AI Commit (`aicommit`) project, organized for CXO
 - **[Installation Guide](README.md#installation)** - Setup and installation instructions
 - **[Configuration](README.md#configuration)** - Environment variables and customization
 - **[Usage Examples](README.md#usage)** - Common usage patterns and examples
+- **[Testing](README.md#testing)** - Running the BATS test suite
 
 ## 🎯 Getting Started
 
@@ -57,21 +58,37 @@ Complete documentation for the AI Commit (`aicommit`) project, organized for CXO
 The documentation is organized into stakeholder-focused categories:
 
 ### Executive Perspective
+
 - **Business Value**: ROI analysis, competitive advantages, and strategic alignment
 - **Investment Justification**: Cost-benefit analysis and resource planning
 - **Organizational Impact**: Cultural transformation and competitive positioning
 
 ### Security & Governance Perspective
+
 - **Zero Trust Architecture**: Comprehensive security framework implementation
 - **Regulatory Compliance**: Multi-framework compliance automation and validation
 - **Risk Management**: Enterprise risk assessment and mitigation strategies
 
 ### Technical Perspective
+
 - **System Design**: Component architecture and data flow documentation
 - **Implementation Details**: Technical specifications and development guidelines
 - **Integration Patterns**: Backend integration and deployment architecture
 
 This structure provides role-appropriate documentation while maintaining comprehensive coverage of all project aspects.
+
+## 🧪 Testing
+
+The project uses BATS (Bash Automated Testing System) as its single test framework:
+
+```bash
+./test/run_tests.sh              # run all 8 categories
+bats test/contexts/smoke.bats    # run smoke tests only
+bats test/unit/                  # run unit tests
+./test/run_tests.sh --security   # run the security scan
+```
+
+Test categories: smoke, unit, negative, edge, security, exception, compliance, integration.
 
 ## 🔗 Cross-References
 
@@ -109,8 +126,7 @@ This structure provides role-appropriate documentation while maintaining compreh
 
 ---
 
-**Documentation Version**: 2.0
-**Last Updated**: 2026-03-23
-**Next Review**: 2026-04-23
+**Documentation Version**: 3.0
+**Last Updated**: 2026-09-03
 **Documentation Owner**: Documentation Team
 **Stakeholder Coverage**: Executive, Security, Compliance, Technical

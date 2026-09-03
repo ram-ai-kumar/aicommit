@@ -14,19 +14,19 @@ This roadmap outlines the strategic implementation plan for AI Commit, organized
 **Business Impact**: Risk reduction, compliance readiness  
 **Resource Requirements**: Security team, compliance team, development resources
 
-#### 1. Enhanced Security Testing Framework (Cucumber-Ruby BDD)
+#### 1. Unified BATS Test Suite
 
-**Status**: Pending  
-**Business Case**: Non-technical stakeholder communication, audit readiness  
-**Implementation**: 2-3 weeks  
-**Success Metrics**: 11 test categories, automated compliance evidence
+**Status**: Completed  
+**Business Case**: Single test framework matching the shell implementation, faster execution, audit readiness  
+**Implementation**: BATS-based smoke, unit, negative, edge, security, exception, compliance, and integration tests  
+**Success Metrics**: 194+ tests, all categories passing, no language mix
 
-#### 2. BDD Implementation Stages (All 6 Stages)
+#### 2. Test Coverage Expansion
 
-**Status**: Stage 1 Completed ✅, Stages 2-6 Pending  
-**Business Case**: Complete test coverage, business alignment  
-**Implementation**: 12 weeks total (2 weeks per stage)  
-**Success Metrics**: Business-oriented test coverage, stakeholder alignment
+**Status**: In Progress  
+**Business Case**: Close remaining behavior gaps (prompt validation, output cleanup, header length, end-to-end commit)  
+**Implementation**: Add targeted BATS cases for outputs, prompt, and full workflows  
+**Success Metrics**: 100% of runtime behavior exercised by BATS
 
 #### 3. Zero Trust Architecture Compliance Implementation
 
@@ -129,7 +129,7 @@ This roadmap outlines the strategic implementation plan for AI Commit, organized
 
 #### Deliverables
 
-- **Enhanced Security Testing Framework**: Cucumber-Ruby BDD implementation
+- **Unified BATS Test Suite**: Shell-native smoke, unit, negative, edge, security, exception, compliance, and integration tests
 - **Zero Trust Architecture Compliance**: Automated ZTA validation
 - **Security Scan Fixes**: Context-aware secret detection
 - **Publish-Ready Installer**: One-liner installation capability
@@ -171,18 +171,18 @@ This roadmap outlines the strategic implementation plan for AI Commit, organized
 - Deliver advanced features
 - Optimize performance
 - Extend ecosystem support
-- Complete BDD implementation
+- Expand BATS test coverage
 
 #### Deliverables
 
-- **Complete BDD Implementation**: All 6 stages operational
+- **Extended BATS Coverage**: Additional edge cases and backend scenarios
 - **Regulatory Compliance Automation**: Continuous compliance monitoring
 - **Additional Backend Support**: Multiple AI backend support
 - **Performance Optimizations**: Optimized operations and user feedback
 
 #### Success Criteria
 
-- Complete BDD test coverage
+- 100% runtime behavior covered by BATS
 - Continuous compliance monitoring
 - Multiple backend support
 - Performance optimizations implemented
@@ -205,7 +205,7 @@ Phase 2: User Experience & Adoption (Weeks 9-16)
 └── Enhanced Model Discovery (Weeks 14-16)
 
 Phase 3: Advanced Features & Optimization (Weeks 17-24)
-├── Complete BDD Implementation (Weeks 17-22)
+├── BATS Coverage Expansion (Weeks 17-22)
 ├── Regulatory Compliance Automation (Weeks 18-22)
 ├── Additional Backend Support (Weeks 20-24)
 └── Performance Optimizations (Weeks 22-24)

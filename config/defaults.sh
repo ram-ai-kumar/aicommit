@@ -6,8 +6,11 @@
 # LLM backend to use for inference (ollama)
 AI_BACKEND="${AI_BACKEND:-ollama}"
 
+# Default LLM model (single source of truth for the project)
+DEFAULT_AI_MODEL="qwen3.5-9b-unsloth:latest"
+
 # LLM model to use for commit message generation (must be available in selected backend)
-AI_MODEL="${AI_MODEL:-qwen3.5-9b-unsloth:latest}"
+AI_MODEL="${AI_MODEL:-$DEFAULT_AI_MODEL}"
 
 # Path to custom prompt template for commit message generation
 # Override in ~/.aicommitrc: AI_PROMPT_FILE="$HOME/.aicommit/templates/custom-prompt.txt"

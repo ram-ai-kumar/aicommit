@@ -78,7 +78,7 @@ teardown() {
 
 @test "validate_ollama_prerequisites fails when pgrep finds no process" {
     mock_bin "pgrep" "exit 1"
-    run validate_ollama_prerequisites "qwen3.5-9b-unsloth:latest"
+    run validate_ollama_prerequisites "$(get_default_ai_model)"
     [ "$status" -eq 1 ]
     assert_output_contains "not running"
 }

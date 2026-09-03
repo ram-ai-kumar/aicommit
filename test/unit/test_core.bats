@@ -216,6 +216,40 @@ teardown() {
     [ -f "${d}/FULL_PROMPT" ]
 }
 
+# ─── generate_commit_message ─────────────────────────────────────────────────
+
+@test "generate_commit_message strips thinking blocks and extracts @@@ delimiters" {
+    echo "console.log('hello');" > app.js
+    git add app.js
+    local changes staged numstat
+    changes=$(git diff --staged)
+    staged=$(git diff --staged --name-only)
+    numstat=$(git diff --staged --numstat)
+    build_ai_context "$changes" "$staged" "$numstat"
+
+    # Mock the LLM call to write a response with reasoning and @@@ delimiters
+    invoke_llm() {
+        local response_file="$3"
+        {
+            echo "<thinking>"
+            echo "some reasoning"
+            echo "</thinking>"
+            echo "@@@"
+            echo "feat(app): add app.js"
+            echo "@@@"
+        } > "$response_file"
+        return 0
+    }
+    export -f invoke_llm
+
+    run generate_commit_message
+    [ "$status" -eq 0 ]
+    assert_output_contains "feat(app): add app.js"
+    refute_output_contains "<thinking>"
+    refute_output_contains "some reasoning"
+    refute_output_contains "@@@"
+}
+
 # ─── cleanup_aicommit_all ────────────────────────────────────────────────────
 
 @test "cleanup_aicommit_all removes FULL_PROMPT" {

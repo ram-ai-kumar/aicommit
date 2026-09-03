@@ -89,7 +89,6 @@ Feature: AI Commit Basic Integration Testing
     When I run aicommit command "--dry-run"
     Then the command should handle timeout gracefully
     And appropriate error should be displayed
-    And fallback mechanisms should be attempted
 
   Scenario: Backend connectivity with authentication
     Given ollama backend requires authentication
@@ -132,15 +131,6 @@ Feature: AI Commit Basic Integration Testing
     When I run aicommit command "--dry-run"
     Then the backend should respond successfully
     And a commit message should be generated
-
-  Scenario: Multiple backend basic connectivity fallback
-    Given primary backend is not available
-    And fallback backend is configured
-    And I have made changes to a file
-    And I add the file to staging area
-    When I run aicommit command "--dry-run"
-    Then the system should fall back to secondary backend
-    And a commit message should still be generated
 
   Scenario: Simple AI model interaction with small changes
     Given I have made small code changes

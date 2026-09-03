@@ -1,5 +1,5 @@
 #!/usr/bin/env bats
-# Unit Tests — lib/backends.sh (8 functions)
+# Unit Tests — lib/backends.sh
 
 setup() {
     source "$(dirname "$BATS_TEST_FILENAME")/../test_helper.sh"
@@ -33,18 +33,108 @@ teardown() {
     assert_output_contains "Unsupported backend"
 }
 
+# ─── get_available_ollama_models ─────────────────────────────────────────────
+
+@test "get_available_ollama_models returns model list" {
+    ollama() {
+        echo "NAME            ID              SIZE    MODIFIED"
+        echo "qwen3.5-9b-unsloth:latest    abc123   4.7 GB  2 days ago"
+    }
+    export -f ollama
+
+    run get_available_ollama_models
+    [ "$status" -eq 0 ]
+    [ "${lines[0]}" = "qwen3.5-9b-unsloth:latest" ]
+}
+
+@test "get_available_ollama_models handles malformed output" {
+    ollama() {
+        echo "invalid output without proper structure"
+    }
+    export -f ollama
+
+    run get_available_ollama_models
+    [ "$status" -eq 0 ]
+    [ "$output" = "" ]
+}
+
+@test "get_available_ollama_models does not expose sensitive data" {
+    ollama() {
+        echo "NAME            ID              SIZE    MODIFIED"
+        echo "model-with-secret-key:latest    secret123   4.7 GB  2 days ago"
+        echo "model-with-token:latest       token456    2.3 GB  1 week ago"
+    }
+    export -f ollama
+
+    run get_available_ollama_models
+    [ "$status" -eq 0 ]
+    assert_output_contains "model-with-secret-key:latest"
+    assert_output_contains "model-with-token:latest"
+    refute_output_contains "secret123"
+    refute_output_contains "token456"
+}
+
+# ─── test_model_loadability ──────────────────────────────────────────────────
+
+@test "test_model_loadability with successful model" {
+    ollama() {
+        if [ "$1" = "run" ] && [ "$2" = "test-model" ]; then
+            echo "OK"
+            return 0
+        fi
+        return 1
+    }
+    export -f ollama
+
+    run test_model_loadability "test-model"
+    [ "$status" -eq 0 ]
+}
+
+@test "test_model_loadability with failing model" {
+    ollama() {
+        if [ "$1" = "run" ] && [ "$2" = "test-model" ]; then
+            return 1
+        fi
+    }
+    export -f ollama
+
+    run test_model_loadability "test-model"
+    [ "$status" -eq 1 ]
+}
+
+@test "test_model_loadability handles timeout" {
+    timeout() {
+        return 124
+    }
+    export -f timeout
+
+    run test_model_loadability "slow-model"
+    [ "$status" -eq 1 ]
+}
+
+@test "test_model_loadability does not expose prompt content in logs" {
+    ollama() {
+        echo "Running model with prompt: 'secret data'" >&2
+        echo "OK"
+        return 0
+    }
+    export -f ollama
+
+    run test_model_loadability "test-model"
+    [ "$status" -eq 0 ]
+    refute_output_contains "secret data"
+}
+
 # ─── validate_ollama_prerequisites ───────────────────────────────────────────
 
 @test "validate_ollama_prerequisites fails when ollama process not found" {
-    # Mock pgrep to return no match (exit 1)
     mock_bin "pgrep" "exit 1"
-    run validate_ollama_prerequisites "qwen2.5-coder:latest"
+    run validate_ollama_prerequisites "qwen3.5-9b-unsloth:latest"
     [ "$status" -eq 1 ]
     assert_output_contains "not running"
 }
 
 @test "validate_ollama_prerequisites fails when model not in list" {
-    # pgrep succeeds (ollama running), ollama list doesn't contain the model
     mock_bin "pgrep" "echo 12345; exit 0"
     mock_bin "ollama" "echo 'NAME  ID  SIZE'; exit 0"
     run validate_ollama_prerequisites "missing-model:latest"
@@ -52,7 +142,43 @@ teardown() {
     assert_output_contains "not found"
 }
 
+@test "validate_ollama_prerequisites fails when model cannot be loaded" {
+    pgrep() {
+        return 0
+    }
+    ollama() {
+        if [ "$1" = "list" ]; then
+            echo "NAME            ID              SIZE    MODIFIED"
+            echo "huge-model:latest   abc123   16 GB  2 days ago"
+        elif [ "$1" = "run" ]; then
+            return 1
+        fi
+    }
+    export -f pgrep ollama
 
+    run validate_ollama_prerequisites "huge-model:latest"
+    [ "$status" -eq 1 ]
+}
+
+@test "validate_ollama_prerequisites sanitizes model names" {
+    pgrep() {
+        return 0
+    }
+    ollama() {
+        if [ "$1" = "list" ]; then
+            echo "NAME            ID              SIZE    MODIFIED"
+            echo "safe-model:latest           abc123   2.3 GB  1 day ago"
+        elif [ "$1" = "run" ]; then
+            echo "OK"
+            return 0
+        fi
+    }
+    export -f pgrep ollama
+
+    run validate_ollama_prerequisites "safe-model; rm -rf /"
+    [ "$status" -eq 1 ]
+    assert_output_contains "Model 'safe-model; rm -rf /' not found"
+}
 
 # ─── invoke_ollama ────────────────────────────────────────────────────────────
 
@@ -64,4 +190,30 @@ teardown() {
     echo "test prompt" > "$pf"
     run invoke_ollama "test-model" "$pf" "$rf" "$ef" "5"
     [ "$status" -eq 1 ]
+}
+
+@test "invoke_ollama respects configured AI_MODEL" {
+    export AI_MODEL="configured-model"
+
+    ollama() {
+        if [ "$1" = "run" ] && [ "$2" = "configured-model" ]; then
+            echo "Generated commit message"
+            return 0
+        else
+            return 1
+        fi
+    }
+    export -f ollama
+
+    local prompt_file="$TEST_TEMP_DIR/prompt_$RANDOM.txt"
+    local response_file="$TEST_TEMP_DIR/response_$RANDOM.txt"
+    local error_file="$TEST_TEMP_DIR/error_$RANDOM.txt"
+
+    echo "test prompt" > "$prompt_file"
+
+    run invoke_ollama "original-model" "$prompt_file" "$response_file" "$error_file" 30
+    [ "$status" -eq 0 ]
+
+    rm -f "$prompt_file" "$response_file" "$error_file"
+    unset AI_MODEL
 }

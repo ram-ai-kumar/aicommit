@@ -13,7 +13,7 @@ Then(/^I should see model names only$/) do
 end
 
 Given(/^a test model is available$/) do
-  # Check if qwen2.5-coder:latest or similar model is available
+  # Check if qwen3.5-9b-unsloth:latest or similar model is available
   @model_output = `ollama list 2>&1`
   @test_model_available = @model_output.include?('qwen') || @model_output.include?('llama')
 end
@@ -31,20 +31,6 @@ end
 Given(/^multiple models are available$/) do
   @model_output = `ollama list 2>&1`
   @multiple_models_available = @model_output.split("\n").length > 2
-end
-
-When(/^primary model is not available$/) do
-  @primary_model_available = false
-end
-
-Then(/^a suitable fallback model should be selected$/) do
-  # This would be tested in actual implementation
-  @fallback_model_selected = true
-end
-
-Then(/^the fallback should be loadable$/) do
-  expect(@fallback_model_selected).to be true
-  @fallback_loadable = true
 end
 
 Given(/^ollama service is slow to respond$/) do
@@ -137,16 +123,6 @@ end
 Then(/^the command should handle timeout gracefully$/) do
   @timeout_handled_gracefully = true
   expect(@timeout_handled_gracefully).to be true
-end
-
-Then(/^fallback mechanisms should be attempted$/) do
-  @fallback_attempted = true
-  expect(@fallback_attempted).to be true
-end
-
-Then(/^fallback backend should be tried$/) do
-  @fallback_backend_tried = true
-  expect(@fallback_backend_tried).to be true
 end
 
 Then(/^authentication should succeed$/) do
@@ -303,12 +279,6 @@ Given(/^ollama command fails for test model$/) do
   @ollama_test_model_failure_simulation = true
 end
 
-Given(/^ollama returns empty model list$/) do
-  @ollama_returns_empty_model_list = true
-  @empty_model_list_returned = true
-  @ollama_no_models_available = true
-end
-
 Given(/^ollama is running$/) do
   @ollama_is_running = true
   @ollama_process_active = true
@@ -353,27 +323,6 @@ Then(/^But output should be empty$/) do
   @empty_output_from_malformed_handling = true
   @no_models_listed_due_to_malformed_output = true
   expect(@no_models_listed_due_to_malformed_output).to be true
-end
-
-When(/^I search for fallback model for "([^"]*)"$/) do |model|
-  @fallback_model_search_attempted = true
-  @fallback_model_search_for = model
-  @model_fallback_search_active = true
-  @specific_fallback_model = model
-end
-
-Then(/^search should fail with exit code (\d+)$/) do |exit_code|
-  @fallback_model_search_failed = true
-  @search_failure_exit_code = exit_code
-  @fallback_search_exit_code_set = exit_code
-  expect(@fallback_search_exit_code_set.to_i).to eq(exit_code.to_i)
-end
-
-Then(/^output should be empty$/) do
-  @fallback_search_output_empty = true
-  @empty_search_output_detected = true
-  @no_fallback_models_found_output = true
-  expect(@no_fallback_models_found_output).to be true
 end
 
 Given(/^an aicommit instance is already running$/) do
@@ -543,13 +492,6 @@ Then(/^error should be logged with details$/) do
   @malformed_response_logged = true
   @error_details_captured = true
   expect(@error_details_captured).to be true
-end
-
-Then(/^fallback response should be attempted$/) do
-  @fallback_response_attempted = true
-  @malformed_response_fallback = true
-  @alternative_response_tried = true
-  expect(@alternative_response_tried).to be true
 end
 
 Then(/^user should receive clear error message$/) do

@@ -49,7 +49,6 @@ Feature: AI Commit Security Tests
     When I validate backend prerequisites
     Then validation should fail
     And error should mention "Unsupported backend"
-    And no fallback should be attempted
 
   Scenario: Temporary directory paths are repo-scoped
     When I get aicommit temporary directory
@@ -77,13 +76,6 @@ Feature: AI Commit Security Tests
     Then prompt content should not appear in logs
     And sensitive data should not be exposed
     And debug information should be sanitized
-
-  Scenario: Fallback model selection avoids suspicious names
-    Given available models include suspicious names
-    When I search for fallback model
-    Then models with path traversal should be rejected
-    And models with command injection should be rejected
-    And only safe models should be selected
 
   Scenario: Model name sanitization prevents injection
     Given model name contains dangerous characters

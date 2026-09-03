@@ -148,34 +148,6 @@ echo \"OK\""
     refute_output_contains "secret data"
 }
 
-@test "find_fallback_model does not try models with suspicious names" {
-    # Create a simple test that checks if suspicious models are filtered out
-    # by mocking get_available_ollama_models directly
-    get_available_ollama_models() {
-        echo "../../../etc/passwd:latest"
-        echo "|cat secrets.txt:latest"
-        echo "safe-model:latest"
-    }
-    export -f get_available_ollama_models
-
-    mock_bin "timeout" "echo \"OK\""
-    # Mock ollama run to succeed only for safe model
-    ollama() {
-        if [ "$2" = "safe-model:latest" ]; then
-            echo "OK"
-            return 0
-        else
-            return 1
-        fi
-    }
-    export -f ollama
-
-    run find_fallback_model "preferred-model"
-    [ "$status" -eq 0 ]
-    # Should choose safe model, not suspicious ones
-    [ "$output" = "safe-model:latest" ]
-}
-
 @test "validate_ollama_prerequisites sanitizes model names" {
     mock_bin "pgrep" "exit 0"
     mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'

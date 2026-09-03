@@ -165,12 +165,6 @@ Then(/^error should indicate JSON syntax error$/) do
   expect(@syntax_error_displayed).to be true
 end
 
-Then(/^default configuration should be used as fallback$/) do
-  @default_config_fallback = true
-  @fallback_successful = true
-  expect(@fallback_successful).to be true
-end
-
 Then(/^error should indicate YAML syntax error$/) do
   @yaml_syntax_error_detected = true
   @yaml_error_displayed = true

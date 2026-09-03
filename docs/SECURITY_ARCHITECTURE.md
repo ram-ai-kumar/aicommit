@@ -75,7 +75,7 @@ AI Commit implements a Zero Trust philosophy, removing any implicit trust in thi
 - **Local-First Processing**: Prefer local AI backends (Ollama)
 - **No External Communication**: Zero network calls to AI providers
 - **Air-Gapped Operation**: Full functionality without internet access
-- **Secure Fallbacks**: Graceful degradation without security compromise
+- **Graceful Error Handling**: Clear errors without security compromise
 
 #### Data Protection
 
@@ -232,7 +232,7 @@ sensitive_patterns=(
 #### Local Processing Preference
 
 1. **Primary Backend**: Ollama (local LLM)
-2. **No Fallback**: Single model qwen2.5-coder:latest only (no cloud backends, no model fallback)
+2. **Single Model**: Only the configured/default model is used (default: qwen3.5-9b-unsloth:latest); no cloud backends, no model switching
 3. **User Consent**: Clear disclosure before any external processing
 4. **Data Minimization**: Send only necessary context to AI
 

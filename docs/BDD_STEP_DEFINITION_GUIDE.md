@@ -80,9 +80,8 @@ This guide describes the organized step definition files for BDD Stage 1 testing
 - `When I check available models`
 - `Then I should see model names only`
 - `Given a test model is available`
-- `Given multiple models are available`
-- `When primary model is not available`
-- `Then a suitable fallback model should be selected`
+- `When the configured model is not available`
+- `Then I should see a clear error message`
 
 ### 6. git_workflow_steps.rb
 
@@ -187,11 +186,11 @@ features/step_definitions/
 
 | Metric                | Before    | After       | Improvement |
 | --------------------- | --------- | ----------- | ----------- |
-| **Ambiguous Matches** | Multiple  | 0           | ✅ 100%      |
-| **Undefined Steps**   | 111       | 0 (Stage 1) | ✅ 100%      |
-| **File Organization** | Scattered | Organized   | ✅ 100%      |
-| **Maintainability**   | Poor      | Excellent   | ✅ 100%      |
-| **Test Readiness**    | Not Ready | Ready       | ✅ 100%      |
+| **Ambiguous Matches** | Multiple  | 0           | ✅ 100%     |
+| **Undefined Steps**   | 111       | 0 (Stage 1) | ✅ 100%     |
+| **File Organization** | Scattered | Organized   | ✅ 100%     |
+| **Maintainability**   | Poor      | Excellent   | ✅ 100%     |
+| **Test Readiness**    | Not Ready | Ready       | ✅ 100%     |
 
 ## Status
 

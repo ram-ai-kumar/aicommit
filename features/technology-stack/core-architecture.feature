@@ -119,7 +119,6 @@ Feature: AI Commit Advanced Configuration Management
     Then API authentication should work
     And remote configuration should be cached
     And network failures should be handled
-    And local fallback should be available
 
   Scenario: Backend validation rejects unknown backend
     Given AI_BACKEND is set to "nonexistent"
@@ -141,7 +140,7 @@ Feature: AI Commit Advanced Configuration Management
 
   Scenario: Ollama validation fails when process not running
     Given pgrep finds no ollama process
-    When I validate ollama prerequisites for "qwen2.5-coder:latest"
+    When I validate ollama prerequisites for "qwen3.5-9b-unsloth:latest"
     Then validation should fail
     And error should mention "not running"
 

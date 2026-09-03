@@ -60,7 +60,6 @@ Feature: AI Commit Risk Management Tests
     Then model bias should be assessed
     And model accuracy should be measured
     And model hallucination risks should be evaluated
-    And model fallback strategies should be tested
     And Model-related risks should be actively managed
 
   Scenario: Insider Threat Risk Mitigation

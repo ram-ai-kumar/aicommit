@@ -10,8 +10,8 @@
 
 ### Stage Status Summary
 
-| Stage       | Status        | Focus                          | Timeline    | Business Impact      |
-| ----------- | ------------- | ------------------------------ | ----------- | -------------------- |
+| Stage       | Status         | Focus                          | Timeline    | Business Impact      |
+| ----------- | -------------- | ------------------------------ | ----------- | -------------------- |
 | **Stage 1** | ✅ Completed   | Foundation testing             | Weeks 1-2   | Basic test coverage  |
 | **Stage 2** | 🔄 In Progress | Error handling, performance    | Weeks 3-4   | Enhanced reliability |
 | **Stage 3** | 📋 Planned     | Business logic, AI features    | Weeks 5-6   | Advanced workflows   |
@@ -32,7 +32,7 @@
 
 1. **Basic Functionality Testing**: Core aicommit operations
 2. **Git Integration Testing**: Git workflow validation
-3. **AI Backend Testing**: Model integration and fallback
+3. **AI Backend Testing**: Model integration and validation
 4. **Configuration Testing**: Basic setup and validation
 5. **User Experience Testing**: Basic user workflows
 
@@ -84,7 +84,7 @@ Feature: Advanced Error Handling
     When I run aicommit
     Then I should see a clear error message explaining the issue
     And I should see suggested solutions
-    And the system should attempt fallback backends
+    And the system should not switch backends
 
   Scenario: Model loading failure
     Given the configured model is not available

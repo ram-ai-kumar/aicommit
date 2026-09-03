@@ -4,16 +4,28 @@
 
 display_setup_info() {
     local file_count="$1" file_list="$2"
+    local staged_status=""
+
+    if command -v git &>/dev/null; then
+        staged_status=$(git status 2>/dev/null | awk '/Changes to be committed:/{flag=1; next} /^[A-Za-z]/{flag=0} flag' | grep -E '^\s*(modified|new file|deleted|renamed|typechange):' || true)
+    fi
 
     echo "💡 Setup: Ollama running, model ready"
-    echo "📁 Staged ($file_count files): $file_list"
+    if [ -n "$staged_status" ]; then
+        echo "📁 Staged ($file_count files):"
+        echo "$staged_status"
+    elif [ -n "$file_list" ]; then
+        echo "📁 Staged ($file_count files): $file_list"
+    else
+        echo "📁 Staged ($file_count files)"
+    fi
 }
 
 display_commit_message() {
     local commit_msg="$1"
 
     echo ""
-    echo "🧠 Suggested Commit:"
+    echo "Suggested Commit:"
     echo "┌─────────────────────────────────────────────────────────────────┐"
     echo "$commit_msg" | fold -w 63 | while IFS= read -r line; do
         printf "│ %-63s │\n" "$line"

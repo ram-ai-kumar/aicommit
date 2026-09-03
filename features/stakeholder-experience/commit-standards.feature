@@ -7,7 +7,7 @@ Feature: Conventional Commit Generation
   @conventional-commits @validation
   Scenario: Generate conventional commit message for feature addition
     Given I have staged changes to a JavaScript feature file
-    And I have Ollama running with qwen2.5-coder:latest model
+    And I have Ollama running with qwen3.5-9b-unsloth:latest model
     When I run aicommit
     Then it should generate a conventional commit message
     And the message should start with "feat:"

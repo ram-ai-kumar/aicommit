@@ -93,41 +93,8 @@ teardown() {
 
 @test "validate_ollama_prerequisites returns 1 when pgrep finds no process" {
     mock_bin "pgrep" "exit 1"
-    run validate_ollama_prerequisites "qwen2.5-coder:latest"
+    run validate_ollama_prerequisites "qwen3.5-9b-unsloth:latest"
     [ "$status" -eq 1 ]
-}
-
-
-
-@test "validate_ollama_prerequisites handles model load failure gracefully" {
-    mock_bin "pgrep" "exit 0"
-    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
-echo 'preferred-model:latest    abc123   8.5 GB  2 days ago'
-echo 'fallback-model:latest     def456   2.3 GB  1 week ago'
-if [ \"\$2\" = \"preferred-model:latest\" ]; then
-    exit 1  # Can't load
-elif [ \"\$2\" = \"fallback-model:latest\" ]; then
-    echo \"OK\"
-    exit 0
-fi"
-    # Capture stderr to check fallback message
-    run validate_ollama_prerequisites "preferred-model:latest"
-    [ "$status" -eq 0 ]
-    assert_output_contains "Using fallback model"
-    [ "$AI_MODEL" = "fallback-model:latest" ]
-}
-
-@test "validate_ollama_prerequisites shows helpful error when no fallback works" {
-    mock_bin "pgrep" "exit 0"
-    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
-echo 'huge-model:latest        abc123   16 GB  2 days ago'
-if [ \"\$1\" = \"run\" ]; then
-    exit 1  # All models fail to load
-fi"
-    run validate_ollama_prerequisites "huge-model:latest"
-    [ "$status" -eq 1 ]
-    assert_output_contains "No suitable model available"
-    assert_output_contains "insufficient RAM"
 }
 
 @test "invoke_ollama handles memory-related errors" {
@@ -149,18 +116,20 @@ exit 1"
     rm -f "$prompt_file" "$response_file" "$error_file"
 }
 
-@test "invoke_ollama uses fallback model when AI_MODEL was changed" {
-    export AI_MODEL="fallback-model"
+@test "invoke_ollama respects configured AI_MODEL" {
+    export AI_MODEL="configured-model"
 
-    mock_bin "ollama" "if [ \"\$2\" = \"fallback-model\" ]; then
+    mock_bin "ollama" "if [ \"\$2\" = \"configured-model\" ]; then
     echo \"Generated commit message\"
     exit 0
+else
+    exit 1
 fi"
 
     # Create test files
-    local prompt_file="$(mktemp)"
-    local response_file="$(mktemp)"
-    local error_file="$(mktemp)"
+    local prompt_file="$TEST_TEMP_DIR/prompt_$RANDOM.txt"
+    local response_file="$TEST_TEMP_DIR/response_$RANDOM.txt"
+    local error_file="$TEST_TEMP_DIR/error_$RANDOM.txt"
 
     echo "test prompt" > "$prompt_file"
 

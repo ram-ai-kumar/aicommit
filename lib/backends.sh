@@ -5,7 +5,7 @@
 # Validate backend prerequisites and model availability
 validate_backend_prerequisites() {
     local backend="${AI_BACKEND:-ollama}"
-    local model="${AI_MODEL:-qwen2.5-coder:latest}"
+    local model="${AI_MODEL:-qwen3.5-9b-unsloth:latest}"
 
     case "$backend" in
         ollama)
@@ -47,11 +47,6 @@ get_available_ollama_models() {
     ollama list 2>/dev/null | awk 'NR>1 && NF>=2 {print $1}' || true
 }
 
-# Get list of already loaded Ollama models
-get_loaded_ollama_models() {
-    ollama ps 2>/dev/null | awk 'NR>1 && NF>=2 {print $1}' || true
-}
-
 # Test if a model can be loaded successfully
 test_model_loadability() {
     local model="$1"
@@ -66,30 +61,8 @@ test_model_loadability() {
     fi
 }
 
-# Find a suitable model for commit generation
-find_fallback_model() {
-    local preferred_model="$1"
-
-    # Security: Skip models with suspicious names
-    local suspicious_pattern='(\.\./|\.\|.*[|&;<>$`'"'"'(){}].*|\|.*)'
-
-    # Only try to use the preferred model if it's available
-    if ollama list 2>/dev/null | grep -qF "$preferred_model"; then
-        # Security check: skip suspicious model names
-        if ! echo "$preferred_model" | grep -qE "$suspicious_pattern"; then
-            if test_model_loadability "$preferred_model"; then
-                echo "$preferred_model"
-                return 0
-            fi
-        fi
-    fi
-
-    return 1  # No suitable model found
-}
-
 validate_ollama_prerequisites() {
     local model="$1"
-    local fallback_model=""
 
     if ! pgrep -f "ollama" > /dev/null; then
         display_error "Ollama is not running" "Start it with: ollama serve"
@@ -117,7 +90,7 @@ invoke_ollama() {
     local error_file="$4"
     local timeout_secs="$5"
 
-    # Use the current AI_MODEL (might be different from original if fallback was used)
+    # Use the configured AI_MODEL
     local current_model="${AI_MODEL:-$model}"
 
     # Run ollama in background to allow timeout and elapsed-time display

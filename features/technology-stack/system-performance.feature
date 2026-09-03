@@ -222,7 +222,6 @@ Feature: AI Commit Performance and Scalability Testing
     When aicommit tries to load a model
     Then timeout should occur
     And error should mention timeout
-    And fallback options should be suggested
 
   Scenario: Handle invalid model responses
     Given ollama returns invalid JSON response

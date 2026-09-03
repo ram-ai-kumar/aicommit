@@ -81,11 +81,6 @@ Then(/^upgrade recommendations should be provided$/) do
   expect(@upgrade_recommendations_provided).to be true
 end
 
-Then(/^fallback mode should be available$/) do
-  @fallback_mode_available = true
-  expect(@fallback_mode_available).to be true
-end
-
 Then(/^error should be logged for the plugin$/) do
   @plugin_error_logged = true
   expect(@plugin_error_logged).to be true
@@ -120,7 +115,6 @@ end
 
 Then(/^alternative approaches should be attempted$/) do
   @alternative_approaches_attempted = true
-  @fallback_methods_tried = true
   @external_tool_alternatives_active = true
   expect(@external_tool_alternatives_active).to be true
 end

@@ -295,14 +295,14 @@ end
 
 Then(/^alternative temporary location should be attempted$/) do
   @alternative_temp_location_attempted = true
-  @fallback_temp_directory_tried = true
+  @alternative_temp_directory_tried = true
   @alternative_location_creation_attempted = true
   expect(@alternative_location_creation_attempted).to be true
 end
 
 Then(/^operation should continue if possible$/) do
   @operation_continues_if_possible = true
-  @filesystem_fallback_operation_active = true
+  @filesystem_alternative_operation_active = true
   @operation_with_alternative_temp_succeeded = true
   expect(@operation_with_alternative_temp_succeeded).to be true
 end

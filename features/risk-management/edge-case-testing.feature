@@ -218,17 +218,6 @@ Feature: AI Commit Edge Case Tests
     When I categorize staged files
     Then ASSET_FILES should be written to temp directory
 
-  Scenario: Fallback model should include preferred model if available
-    Given preferred model is available in model list
-    When I search for fallback model
-    Then preferred model should be returned
-    And search should succeed
-
-  Scenario: Fallback model should prioritize commit-specific models
-    Given generic and commit-specific models are available
-    When I search for fallback model
-    Then commit-specific model should be preferred over generic
-
   Scenario: Handle model loadability timeout
     Given model takes too long to respond
     When I test model loadability

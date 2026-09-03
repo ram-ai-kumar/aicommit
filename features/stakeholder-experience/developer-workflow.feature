@@ -78,14 +78,12 @@ Feature: Enhanced AI Commit Basic Functionality
     When I attempt to load the configuration
     Then validation should fail
     And error should indicate JSON syntax error
-    And default configuration should be used as fallback
 
   Scenario: Configuration validation with malformed YAML
     Given a configuration file contains malformed YAML
     When I attempt to load the configuration
     Then validation should fail
     And error should indicate YAML syntax error
-    And default configuration should be used as fallback
 
   Scenario: Environment variable type validation
     Given AI_TIMEOUT is set to "invalid-number" in environment
@@ -120,7 +118,6 @@ Feature: Enhanced AI Commit Basic Functionality
     When I check aicommit version compatibility
     Then compatibility issues should be reported
     And upgrade recommendations should be provided
-    And fallback mode should be available
 
   Scenario: Plugin system with invalid plugin
     Given a plugin with invalid metadata exists

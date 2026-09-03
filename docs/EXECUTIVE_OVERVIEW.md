@@ -41,7 +41,7 @@ AI Commit (`aicommit`) is a **Zero Trust, privacy-first AI-powered commit messag
 ### Developer Experience
 
 - **Seamless integration** - works with existing Git workflows
-- **No configuration complexity** - intelligent model selection and fallback
+- **No configuration complexity** - single configured local model
 - **Cross-platform support** - Linux, macOS, Windows compatibility
 - **Enterprise-ready** - scalable deployment and management
 

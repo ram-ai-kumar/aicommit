@@ -21,22 +21,6 @@ Given(/^repository uses git worktrees$/) do
   @worktree_handling_needed = true
 end
 
-Given(/^primary backend is not available$/) do
-  @primary_backend_unavailable = true
-  @fallback_needed = true
-end
-
-Given(/^fallback backend is configured$/) do
-  @fallback_backend_configured = true
-  @backup_backend_ready = true
-end
-
-Then(/^the system should fall back to secondary backend$/) do
-  @fallback_to_secondary = true
-  @secondary_backend_used = true
-  expect(@secondary_backend_used).to be true
-end
-
 # Repository state steps
 Given(/^I am in a repository with many files$/) do
   @large_repository = true
@@ -172,8 +156,3 @@ Then(/^the message should follow conventional commits format$/) do
   expect(@message_structure_correct).to be true
 end
 
-Then(/^a commit message should still be generated$/) do
-  @fallback_message_generated = true
-  @fallback_successful = true
-  expect(@fallback_successful).to be true
-end

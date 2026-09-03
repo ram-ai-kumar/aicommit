@@ -90,7 +90,7 @@ This guide explains how to use the standardized step definitions to make BDD tes
 - `Then validation should fail`
 - `Then appropriate error message should be displayed`
 - `Then error should indicate error_type`
-- `Then default configuration should be used as fallback`
+- `Then default configuration should be used`
 
 ### 8. Performance Steps
 

@@ -32,6 +32,15 @@ teardown() {
     assert_output_contains "Ollama running"
 }
 
+@test "display_setup_info shows formatted git status output when changes are staged" {
+    echo "test content" > test_file.txt
+    git add test_file.txt
+    run display_setup_info "1" "test_file.txt"
+    assert_output_contains "new file:   test_file.txt"
+    git reset test_file.txt >/dev/null 2>&1 || true
+    rm -f test_file.txt
+}
+
 # ─── display_commit_message ───────────────────────────────────────────────────
 
 @test "display_commit_message exits 0" {
@@ -44,9 +53,10 @@ teardown() {
     assert_output_contains "feat: add login"
 }
 
-@test "display_commit_message shows Suggested Commit header" {
+@test "display_commit_message shows Suggested Commit header without brain icon" {
     run display_commit_message "fix: handle null"
-    assert_output_contains "Suggested Commit"
+    assert_output_contains "Suggested Commit:"
+    refute_output_contains "🧠"
 }
 
 @test "display_commit_message wraps in a box" {
@@ -103,5 +113,5 @@ teardown() {
 
 @test "display_commit_confirmation shows y/n/e prompt" {
     run display_commit_confirmation
-    assert_output_contains "y/n/e"
+    assert_output_contains "[Y]/n/e"
 }

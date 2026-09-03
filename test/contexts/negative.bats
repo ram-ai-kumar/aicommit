@@ -78,7 +78,7 @@ teardown() {
 
 @test "validate_ollama_prerequisites fails when pgrep finds no process" {
     mock_bin "pgrep" "exit 1"
-    run validate_ollama_prerequisites "qwen2.5-coder:latest"
+    run validate_ollama_prerequisites "qwen3.5-9b-unsloth:latest"
     [ "$status" -eq 1 ]
     assert_output_contains "not running"
 }
@@ -87,13 +87,6 @@ teardown() {
     mock_bin "ollama" "exit 1"
     run test_model_loadability "test-model"
     [ "$status" -eq 1 ]
-}
-
-@test "find_fallback_model returns 1 when no models available" {
-    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'"
-    run find_fallback_model "nonexistent-model"
-    [ "$status" -eq 1 ]
-    [ "$output" = "" ]
 }
 
 @test "validate_ollama_prerequisites fails when model not found" {

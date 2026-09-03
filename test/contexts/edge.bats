@@ -150,32 +150,12 @@ teardown() {
     [ -f "${TEST_TEMP_DIR}/ASSET_FILES" ]
 }
 
-@test "find_fallback_model skips preferred model in search" {
-    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
-echo 'preferred-model:latest    abc123   4.7 GB  2 days ago'"
-    mock_bin "timeout" "exit 0"
-    run find_fallback_model "preferred-model:latest"
-    # With new implementation, preferred model should be returned since it's available
-    [ "$status" -eq 0 ]
-    [ "$output" = "preferred-model:latest" ]
-}
-
-@test "find_fallback_model returns 1 when preferred model not in list" {
-    mock_bin "ollama" "echo 'NAME            ID              SIZE    MODIFIED'
-echo 'qwen2.5-coder:latest    abc123   4.7 GB  2 days ago'
-if [ \"\$2\" = \"qwen2.5-coder:latest\" ]; then
-    echo \"OK\"
-    exit 0
-elif [ \"\$1\" = \"run\" ]; then
-    exit 1
-fi"
-    run find_fallback_model "missing-model"
-    [ "$status" -eq 1 ]
-    [ "$output" = "" ]
-}
-
 @test "test_model_loadability handles timeout" {
-    mock_bin "timeout" "exit 124"
+    timeout() {
+        return 124
+    }
+    export -f timeout
+
     run test_model_loadability "slow-model"
     [ "$status" -eq 1 ]
 }

@@ -101,7 +101,7 @@ load_configuration() {
 - **Functions**:
   - `detect_backend()` - Detect available AI backends
   - `call_ollama()` - Local LLM inference
-  - `find_fallback_model()` - Model availability check
+  - `test_model_loadability()` - Verify model can be loaded
 
 #### context-analyzer.sh
 
@@ -221,7 +221,7 @@ ai_context[sensitive_files]=".env config.json"
 #### Ollama (Primary)
 
 - **Type**: Local LLM inference
-- **Models**: qwen2.5-coder:latest
+- **Models**: qwen3.5-9b-unsloth:latest
 - **Communication**: HTTP API on localhost:11434
 
 ### Backend Selection Logic
@@ -230,29 +230,15 @@ ai_context[sensitive_files]=".env config.json"
 select_backend() {
     local preferred_model="$1"
 
-    # 1. Check configured backend preference
-    if [[ -n "$AI_BACKEND" ]]; then
-        if verify_backend "$AI_BACKEND"; then
-            echo "$AI_BACKEND"
+    # 1. Check configured backend preference (Ollama only)
+    if [[ "${AI_BACKEND:-ollama}" == "ollama" ]]; then
+        if pgrep -f "ollama" > /dev/null; then
+            echo "ollama"
             return 0
         fi
     fi
 
-    # 2. Try Ollama (local preference)
-    if check_ollama_available; then
-        echo "ollama"
-        return 0
-    fi
-
-    # 3. Try configured fallback backends
-    for backend in "${FALLBACK_BACKENDS[@]}"; do
-        if verify_backend "$backend"; then
-            echo "$backend"
-            return 0
-        fi
-    done
-
-    # 4. No backend available
+    # 2. No backend available
     return 1
 }
 ```
@@ -267,8 +253,8 @@ select_backend() {
 
 #### Model Selection
 
-- User preference configuration
-- Single model (no fallback)
+- User preference configuration (`~/.aicommitrc` or `AI_MODEL` env var)
+- Single configured model only — no switching to other models or cloud backends
 - Performance-based optimization
 
 #### Model Validation
@@ -283,7 +269,7 @@ select_backend() {
 
 #### Graceful Degradation
 
-- **Backend Failures**: Clear error messages (no fallback)
+- **Backend Failures**: Clear error messages (no backend switching)
 - **Network Issues**: Local processing when possible
 - **Invalid Input**: Helpful error messages and suggestions
 - **Resource Limits**: Configurable timeouts and limits
@@ -407,7 +393,7 @@ select_backend() {
 
 - **Standard Interface**: Consistent API across backends
 - **Configuration**: Backend-specific configuration
-- **No Fallback**: Single model only (no backend switching)
+- **Single Model**: Single model only (no backend switching)
 
 ## 📊 Architecture Evolution
 

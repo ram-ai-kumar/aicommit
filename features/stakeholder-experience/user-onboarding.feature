@@ -18,7 +18,7 @@ Feature: AI Commit Smoke Tests
   Scenario: Default configuration validation
     When I check the default configuration
     Then AI_BACKEND should be "ollama"
-    And AI_MODEL should be "qwen2.5-coder:latest"
+    And AI_MODEL should be "qwen3.5-9b-unsloth:latest"
     And AI_TIMEOUT should be "120"
     And AI_PROMPT_FILE should exist
 
@@ -54,13 +54,6 @@ Feature: AI Commit Smoke Tests
     Then the test should pass
     And the model should respond correctly
 
-  Scenario: Fallback model selection
-    Given ollama is available and running
-    And multiple models are available
-    When primary model is not available
-    Then a suitable fallback model should be selected
-    And the fallback should be loadable
-
   Scenario: Library functions availability
     When I source the aicommit script
     Then validate_prerequisites function should be available
@@ -80,7 +73,6 @@ Feature: AI Commit Smoke Tests
     And invoke_llm function should be available
     And get_available_ollama_models function should be available
     And test_model_loadability function should be available
-    And find_fallback_model function should be available
     And validate_ollama_prerequisites function should be available
     And invoke_ollama function should be available
 

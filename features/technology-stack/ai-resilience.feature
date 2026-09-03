@@ -1,7 +1,7 @@
 @ai-models @critical
 Feature: AI Model Management Tests
   As a developer relying on AI for commit messages
-  I want reliable model validation and basic fallback mechanisms
+  I want reliable model validation and clear error handling
   So I can get commit messages with available models
 
   Background:
@@ -29,40 +29,12 @@ Feature: AI Model Management Tests
     Then the test should fail
     And appropriate error should be displayed
 
-  Scenario: Basic fallback model selection from predefined list
-    Given primary model is not available
-    And default models are available
-    When I search for fallback model
-    Then a suitable fallback model should be selected from defaults
-    And the fallback should be loadable
-    And fallback should be from known safe models
-
-  Scenario: Fallback model includes preferred model when available
-    Given preferred model is available in model list
-    When I search for fallback model
-    Then preferred model should be returned
-    And search should succeed
-
-  Scenario: Fallback model handles malformed ollama output gracefully
+  Scenario: Handle malformed ollama output when listing models
     Given ollama returns invalid output structure
     When I list available models
     Then command should succeed
     But output should be empty
     And no errors should crash the system
-
-  Scenario: Fallback model fails when no models available
-    Given ollama returns empty model list
-    When I search for fallback model
-    Then search should fail with exit code 1
-    And output should be empty
-    And appropriate error should be displayed
-
-  Scenario: Model validation with suspicious names
-    Given available models include suspicious names
-    When I search for fallback model
-    Then models with path traversal should be rejected
-    And models with command injection should be rejected
-    And only safe models should be selected
 
   Scenario: Model validation sanitizes dangerous names
     Given model name contains dangerous characters
@@ -114,7 +86,7 @@ Feature: AI Model Management Tests
 
   Scenario: Ollama validation fails when process not running
     Given pgrep finds no ollama process
-    When I validate ollama prerequisites for "qwen2.5-coder:latest"
+    When I validate ollama prerequisites for "qwen3.5-9b-unsloth:latest"
     Then validation should fail
     And error should mention "not running"
     And startup instructions should be provided

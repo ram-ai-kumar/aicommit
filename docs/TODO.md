@@ -91,8 +91,8 @@ This document consolidates all scheduled, pending, and planned features from acr
 **Description**: Strict model preference that only uses configured or default models
 **Key Changes**:
 
-- Remove loaded model priority (no fallback to randomly loaded models)
-- Restrict fallback to known default models only
+- Remove loaded model priority (do not switch to randomly loaded models)
+- Remove model switching entirely; use single configured/default model only
 - Enhanced model validation with clear error messages
   **Success Metrics**: 100% configuration respect, predictable model behavior
 
@@ -219,7 +219,7 @@ This document consolidates all scheduled, pending, and planned features from acr
 
 - git-integration.feature - Git workflow integration and automation
 - core-architecture.feature - System architecture and library functions
-- ai-resilience.feature - AI backend connectivity and fallback strategies
+- ai-resilience.feature - AI backend connectivity and resilience
 - system-performance.feature - Performance, scalability, and resilience
 - workflow-automation.feature - End-to-end workflow automation
 
@@ -256,7 +256,7 @@ This document consolidates all scheduled, pending, and planned features from acr
 
 The following items have been implemented and are no longer pending:
 
-- ✅ **Model Fallback Enhancement** - Intelligent model switching with memory-aware error handling
+- ✅ **Single Model Enforcement** - Strict use of the configured/default model only
 - ✅ **Security Hardening** - Model name sanitization and command injection prevention
 - ✅ **Comprehensive Testing** - 87 test cases covering all functionality
 - ✅ **Backend Abstraction** - Clean separation between LLM backends

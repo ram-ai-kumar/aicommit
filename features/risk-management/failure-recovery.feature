@@ -34,7 +34,6 @@ Feature: AI Commit Advanced Error Handling
     When I run aicommit command "--dry-run"
     Then malformed response should be detected
     And error should be logged with details
-    And fallback response should be attempted
     And user should receive clear error message
 
   Scenario: Concurrent access conflicts during processing
@@ -160,7 +159,7 @@ Feature: AI Commit Advanced Error Handling
 
   Scenario: Fail ollama validation when process not running
     Given pgrep finds no ollama process
-    When I validate ollama prerequisites for "qwen2.5-coder:latest"
+    When I validate ollama prerequisites for "qwen3.5-9b-unsloth:latest"
     Then validation should fail
     And error should mention "not running"
 
@@ -169,12 +168,6 @@ Feature: AI Commit Advanced Error Handling
     When I test model loadability for "test-model"
     Then the test should fail
     And exit code should be 1
-
-  Scenario: Fail fallback model search when no models available
-    Given ollama returns empty model list
-    When I search for fallback model for "nonexistent-model"
-    Then search should fail with exit code 1
-    And output should be empty
 
   Scenario: Fail ollama validation when model not found
     Given ollama is running

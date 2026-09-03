@@ -21,7 +21,6 @@ TEST_CATEGORIES=(
     "exception"
     "compliance"
     "integration"
-    "model_fallback"
 )
 
 # Results tracking

@@ -7,7 +7,7 @@
 AI_BACKEND="${AI_BACKEND:-ollama}"
 
 # Default LLM model (single source of truth for the project)
-DEFAULT_AI_MODEL="qwen2.5-coder:latest"
+DEFAULT_AI_MODEL="qwen3.5-9b-unsloth:latest"
 
 # LLM model to use for commit message generation (must be available in selected backend)
 AI_MODEL="${AI_MODEL:-$DEFAULT_AI_MODEL}"
